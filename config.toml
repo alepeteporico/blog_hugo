@@ -1,4 +1,4 @@
-baseurl = "http://example.org/"
+baseurl = "https://alepeteporico.github.io/alepeteporicoblog.github.io/"
 title = "Alepetepórico Blog"
 theme = "hugo-theme-nix"
 languageCode = "en-us"
