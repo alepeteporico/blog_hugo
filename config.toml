@@ -1,3 +1,33 @@
-baseURL = "http://example.org/"
+baseurl = "http://example.org/"
+title = "Alepetepórico Blog"
+theme = "hugo-theme-nix"
 languageCode = "en-us"
-title = "My New Hugo Site"
+disqusShortname = "Alepetepórico"
+
+[menu]
+  [[menu.header]]
+    name = "prácticas"
+    weight = 0
+    url = "practicas"
+#  [[menu.header]]
+#    name = "about"
+#    weight = 1
+#    url = "about"
+
+[params]
+  GithubID = "alepeteporico"
+  TwitterID = "alepeteporico"
+#  LinkedInID = "your_linkedin"
+#  MediumID = "your_medium"
+  SpotifyID = "tojandro"
+#  SoundcloudID = "your_soundcloud"
+#  YoutubeID = "your_youtube"
+#  TelegramID = "your_telegram"
+  Name = "Alepetepórico Blog"
+  HeaderUsername = "blog"
+  HeaderHostname = "alepetepórico"
+  Email = "tojandro@gmail.com"
+  About = "Sean bienvenidos al blog de informática de Alejandro Gutiérrez Valencia"
+  ProfilePicture = "/profile.jpg"
+  Favicon = "/favicon.ico"
+
