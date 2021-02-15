@@ -71,3 +71,4 @@ menu = "main"
 **Y ya tendremos nuestra [página](https://alepeteporico.github.io/) desplegada, solo tendremos que ir añadiendo contenido**
 
 ![pagina](/implantacion_web_estatica/4.png)
+
