@@ -9,26 +9,26 @@ menu = "main"
 +++
 
 
-***La instalación es tan sencilla como usar apt:***
+**La instalación es tan sencilla como usar apt:**
 
-`sudo apt install hugo`
+    sudo apt install hugo
 
-***Una vez instalado el siguiente paso sería crear un sitio web:***
+**Una vez instalado el siguiente paso sería crear un sitio web:**
 
-`hugo new site [nombre] `
+    hugo new site [nombre]
 
-***Esto creará una carpeta donde podremos configurar nuestra página, para ello primero descargaremos desde [la página oficial de hugo](https://themes.gohugo.io/) un tema. Debemos fijarnos que se corresponde con nuestra versión de hugo o es inferior, si elegimos una plantilla que necesite una versión de hugo superior dará problemas.***
+**Esto creará una carpeta donde podremos configurar nuestra página, para ello primero descargaremos desde [la página oficial de hugo](https://themes.gohugo.io/) un tema. Debemos fijarnos que se corresponde con nuestra versión de hugo o es inferior, si elegimos una plantilla que necesite una versión de hugo superior dará problemas.**
 
 
-***Una vez escogida nuestra plantilla clonaremos el respositorio en la carpeta themes, dentro que se encuentra dentro de la carpeta de configuración de nuestra página:***
+**Una vez escogida nuestra plantilla clonaremos el respositorio en la carpeta themes, dentro que se encuentra dentro de la carpeta de configuración de nuestra página:**
 
-`git clone git@github.com:jpescador/hugo-future-imperfect.git`
+    git clone git@github.com:LordMathis/hugo-theme-nix.git
 
-***Dentro del respositorio tendremos que copiar el contenido la carpeta exampleSites al raiz:***
+**Dentro del respositorio tendremos que copiar el contenido la carpeta exampleSites al raiz:**
 
-`cp -r exampleSite/* ../../`
+    cp -r exampleSite/* ../../
 
-***Una vez hayamos hecho esto simplemente ejecutaremos debemos ejecutar nuestro servidor en local y entraremos en localhost por el puerto 1313***
+**Una vez hayamos hecho esto simplemente ejecutaremos debemos ejecutar nuestro servidor en local y entraremos en localhost por el puerto 1313**
 
 
     alejandrogv@AlejandroGV:~/Escritorio/ASIR/IWEB/hugo/alepeteporicoblog$ hugo server
@@ -53,8 +53,21 @@ menu = "main"
     Web Server is available at //localhost:1313/ (bind address 127.0.0.1)
     Press Ctrl+C to stop
 
-***Lo unico que faltaría sería modificar la web a nuestro gusto, el archivo de configuración general suele ser config.toml que está en el directorio raiz. Y el contenido de la página está en la carpeta content***
+**Lo unico que faltaría sería modificar la web a nuestro gusto, el archivo de configuración general suele ser config.toml que está en el directorio raiz. Y el contenido de la página está en la carpeta content**
 
-***Una vez que la página está a nuestro gusto podremos empezar a implementarla en github pages, pero primero subiremos este repositorio a github***
+**Una vez que la página está a nuestro gusto podremos empezar a implementarla en github pages, crearemos un respositorio vacío en github, al que llamaré alepeteporico.github.io clonaremos el repositorio y crearemos el contenido estático en este repositorio con el siguiete comando**
+
+    alejandrogv@AlejandroGV:~/Escritorio/ASIR/IWEB/hugo/blog_hugo$ hugo -d ../alepeteporicoblog.github.io/
 
 
+**Ahora deberemos entrar en la configuración de nuestro repostirorio para añadir nuestra página a GithubPages, en la option podremos encontrar el apartado GithubPages**
+
+![apartado_Githubpages](/implantacion_web_estatica/2.png)
+
+**Cambiaremos el Source de none a main y entonces se generará la URL de nuestra página**
+
+![none](/implantacion_web_estatica/3.png)
+
+**Y ya tendremos nuestra [página](https://alepeteporico.github.io/) desplegada, solo tendremos que ir añadiendo contenido**
+
+![pagina](/implantacion_web_estatica/4.png)
