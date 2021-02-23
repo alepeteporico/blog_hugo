@@ -1,5 +1,5 @@
 +++
-title = "Servidor web, Base de datos y DNS"
+title = "DNS, servidor web y base de datos"
 description = ""
 tags = [
     "SRI"
@@ -115,7 +115,7 @@ menu = "main"
         ;
         @       IN      NS      freston.alegv.gonzalonazareno.org.
         
-        $ORIGIN madu.gonzalonazareno.org.
+        $ORIGIN alegv.gonzalonazareno.org.
         
         dulcinea        IN      A       10.0.2.11
         sancho  IN      A       10.0.1.4
@@ -420,4 +420,41 @@ menu = "main"
         IncludeOptional	sites-enabled/*.conf
 
 **Directamente pasaremos a la configuración de un virtualhost**
+
+        [centos@quijote ~]$ cat /etc/httpd/sites-available/pagina.conf
+        <VirtualHost *:80>
+            ServerName www.alegv.gonzalonazareno.org
+            DocumentRoot /var/www/alegv 
+
+            <Directory /var/www/alegv/>
+                Options FollowSymLinks
+                AllowOverride All
+                Order deny,allow
+                Allow from all
+
+                <FilesMatch "\.php">
+                        SetHandler "proxy:unix:/run/php-fpm/www.sock|fcgi://localhost"
+                </FilesMatch>
+
+            </Directory>
+
+            ErrorLog /var/www/alegv/log/error.log
+            CustomLog /var/www/alegv/log/requests.log combined
+        </VirtualHost>
+
+**Creamos el vínculo en sites-enabled y las carpetas necesarias en "/var/www/"**
+
+        [centos@quijote sites-available]$ sudo ln -s pagina.conf ../sites-enabled/
+        [centos@quijote ~]$ sudo mkdir -p /var/www/alegv/log
+
+**Selinux nos dará problemas con los nuevos directorios, por ello debemos ejecutar los siguientes comandos y reiniciar el servicio httpd**
+
+        [centos@quijote ~]$ sudo semanage fcontext -a -t httpd_log_t "/var/www/alegv/log(/.*)?"
+        [root@quijote ~]# sudo restorecon -R -v /var/www/alegv/log
+        [centos@quijote ~]$ sudo systemctl restart httpd
+
+**Creamos el fichero info.php**
+
+        [centos@quijote ~]$ cat /var/www/alegv/info.php 
+        echo "<?php phpinfo(); ?>"
 
