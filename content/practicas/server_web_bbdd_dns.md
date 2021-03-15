@@ -96,8 +96,8 @@ menu = "main"
 
         $ORIGIN alegv.gonzalonazareno.org.
 
-        dulcinea        IN      A       10.0.1.5
-        sancho  IN      A       10.0.1.4
+        dulcinea        IN      A       10.0.1.8
+        sancho  IN      A       10.0.1.3
         quijote IN      A       10.0.2.2
         freston IN      A       10.0.1.9
         www     IN      CNAME   quijote
@@ -117,8 +117,8 @@ menu = "main"
         
         $ORIGIN alegv.gonzalonazareno.org.
         
-        dulcinea        IN      A       10.0.2.11
-        sancho  IN      A       10.0.1.4
+        dulcinea        IN      A       10.0.2.10
+        sancho  IN      A       10.0.1.3
         quijote IN      A       10.0.2.2
         freston IN      A       10.0.1.9
         www     IN      CNAME   quijote
@@ -159,8 +159,8 @@ menu = "main"
 
         $ORIGIN 1.0.10.in-addr.arpa.
 
-        5       IN      PTR     dulcinea
-        4       IN      PTR     sancho
+        8       IN      PTR     dulcinea
+        3       IN      PTR     sancho
         9       IN      PTR     freston
 
 ### db.2.0.10
@@ -178,7 +178,7 @@ menu = "main"
         
         $ORIGIN 2.0.10.in-addr.arpa.
         
-        11      IN      PTR     dulcinea
+        10      IN      PTR     dulcinea
         2       IN      PTR     quijote
 
 **Si quisieramos asegurarnos de que no tenemos ningún error de sintáxis podemos usar esto:**
@@ -260,7 +260,7 @@ menu = "main"
                         macaddress: fa:16:3e:8b:3f:fb
                     mtu: 8950
                     set-name: ens4
-                    addresses: [10.0.1.4/24]
+                    addresses: [10.0.1.10/24]
                     gateway4: 10.0.1.5
                     nameservers:
                         addresses: [192.168.202.2, 192.168.200.2, 1.0.1.9]
@@ -311,17 +311,17 @@ menu = "main"
 ### Dulcinea
 
         debian@dulcinea:~$ dig +short @10.0.1.9 dulcinea.alegv.gonzalonazareno.org
-        10.0.1.5
+        10.0.1.8
         debian@dulcinea:~$ dig +short @10.0.1.9 freston.alegv.gonzalonazareno.org
         10.0.1.9
         debian@dulcinea:~$ dig +short @10.0.1.9 quijote.alegv.gonzalonazareno.org
         10.0.2.2
         debian@dulcinea:~$ dig +short @10.0.1.9 sancho.alegv.gonzalonazareno.org
-        10.0.1.4
+        10.0.1.3
 
         debian@dulcinea:~$ dig +short @10.0.1.9 bd.alegv.gonzalonazareno.org
         sancho.alegv.gonzalonazareno.org.
-        10.0.1.4
+        10.0.1.3
         debian@dulcinea:~$ dig +short @10.0.1.9 www.alegv.gonzalonazareno.org
         quijote.alegv.gonzalonazareno.org.
         10.0.2.2
@@ -331,22 +331,22 @@ menu = "main"
 
         [centos@quijote ~]$ dig +short @10.0.1.9 -x 10.0.2.2
         quijote.2.0.10.in-addr.arpa.
-        [centos@quijote ~]$ dig +short @10.0.1.9 -x 10.0.2.11
+        [centos@quijote ~]$ dig +short @10.0.1.9 -x 10.0.2.10
         dulcinea.2.0.10.in-addr.arpa.
 
 ### Sancho
 
         ubuntu@sancho:~$ dig +short @10.0.1.9 dulcinea.alegv.gonzalonazareno.org
-        10.0.1.5
+        10.0.1.8
         ubuntu@sancho:~$ dig +short @10.0.1.9 freston.alegv.gonzalonazareno.org
         10.0.1.9
 
 ### Freston
 
-        debian@freston:~$ dig +short @localhost -x 10.0.1.4
+        debian@freston:~$ dig +short @localhost -x 10.0.1.3
         sancho.1.0.10.in-addr.arpa.
 
-        debian@freston:~$ dig +short @localhost -x 10.0.1.5
+        debian@freston:~$ dig +short @localhost -x 10.0.1.8
         dulcinea.1.0.10.in-addr.arpa.
 
 ### Desde fuera:
@@ -384,11 +384,13 @@ menu = "main"
         Created symlink /etc/systemd/system/multi-user.target.wants/php-fpm.service → /usr/lib/systemd/system/php-fpm.service.
         Created symlink /etc/systemd/system/multi-user.target.wants/httpd.service → /usr/lib/systemd/system/httpd.service.
 
-**Para que podamos acceder debemos habilitar en el firewall los puertos 443 y 80**
+**Para que podamos acceder debemos habilitar en el firewall los puertos 443, 80 y 53**
 
         [centos@quijote ~]$ sudo firewall-cmd --permanent --add-port=443/tcp
         success
         [centos@quijote ~]$ sudo firewall-cmd --permanent --add-port=80/tcp
+        success
+        [centos@quijote ~]$ sudo firewall-cmd --permanent --add-port=53/udp
         success
 
 **Para guardarlas debemos hacer un reload y comprobamos las reglas que tenemos:**
@@ -402,7 +404,7 @@ menu = "main"
           interfaces: eth0
           sources: 
           services: dhcpv6-client ssh
-          ports: 443/tcp 80/tcp
+          ports: 443/tcp 80/tcp 53/udp
           protocols: 
           masquerade: no
           forward-ports: 
@@ -424,7 +426,7 @@ menu = "main"
         [centos@quijote ~]$ cat /etc/httpd/sites-available/pagina.conf
         <VirtualHost *:80>
             ServerName www.alegv.gonzalonazareno.org
-            DocumentRoot /var/www/alegv 
+            DocumentRoot /var/www/alegv
 
             <Directory /var/www/alegv/>
                 Options FollowSymLinks
