@@ -76,7 +76,7 @@ menu = "main"
 
     read -p "¿Has añadido archivos nuevos? (y/n) " nuevos
     read -p "¿Cual va a ser el commit? " comentario
-    
+
     if [ $nuevos == "y" ]
         then
         cd blog_hugo/
@@ -88,8 +88,8 @@ menu = "main"
         git add .
         git commit -am "$comentario"
         git push
-    
-    elif [ $nuevos == "n": ]
+
+    elif [ $nuevos == "n" ]
         then
         cd blog_hugo/
         git commit -am "$comentario"
@@ -98,5 +98,5 @@ menu = "main"
         cd ../alepeteporico.github.io/
         git commit -am "$comentario"
         git push
-    
+
     fi
