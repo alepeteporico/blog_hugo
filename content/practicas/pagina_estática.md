@@ -72,3 +72,31 @@ menu = "main"
 
 ![pagina](/implantacion_web_estatica/4.png)
 
+**También he creado un script que al ejecutarlo añade los cambios directamente a los dos repositorios y realiza el hugo -d para actualizar la página estática, este lo situariamos en la carpeta donde se encuentran los dos repositorios y el codigo sería el siguiente:**
+
+    read -p "¿Has añadido archivos nuevos? (y/n) " nuevos
+    read -p "¿Cual va a ser el commit? " comentario
+    
+    if [ $nuevos == "y" ]
+        then
+        cd blog_hugo/
+        git add .
+        git commit -am "$comentario"
+        git push
+        hugo -d  ../alepeteporico.github.io/
+        cd ../alepeteporico.github.io/
+        git add .
+        git commit -am "$comentario"
+        git push
+    
+    elif [ $nuevos == "n": ]
+        then
+        cd blog_hugo/
+        git commit -am "$comentario"
+        git push
+        hugo -d  ../alepeteporico.github.io/
+        cd ../alepeteporico.github.io/
+        git commit -am "$comentario"
+        git push
+    
+    fi
