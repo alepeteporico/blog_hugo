@@ -4,7 +4,7 @@ description = ""
 tags = [
     "SRI"
 ]
-date = "2021-02-19"
+date = "2021-03-16"
 menu = "main"
 +++
 
@@ -97,7 +97,7 @@ menu = "main"
         $ORIGIN alegv.gonzalonazareno.org.
 
         dulcinea        IN      A       10.0.1.8
-        sancho  IN      A       10.0.1.3
+        sancho  IN      A       10.0.1.6
         quijote IN      A       10.0.2.2
         freston IN      A       10.0.1.9
         www     IN      CNAME   quijote
@@ -118,7 +118,7 @@ menu = "main"
         $ORIGIN alegv.gonzalonazareno.org.
         
         dulcinea        IN      A       10.0.2.10
-        sancho  IN      A       10.0.1.3
+        sancho  IN      A       10.0.1.6
         quijote IN      A       10.0.2.2
         freston IN      A       10.0.1.9
         www     IN      CNAME   quijote
@@ -160,7 +160,7 @@ menu = "main"
         $ORIGIN 1.0.10.in-addr.arpa.
 
         8       IN      PTR     dulcinea
-        3       IN      PTR     sancho
+        6       IN      PTR     sancho
         9       IN      PTR     freston
 
 ### db.2.0.10
@@ -260,16 +260,16 @@ menu = "main"
                         macaddress: fa:16:3e:8b:3f:fb
                     mtu: 8950
                     set-name: ens4
-                    addresses: [10.0.1.10/24]
-                    gateway4: 10.0.1.5
+                    addresses: [10.0.1.6/24]
+                    gateway4: 10.0.1.8
                     nameservers:
                         addresses: [192.168.202.2, 192.168.200.2, 1.0.1.9]
-        		search: ["alegv.gonzalonazareno.org"]
+                        search: ["alegv.gonzalonazareno.org"]
 
         ubuntu@sancho:~$ cat /etc/resolv.conf 
-        nameserver 127.0.0.53
-        options edns0 trust-ad
-        search alegv.gonzalonazareno.org
+                nameserver 127.0.0.53
+                options edns0 trust-ad
+                search alegv.gonzalonazareno.org
 
 ### Quijote
 
@@ -460,3 +460,4 @@ menu = "main"
         [centos@quijote ~]$ cat /var/www/alegv/info.php 
         echo "<?php phpinfo(); ?>"
 
+**prueba**

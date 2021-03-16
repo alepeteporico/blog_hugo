@@ -4,7 +4,7 @@ description = ""
 tags = [
     "HLC"
 ]
-date = "2021-02-15"
+date = "2021-03-16"
 menu = "main"
 +++
 
@@ -50,6 +50,10 @@ menu = "main"
 
         # Uncomment the next line to enable packet forwarding for IPv4
         net.ipv4.ip_forward=1
+
+**Para asegurarnos ejecutamos el siguiente comando también:**
+
+        echo 1 > /proc/sys/net/ipv4/ip_forward
 
 **Añadiremos las reglas de IPTABLES**
 
@@ -284,3 +288,47 @@ menu = "main"
 
         profesor@dulcinea:~$ chmod 700 .ssh/
         profesor@dulcinea:~$ chmod 600 .ssh/authorized_keys 
+
+**Configuramos los nombres de dominio de cada maquina**
+
+        debian@dulcinea:~$ hostname --fqdn
+        dulcinea.gonzalonzareno.org
+
+        debian@freston:~$ hostname --fqdn
+        freston.gonzalonzareno.org
+
+        [centos@quijote ~]$ sudo hostnamectl set-hostname quijote.gonzalonzareno.org
+        [centos@quijote ~]$ sudo hostnamectl status
+           Static hostname: quijote.gonzalonzareno.org
+                 Icon name: computer-vm
+                   Chassis: vm
+                Machine ID: cab9605edaa5484da7c2f02b8fd10762
+                   Boot ID: 3ee2734a439e4e22a1e549e02e1bcc57
+            Virtualization: kvm
+          Operating System: CentOS Linux 8
+               CPE OS Name: cpe:/o:centos:centos:8
+                    Kernel: Linux 4.18.0-240.10.1.el8_3.x86_64
+              Architecture: x86-64
+
+        ubuntu@sancho:~$ sudo hostnamectl set-hostname sancho.gonzalonzareno.org
+        ubuntu@sancho:~$ sudo hostnamectl
+           Static hostname: sancho.gonzalonzareno.org
+                 Icon name: computer-vm
+                   Chassis: vm
+                Machine ID: 9138cf2982db44c5874f2d6fc46ab48a
+                   Boot ID: eda34c94d09f47d386baaa057ea4dc7b
+            Virtualization: kvm
+          Operating System: Ubuntu 20.04.2 LTS
+                    Kernel: Linux 5.4.0-48-generic
+              Architecture: x86-64
+
+**Por último, para confirmar que nuestro servidor tiene sincronizado su reloj añadiremos estas líneas en el fichero /etc/ntp.conf**
+
+        server 0.es.pool.ntp.org
+        server 0.europe.pool.ntp.org
+        server 2.europe.pool.ntp.org
+
+**Y ejecutaremos el siguiente comando**
+
+        debian@dulcinea:~$ sudo ntpdate -u pool.ntp.org
+        16 Mar 13:05:12 ntpdate[6695]: adjust time server 213.251.52.234 offset 0.021472 sec
