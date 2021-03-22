@@ -9,7 +9,7 @@ disqusShortname = "Alepetepórico"
     name = "prácticas"
     weight = 0
     url = "practicas"
-[menu]
+
   [[menu.header]]
     name = "apuntes"
     weight = 0
