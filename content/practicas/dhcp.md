@@ -39,7 +39,7 @@ menu = "main"
 
 **Instalamos el servidor dhcp:**
 
-    sudo apt install isc-dhcp-server
+    vagrant@servidor:~$ sudo apt install isc-dhcp-server
 
 
 **Configuramos el fichero "/etc/default/isc-dhcp-server" y añadimos en INTERFACESv4 la eth2 que es la tarjeta privada.**
@@ -97,13 +97,35 @@ menu = "main"
         inet6 fe80::a00:27ff:fe06:d788/64 scope link 
            valid_lft forever preferred_lft forever
 
+**Veamos la lista de concesiones y comprobamos que se ha dado ip a nuestro nodo1**
+
+        vagrant@servidor:~$ cat /var/lib/dhcp/dhcpd.leases
+        # The format of this file is documented in the dhcpd.leases(5) manual page.
+        # This lease file was written by isc-dhcp-4.4.1
+
+        # authoring-byte-order entry is generated, DO NOT DELETE
+        authoring-byte-order little-endian;
+
+        lease 192.168.100.2 {
+          starts 4 2021/03/18 10:49:21;
+          ends 4 2021/03/18 22:49:21;
+          tstp 4 2021/03/18 22:49:21;
+          cltt 4 2021/03/18 10:49:21;
+          binding state active;
+          next binding state free;
+          rewind binding state free;
+          hardware ethernet 08:00:27:42:80:3a;
+          uid "\377'B\200:\000\001\000\001'\345\351S\010\000'B\200:";
+          client-hostname "nodolan1";
+        }
+        server-duid "\000\001\000\001'\345\354\237\010\000'\324\345e";
+
 
 * Configura el servidor para que funcione como router y NAT, de esta forma los clientes tengan internet. Muestra las rutas por defecto del servidor y el cliente. Realiza una prueba de funcionamiento para comprobar que el cliente tiene acceso a internet (utiliza nombres, para comprobar que tiene resolución DNS).
 
-**Ahora debemos configurar esta máquina servidor para que actue como router, para ello descomentaremos la siguiente línea del fichero "/etc/sysctl.conf":**
+**Ahora debemos configurar esta máquina servidor para que actue como router, para ello activaremos el forward con el siguiente comando:**
 
-    # Uncomment the next line to enable packet forwarding for IPv4
-    net.ipv4.ip_forward=1
+   root@servidor:~# echo 1 > /proc/sys/net/ipv4/ip_forward
 
 
 **Para configurar NAT en nuestro servidor debemos modificar el fichero "/etc/network/interfaces" y añadir la siguiente línea:**
@@ -113,11 +135,10 @@ menu = "main"
 
 **Después de reiniciar el servicio de red nuestro siguiente paso deberá ser configurar las rutas de nuestras máquinas, primero hay que borrar la default via, para ello veremos la tabla de enrutamiento con el comando ip r:**
 
-    vagrant@servidor:~$ ip r
-    default via 10.0.2.2 dev eth0 
-    10.0.2.0/24 dev eth0 proto kernel scope link src 10.0.2.15 
-    192.168.1.0/24 dev eth1 proto kernel scope link src 192.168.1.124 
-    192.168.100.0/24 dev eth2 proto kernel scope link src 192.168.100.1
+        vagrant@servidor:~$ ip r
+        default via 10.0.2.2 dev eth0 
+        10.0.2.0/24 dev eth0 proto kernel scope link src 10.0.2.15 
+        192.168.100.0/24 dev eth2 proto kernel scope link src 192.168.100.1
 
 
 **Borrariamos el default via con el siguiente comando:**
@@ -215,3 +236,5 @@ https://www.youtube.com/watch?v=XBQpHuai3RA&feature=youtu.be
            valid_lft 23sec preferred_lft 23sec
         inet6 fe80::a00:27ff:fe2a:112b/64 scope link 
            valid_lft forever preferred_lft forever
+
+**Nueva linea**
