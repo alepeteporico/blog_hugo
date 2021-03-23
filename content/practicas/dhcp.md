@@ -86,7 +86,7 @@ menu = "main"
            valid_lft forever preferred_lft forever
     3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
         link/ether 08:00:27:b5:11:a3 brd ff:ff:ff:ff:ff:ff
-        inet 192.168.1.124/24 brd 192.168.1.255 scope global dynamic eth1
+        inet 172.22.8.212/16 brd 172.22.255.255 scope global dynamic eth1
            valid_lft 85587sec preferred_lft 85587sec
         inet6 fe80::a00:27ff:feb5:11a3/64 scope link 
            valid_lft forever preferred_lft forever
@@ -130,54 +130,42 @@ menu = "main"
 
 **Para configurar NAT en nuestro servidor debemos modificar el fichero "/etc/network/interfaces" y añadir la siguiente línea:**
 
-    up iptables -t nat -A POSTROUTING -s 192.168.100.0/24 -o eth1 -j MASQUERADE
+    up iptables -t nat -A POSTROUTING -s 192.168.100.0/24 -o eth0 -j MASQUERADE
 
 
-**Después de reiniciar el servicio de red nuestro siguiente paso deberá ser configurar las rutas de nuestras máquinas, primero hay que borrar la default via, para ello veremos la tabla de enrutamiento con el comando ip r:**
+**Después de reiniciar el servicio de red visualizaremos la salida del comando `ip r` tanto en el nodo como en el servidor para ver el direccionamiento:**
 
-        vagrant@servidor:~$ ip r
-        default via 10.0.2.2 dev eth0 
-        10.0.2.0/24 dev eth0 proto kernel scope link src 10.0.2.15 
-        192.168.100.0/24 dev eth2 proto kernel scope link src 192.168.100.1
-
-
-**Borrariamos el default via con el siguiente comando:**
-
-    vagrant@servidor:~$ sudo ip route del default via 10.0.2.2 dev eth0
-
-
-**Y añadiriamos una nueva con el siguiente:**
-
-    vagrant@servidor:~$ sudo ip route add default via 192.168.1.1 dev eth1
-
-
-**Volvemos a comprobar el comando ip r y veremos que el default via ha cambiado:**
+##### Servidor
 
     vagrant@servidor:~$ ip r
-    default via 192.168.1.1 dev eth1 
+    default via 10.0.2.2 dev eth0 
     10.0.2.0/24 dev eth0 proto kernel scope link src 10.0.2.15 
-    192.168.1.0/24 dev eth1 proto kernel scope link src 192.168.1.124 
+    172.22.0.0/16 dev eth1 proto kernel scope link src 172.22.8.212 
     192.168.100.0/24 dev eth2 proto kernel scope link src 192.168.100.1
 
-
-**Realizaremos el mismo proceso con la tabla de enrutamiento en el cliente:**
+##### Nodo 1
 
     vagrant@nodolan1:~$ ip r
     default via 10.0.2.2 dev eth0 
     10.0.2.0/24 dev eth0 proto kernel scope link src 10.0.2.15 
-    192.168.100.0/24 dev eth1 proto kernel scope link src 192.168.100.2
+    192.168.100.0/24 dev eth1 proto kernel scope link src 192.168.100.2 
 
+**Vemos que el nodo sale por defecto por la 10.0.0.0, vamos a cambiarlo, borrariamos el default via con el siguiente comando:**
 
     vagrant@nodolan1:~$ sudo ip route del default via 10.0.2.2 dev eth0
 
 
+**Y añadiriamos una nueva con el siguiente:**
+
     vagrant@nodolan1:~$ sudo ip route add default via 192.168.100.1 dev eth1
 
+
+**Volvemos a comprobar el comando ip r y veremos que el default via ha cambiado:**
 
     vagrant@nodolan1:~$ ip r
     default via 192.168.100.1 dev eth1 
     10.0.2.0/24 dev eth0 proto kernel scope link src 10.0.2.15 
-    192.168.100.0/24 dev eth1 proto kernel scope link src 192.168.100.2
+    192.168.100.0/24 dev eth1 proto kernel scope link src 192.168.100.2 
 
 
 **Hacemos ping a www.google.es y con su funcionamiento comprobaremos que tenemos salida a internet y resuelve nombres de dominio.**
@@ -209,11 +197,19 @@ menu = "main"
 
 **La primera línea captura el dhcp discover.**
 
+    12:09:14.604297 IP 0.0.0.0.bootpc > 255.255.255.255.bootps: BOOTP/DHCP, Request from 08:00:27:42:80:3a (oui Unknown), length 300
+
 **En la segunda línea puede verse como el servidor responde a petición con un dhcp offer.**
+
+    12:09:15.605343 IP 192.168.100.1.bootps > 192.168.100.4.bootpc: BOOTP/DHCP, Reply, length 302
 
 **En la tercera se realiza la petición del cliente al servidor con un dhcp request.**
 
+    12:09:15.605710 IP 0.0.0.0.bootpc > 255.255.255.255.bootps: BOOTP/DHCP, Request from 08:00:27:42:80:3a (oui Unknown), length 300
+
 **Y por úlitmo se realiza la concesión al cliente mediante el paquete dhcp ack.**
+
+    12:09:15.607363 IP 192.168.100.1.bootps > 192.168.100.4.bootpc: BOOTP/DHCP, Reply, length 302
 
 * Los clientes toman una configuración, y a continuación apagamos el servidor dhcp. ¿qué ocurre con el cliente windows? ¿Y con el cliente linux?
 
