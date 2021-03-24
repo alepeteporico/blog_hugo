@@ -394,6 +394,7 @@ menu = "main"
         alejandrogv@AlejandroGV:~$ sudo rclone mount --vfs-cache-mode writes drive: GoogleDrive &
 
 **Usamos el --vfs para prevenir un error que puede ocasionarse al editar algun archivo del directorio.**
+
 ![rclone](/practica1_SAD/3-3.png)
 
 **En la foto anterior podemos ver que se ha montado bien. Si crearamos o borraramos algún archivo en el directorio o en el servicio se sincronizarían los cambios.**
