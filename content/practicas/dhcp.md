@@ -211,11 +211,9 @@ menu = "main"
 
     12:09:15.607363 IP 192.168.100.1.bootps > 192.168.100.4.bootpc: BOOTP/DHCP, Reply, length 302
 
-* Los clientes toman una configuración, y a continuación apagamos el servidor dhcp. ¿qué ocurre con el cliente windows? ¿Y con el cliente linux?
+* Los clientes toman una configuración, y a continuación [apagamos el servidor dhcp](https://youtu.be/JJNVnoTwtP0). ¿qué ocurre con el cliente windows? ¿Y con el cliente linux?
 
-[Vídeo](https://youtu.be/JJNVnoTwtP0)
-
-* Los clientes toman una configuración, y a continuación cambiamos la configuración del servidor dhcp (por ejemplo el rango). ¿qué ocurriría con un cliente windows? ¿Y con el cliente linux?
+* Los clientes toman una configuración, y a continuación [cambiamos la configuración del servidor dhcp](https://youtu.be/Bsoo-1iCjLA) (por ejemplo el rango). ¿qué ocurriría con un cliente windows? ¿Y con el cliente linux?
 
 * Indica las modificaciones realizadas en los ficheros de configuración y entrega una comprobación de que el cliente ha tomado esa dirección.
 
