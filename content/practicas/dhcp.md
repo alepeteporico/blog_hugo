@@ -213,7 +213,9 @@ menu = "main"
 
 * Los clientes toman una configuración, y a continuación apagamos el servidor dhcp. ¿qué ocurre con el cliente windows? ¿Y con el cliente linux?
 
-https://www.youtube.com/watch?v=XBQpHuai3RA&feature=youtu.be
+[Vídeo](https://youtu.be/JJNVnoTwtP0)
+
+* Los clientes toman una configuración, y a continuación cambiamos la configuración del servidor dhcp (por ejemplo el rango). ¿qué ocurriría con un cliente windows? ¿Y con el cliente linux?
 
 * Indica las modificaciones realizadas en los ficheros de configuración y entrega una comprobación de que el cliente ha tomado esa dirección.
 
@@ -233,4 +235,3 @@ https://www.youtube.com/watch?v=XBQpHuai3RA&feature=youtu.be
         inet6 fe80::a00:27ff:fe2a:112b/64 scope link 
            valid_lft forever preferred_lft forever
 
-**Nueva linea**
