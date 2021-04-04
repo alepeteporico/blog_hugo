@@ -215,21 +215,29 @@ menu = "main"
 
 * Los clientes toman una configuración, y a continuación [cambiamos la configuración del servidor dhcp](https://youtu.be/Bsoo-1iCjLA) (por ejemplo el rango). ¿qué ocurriría con un cliente windows? ¿Y con el cliente linux?
 
-* Indica las modificaciones realizadas en los ficheros de configuración y entrega una comprobación de que el cliente ha tomado esa dirección.
+* Crea una reserva para el que el cliente tome siempre la dirección 192.168.100.100. Indica las modificaciones realizadas en los ficheros de configuración y entrega una comprobación de que el cliente ha tomado esa dirección.
 
-**Para crear una reserva debemos añadir lo siguiente al fichero /etc/dhcp/dhcpd.conf**
+**Para realizar esta configuración nuestro primer paso será averiguar la MAC de la tarjeta de red del nodo al que queremos hacer una reserva. podemos verlo con `ip a`**
+
+        3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+            link/ether 08:00:27:42:80:3a brd ff:ff:ff:ff:ff:ff
+
+**Para crear una reserva debemos añadir lo siguiente al fichero /etc/dhcp/dhcpd.conf usando por supuesto la MAC que hemos buscado anteriormente.**
 
     host nodolan {
-    hardware ethernet 08:00:27:2a:11:2b;
+    hardware ethernet 08:00:27:42:80:3a;
     fixed-address 192.168.100.100;
     }
 
 **Reiniciamos el servicio dhcp y cuando pase el tiempo de concesión o al pedir una nueva ip veremos que cambia la IP de nuestro cliente:**
 
-    3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
-        link/ether 08:00:27:2a:11:2b brd ff:ff:ff:ff:ff:ff
-        inet 192.168.100.100/24 brd 192.168.100.253 scope global dynamic eth1
-           valid_lft 23sec preferred_lft 23sec
-        inet6 fe80::a00:27ff:fe2a:112b/64 scope link 
-           valid_lft forever preferred_lft forever
+        vagrant@nodolan1:~$ ip a
+        ...
+        ...
+        3: eth1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+            link/ether 08:00:27:42:80:3a brd ff:ff:ff:ff:ff:ff
+            inet 192.168.100.100/24 brd 192.168.100.253 scope global dynamic eth1
+               valid_lft 15sec preferred_lft 15sec
+            inet6 fe80::a00:27ff:fe42:803a/64 scope link 
+               valid_lft forever preferred_lft forever
 
