@@ -133,4 +133,117 @@ Database configuration completed successfully. The passwords were auto generated
         SQL> CONNECT c##ale/ale
         Connected.
 
-* 
+* Hemos creado unas tablas y añadido contenido a las mismas.
+
+        SQL> SELECT * FROM propietarios;
+        
+        NIF	  NOMBRE	  APELLIDOS			 CUOTA
+        --------- --------------- ------------------------- ----------
+        61219065B Mario 	  Guti??rrez Valencia		   300
+        20015195C Alexandra	  Angulo Lamas			   320
+        19643077L Miriam	  Zafra Valencia		    45
+        33599573T Josue 	  Reche de los Santos		    50
+        X4164637G Christian	  Lopez Reyes			    50
+        
+        SQL> SELECT * FROM caballos;
+        
+        CODIGOCABA NIFPROPIE NOMBRE	     FECHNAC   RAZA
+        ---------- --------- --------------- --------- --------------------
+        1234567890 61219065B Sardinilla      22-APR-10 Arabe
+        0987654321 61219065B Caramelo	     27-MAR-13 Mustang
+        1098743564 20015195C Marques	     07-OCT-11 Mustang
+        2348743564 20015195C Juan Valdez     15-NOV-08 Purasangre
+        4348486564 19643077L Tarantino	     13-DEC-09 Lusitano
+        3348486935 19643077L Paco	     07-JUN-14 Purasangre
+        3348454346 33599573T Connell	     25-JUL-07 Akhal-Teke
+        5438454346 33599573T Faraon	     23-MAY-12 Akhal-Teke
+        5438345346 33599573T Isabel	     23-APR-12 Holsteiner
+        3958345174 X4164637G Rafael	     05-FEB-10 Arabe
+        
+        10 rows selected.
+        
+        SQL> SELECT * FROM caballos_carreras;
+        
+        CODIGOCABA EDADMINPART EDADMAXPART
+        ---------- ----------- -----------
+        1234567890
+        0987654321
+        1098743564
+        2348743564
+        4348486564
+        3348486935
+        3348454346
+        5438454346
+        5438345346
+        3958345174
+        
+        10 rows selected.
+
+## Instalación de servidor MYSQL.
+
+* la instalación es muy sencilla, simplemente instalamos el servidor de mariadb con un simple apt.
+
+        vagrant@mysql:~$ sudo apt install mariadb-server
+
+* Podemos entrar al servidor.
+
+* Creamos un usuario.
+
+        MariaDB [(none)]> CREATE USER 'ale'@'%' IDENTIFIED BY 'ale';
+        Query OK, 0 rows affected (0.001 sec)
+
+* Y al crear una base de datos debemos darle a nuestro usuario permisos sobre la misma.
+
+        MariaDB [(none)]> CREATE DATABASE prueba;
+        Query OK, 1 row affected (0.001 sec)
+
+        MariaDB [(none)]> GRANT ALL PRIVILEGES ON prueba.* TO 'ale'@'%';
+        Query OK, 0 rows affected (0.001 sec)
+
+* Hemos creado algunas tablas y le hemos añadido datos.
+
+        MariaDB [prueba]> SELECT * FROM Propietarios;
+        +-----------+-----------+---------------------+--------+
+        | NIF       | Nombre    | Apellidos           | Cuota  |
+        +-----------+-----------+---------------------+--------+
+        | 19643077L | Miriam    | Zafra Valencia      |  45.00 |
+        | 20015195C | Alexandra | Angulo Lamas        | 320.00 |
+        | 33599573T | Josue     | Reche de los Santos |  50.00 |
+        | 61219065B | Mario     | Gutiérrez Valencia  | 300.00 |
+        | X4164637G | Christian | Lopez Reyes         |  50.00 |
+        +-----------+-----------+---------------------+--------+
+        5 rows in set (0.001 sec)
+
+        MariaDB [prueba]> SELECT * FROM Caballos;
+        +---------------+----------------+-------------+------------+------------+
+        | CodigoCaballo | NIFPropietario | Nombre      | FechNac    | Raza       |
+        +---------------+----------------+-------------+------------+------------+
+        | 1098743564    | 20015195C      | Marques     | 2011-11-07 | Mustang    |
+        | 1234567890    | 61219065B      | Sardinilla  | 2010-03-22 | Arabe      |
+        | 2348743564    | 20015195C      | Juan Valdez | 2008-02-15 | Purasangre |
+        | 3958345174    | X4164637G      | Rafael      | 2010-05-06 | Arabe      |
+        | 4348486564    | 19643077L      | Tarantino   | 2009-10-13 | Lusitano   |
+        +---------------+----------------+-------------+------------+------------+
+        5 rows in set (0.000 sec)
+
+        MariaDB [prueba]> SELECT * FROM Caballos_Carreras;
+        +---------------+-------------+-------------+
+        | CodigoCaballo | EdadMinPart | EdadMaxPart |
+        +---------------+-------------+-------------+
+        | 1234567890    |        NULL |        NULL |
+        | 2348743564    |        NULL |        NULL |
+        | 4348486564    |        NULL |        NULL |
+        +---------------+-------------+-------------+
+        3 rows in set (0.001 sec)
+
+### Configuración para acceso remoto de MYSQL.
+
+* Debemos editar el fichero `/etc/mysql/mariadb.conf.d/50-server.cnf` y buscar la línea `bind-address`.
+
+        bind-address              = 127.0.0.1
+
+* Lo único que deberemos hacer para permitir el acceso remoto es cambiar la dirección del localhost por 0.0.0.0
+
+        bind-address              = 0.0.0.0
+
+* Ahora en la base de datos crearemos un usuario que especificaremos que 
