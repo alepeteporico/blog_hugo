@@ -6,7 +6,7 @@ tags = [
 ]
 date = "2021-03-22"
 menu = "main"
-+++
++++ 
 
 **Instalamos un servidor LAMP**
 
@@ -65,7 +65,7 @@ menu = "main"
 
 **Y para amenizar el trabajo podríamos crear un enlace simbólico para no tener que escribir la versión cada vez que queramos hacer una configuración:**
 
-    vagrant@cmsalegv:~$ sudo ln -s /var/www/html/drupal-8.8.1/ /var/www/html/drupal
+    vagrant@cmsalegv:~$ sudo ln -s /var/www/drupal-8.8.1/ /var/www/drupal
 
 **Debemos activar el modulo rewrite en apache**
 
@@ -75,9 +75,9 @@ menu = "main"
 
     <VirtualHost *:80>
 
-            ServerName www.alejandrogv-drupal.org
+            ServerName www.alegv-drupal.org
             ServerAdmin webmaster@localhost
-            DocumentRoot /var/www/html/drupal
+            DocumentRoot /var/www/drupal
             <Directory /var/www/html/drupal/>
                     Options Indexes FollowSymLinks
                     AllowOverride All
@@ -89,3 +89,10 @@ menu = "main"
 
     <VirtualHost>
 
+**Añadimos la IP estática que hemos añadido a nuestro servidor en el `/etc/hosts` de nuestra máquina anfitriona**
+
+        192.168.100.200    www.alegv-drupal.com
+
+**Y ya podremos acceder a nuetro drupal**
+
+![redes](/cms_php/1.png)
