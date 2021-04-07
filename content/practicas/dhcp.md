@@ -8,13 +8,21 @@ date = "2021-03-16"
 menu = "main"
 +++
 
-* Lee el documento Teoría: Servidor DHCP y explica el funcionamiento del servidor DHCP resumido en este gráfico.
+* Lee el documento Teoría: Servidor DHCP y explica el funcionamiento del servidor DHCP resumido en este [gráfico](https://fp.josedomingo.org/serviciosgs/u02/img/dhcp.png).
 
-**En primer lugar el cliente manda una petición para ver si hay un servidor DHCP que pueda darle una dirección.**
+**En primer lugar el cliente manda una petición `DHCPDISCOVER` en cuanto se inicia, ya que no tiene configuración de IP usa esta petición para ver si hay un servidor DHCP que pueda darle una dirección.**
 
-**El servidor reciviría esa petición y le dice al cliente que hay un servidor DHCP y puede ofrecerle una IP, por tanto el cliente pide una IP al servidor.**
+**Después de esto el cliente esperará en estado `SELECTING` y recibirá las ofertas `DHCPOFFER` del servidor o servidores DHCP que pueda haber en nuestra red local.**
 
-**Por último el servidor al recibir esa última petición le concede una IP dentro de su rango.**
+**Cuando el cliente toma una decisión en caso de que hubiera mas de un servidor que elegir envía un paquete `DHCPREQUEST` para avisar a los servidores de que ya ha tomado esta decisión. El servidor por tanto responderá con un `DHCPPACK` con toda la configuración de red para este cliente**
+
+**Ahora pueden ocurrir dos cosas**
+
+1. La IP que hemos escogido ya está en uso, en este caso se informaría al servidor con un `DHCPDECLINE` rechazando esta configuración y volviendo al estado inicial.
+
+2. La IP está libre y podemos usar la configuración que se nos da. Por lo que pasamos al estado `BOUND`
+
+**Estando en el estado `BOUND` el cliente recibe unos temporizadores los cuales entre otras cosas sirven para renovar nuestra dirección IP cada cierto tiempo que podremos establecer.**
 
 * Entrega el fichero Vagrantfile que define el escenario.
 
