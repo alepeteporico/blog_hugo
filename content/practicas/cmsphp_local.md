@@ -8,6 +8,24 @@ date = "2021-03-22"
 menu = "main"
 +++ 
 
+## VagrantFile
+
+    Vagrant.configure("2") do |config|
+        config.vm.define :cmsagv do |cmsagv|
+            cmsagv.vm.box = "debian/buster64"
+            cmsagv.vm.hostname = "cmsagv"
+            cmsagv.vm.network :private_network, ip: "172.22.100.5",
+              virtualbox__intnet: "interna"
+            cmsagv.vm.network :private_network, ip: "192.168.100.200"
+        end
+        config.vm.define :backup do |backup|
+            backup.vm.box = "debian/buster64"
+            backup.vm.hostname = "backup"
+            backup.vm.network :private_network, ip: "172.22.100.10",
+                    virtualbox__intnet: "interna"
+        end
+    end
+
 **Instalamos un servidor LAMP**
 
 #### Apache
