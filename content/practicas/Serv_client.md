@@ -246,4 +246,104 @@ Database configuration completed successfully. The passwords were auto generated
 
         bind-address              = 0.0.0.0
 
-* Ahora en la base de datos crearemos un usuario que especificaremos que 
+* Ahora en la base de datos crearemos un usuario que especificaremos donde se encuentra, podríamos poner una sola IP específica, sin embargo permitiremos que se pueda acceder desde cualquier sitio usando `%`. Le daremos permisos sobre la base de datos y tendremos que ponerle contraseña a nuestro usuario.
+
+        MariaDB [(none)]> CREATE USER 'remoto1'@'%' IDENTIFIED BY 'remoto';
+        Query OK, 0 rows affected (0.161 sec)
+
+        MariaDB [(none)]> GRANT ALL PRIVILEGES ON prueba.* TO 'remoto'@'%';
+        Query OK, 0 rows affected (0.164 sec)
+
+        MariaDB [(none)]> SET PASSWORD FOR 'remoto'@'%' = PASSWORD('remoto');
+
+* Comprobamos que podemos acceder a nuestra base de datos desde el ciente.
+
+        root@clientemysql:~# mysql -h 172.22.100.5 -u remoto -p
+        Enter password: 
+        Welcome to the MariaDB monitor.  Commands end with ; or \g.
+        Your MariaDB connection id is 41
+        Server version: 10.3.27-MariaDB-0+deb10u1 Debian 10
+
+        Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+        Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+        MariaDB [(none)]> use prueba;
+        Reading table information for completion of table and column names
+        You can turn off this feature to get a quicker startup with -A
+
+        Database changed
+        MariaDB [prueba]>
+
+* Vemos que podemos trabajar con la base de datos de prueba que creamos anteriormente.
+
+        MariaDB [prueba]> SHOW TABLES;
+        +-------------------+
+        | Tables_in_prueba  |
+        +-------------------+
+        | Caballos          |
+        | Caballos_Carreras |
+        | Propietarios      |
+        +-------------------+
+        3 rows in set (0.002 sec)
+
+### Cliente remoto de SQL*PLUS
+
+* En primer lugar tendremos que añadir un hostname en nuestro servidor añadiendo la siguiente línea a nuestro `/etc/hosts`.
+
+        172.22.100.15   oracle.alegv.bd     oracle
+
+* A continuación, configuraremos nuestro servidor para que escuche las peticiones que se hacen de fuera, si vemos el fichero `/opt/oracle/product/19c/dbhome_1/network/admin/listener.ora` podremos ver que se especifica justo antes de donde aparece el puerto donde escucha que solo escucha las peticiones de myhost, es decir, el localhost.
+
+        LISTENER =
+          (DESCRIPTION_LIST =
+            (DESCRIPTION =
+              (ADDRESS = (PROTOCOL = TCP)(HOST = myhost)(PORT = 1521))
+              (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
+            )
+          )
+
+* Lo modificaremos y podremos nuestro hostname para escuchar todas las peticiones de nuestra interfaz de red local.
+
+        LISTENER =
+          (DESCRIPTION_LIST =
+            (DESCRIPTION =
+              (ADDRESS = (PROTOCOL = TCP)(HOST = oracle.alegv.bd)(PORT = 1521))
+              (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
+            )
+          )
+
+* E iniciamos la escucha.
+
+        [oracle@oracle ~]$ lsnrctl start
+
+        LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 12-APR-2021 17:54:57
+
+        Copyright (c) 1991, 2019, Oracle.  All rights reserved.
+
+        Starting /opt/oracle/product/19c/dbhome_1/bin/tnslsnr: please wait...
+
+        TNSLSNR for Linux: Version 19.0.0.0.0 - Production
+        System parameter file is /opt/oracle/product/19c/dbhome_1/network/admin/listener.ora
+        Log messages written to /opt/oracle/diag/tnslsnr/oracle/listener/alert/log.xml
+        Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=oracle.alegv.bd)(PORT=1521)))
+        Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=ipc)(KEY=EXTPROC1521)))
+
+        Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle.alegv.bd)(PORT=1521)))
+        STATUS of the LISTENER
+        ------------------------
+        Alias                     LISTENER
+        Version                   TNSLSNR for Linux: Version 19.0.0.0.0 - Production
+        Start Date                12-APR-2021 17:54:59
+        Uptime                    0 days 0 hr. 0 min. 0 sec
+        Trace Level               off
+        Security                  ON: Local OS Authentication
+        SNMP                      OFF
+        Listener Parameter File   /opt/oracle/product/19c/dbhome_1/network/admin/listener.ora
+        Listener Log File         /opt/oracle/diag/tnslsnr/oracle/listener/alert/log.xml
+        Listening Endpoints Summary...
+          (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=oracle.alegv.bd)(PORT=1521)))
+          (DESCRIPTION=(ADDRESS=(PROTOCOL=ipc)(KEY=EXTPROC1521)))
+        The listener supports no services
+        The command completed successfully
+
