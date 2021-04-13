@@ -289,10 +289,6 @@ Database configuration completed successfully. The passwords were auto generated
 
 ### Cliente remoto de SQL*PLUS
 
-* En primer lugar tendremos que añadir un hostname en nuestro servidor añadiendo la siguiente línea a nuestro `/etc/hosts`.
-
-        172.22.100.15   oracle.alegv.bd     oracle
-
 * A continuación, configuraremos nuestro servidor para que escuche las peticiones que se hacen de fuera, si vemos el fichero `/opt/oracle/product/19c/dbhome_1/network/admin/listener.ora` podremos ver que se especifica justo antes de donde aparece el puerto donde escucha que solo escucha las peticiones de myhost, es decir, el localhost.
 
         LISTENER =
@@ -303,21 +299,21 @@ Database configuration completed successfully. The passwords were auto generated
             )
           )
 
-* Lo modificaremos y podremos nuestro hostname para escuchar todas las peticiones de nuestra interfaz de red local.
+* Lo modificaremos y podremos la dirección `0.0.0.0` para que escuche todas las peticiones de fuera.
 
         LISTENER =
           (DESCRIPTION_LIST =
             (DESCRIPTION =
-              (ADDRESS = (PROTOCOL = TCP)(HOST = oracle.alegv.bd)(PORT = 1521))
+              (ADDRESS = (PROTOCOL = TCP)(HOST = 0.0.0.0)(PORT = 1521))
               (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
             )
           )
 
 * E iniciamos la escucha.
 
-        [oracle@oracle ~]$ lsnrctl start
+[oracle@oracle ~]$ lsnrctl start
 
-        LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 12-APR-2021 17:54:57
+        LSNRCTL for Linux: Version 19.0.0.0.0 - Production on 13-APR-2021 07:17:12
 
         Copyright (c) 1991, 2019, Oracle.  All rights reserved.
 
@@ -326,15 +322,15 @@ Database configuration completed successfully. The passwords were auto generated
         TNSLSNR for Linux: Version 19.0.0.0.0 - Production
         System parameter file is /opt/oracle/product/19c/dbhome_1/network/admin/listener.ora
         Log messages written to /opt/oracle/diag/tnslsnr/oracle/listener/alert/log.xml
-        Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=oracle.alegv.bd)(PORT=1521)))
+        Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=0.0.0.0)(PORT=1521)))
         Listening on: (DESCRIPTION=(ADDRESS=(PROTOCOL=ipc)(KEY=EXTPROC1521)))
 
-        Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=oracle.alegv.bd)(PORT=1521)))
+        Connecting to (DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=0.0.0.0)(PORT=1521)))
         STATUS of the LISTENER
         ------------------------
         Alias                     LISTENER
         Version                   TNSLSNR for Linux: Version 19.0.0.0.0 - Production
-        Start Date                12-APR-2021 17:54:59
+        Start Date                13-APR-2021 07:17:14
         Uptime                    0 days 0 hr. 0 min. 0 sec
         Trace Level               off
         Security                  ON: Local OS Authentication
@@ -342,8 +338,35 @@ Database configuration completed successfully. The passwords were auto generated
         Listener Parameter File   /opt/oracle/product/19c/dbhome_1/network/admin/listener.ora
         Listener Log File         /opt/oracle/diag/tnslsnr/oracle/listener/alert/log.xml
         Listening Endpoints Summary...
-          (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=oracle.alegv.bd)(PORT=1521)))
+          (DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=0.0.0.0)(PORT=1521)))
           (DESCRIPTION=(ADDRESS=(PROTOCOL=ipc)(KEY=EXTPROC1521)))
         The listener supports no services
         The command completed successfully
 
+* En el cliente debemos instalar el paquete alien y descargar de la [página oficial de oracle](https://www.oracle.com/es/database/technologies/instant-client/linux-x86-64-downloads.html) los siguientes paquetes:
+
+        oracle-instantclient19.6-basic-19.6.0.0.0-1.x86_64.rpm
+        oracle-instantclient19.6-devel-19.6.0.0.0-1.x86_64.rpm
+        oracle-instantclient19.6-sqlplus-19.6.0.0.0-1.x86_64.rpm
+
+* Como se han descargado archivos RPM y tenemos un debian, podriamos convertirlos facilmente a una extensión DEB con el paquete recién instalado alien e instalariamos todos los paquetes.
+
+        vagrant@clientoracle:~$ sudo alien oracle-instantclient19.6-basic-19.6.0.0.0-1.x86_64.rpm 
+        Warning: Skipping conversion of scripts in package oracle-instantclient19.6-basic: postinst postrm
+        Warning: Use the --scripts parameter to include the scripts.
+        oracle-instantclient19.6-basic_19.6.0.0.0-2_amd64.deb generated
+
+        vagrant@clientoracle:~$ sudo dpkg -i oracle-instantclient19.6-basic_19.6.0.0.0-2_amd64.deb 
+        (Reading database ... 34588 files and directories currently installed.)
+        Preparing to unpack oracle-instantclient19.6-basic_19.6.0.0.0-2_amd64.deb ...
+        Unpacking oracle-instantclient19.6-basic (19.6.0.0.0-2) ...
+        Setting up oracle-instantclient19.6-basic (19.6.0.0.0-2) ...
+        Processing triggers for libc-bin (2.28-10) ...
+
+* Creamos el fichero de configuración `/etc/ld.so.conf.d/oracle.conf` y añadimos la siguiente línea:
+
+        /usr/lib/oracle/19.6/client64/lib/
+
+* Y actualizamos la configuración:
+
+        vagrant@clientoracle:~$ sudo ldconfig
