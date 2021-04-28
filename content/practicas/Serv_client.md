@@ -370,3 +370,39 @@ Database configuration completed successfully. The passwords were auto generated
 * Y actualizamos la configuración:
 
         vagrant@clientoracle:~$ sudo ldconfig
+
+### Aplicación web para postgres
+
+
+* Por supuesto, primero instalamos postgres
+
+        vagrant@postgres:~$ sudo apt install postgresql
+
+* Instalaremos phppgadmin para poder administrar nuestra base de datos mediante una aplicación web.
+
+        vagrant@postgres:~$ sudo apt install phppgadmin
+
+* Ahora configuraremos esta aplicación, para ello lo primero que debemos hacer es permitir que se pueda acceder de forma remota en el archivo de configuración `/etc/apache2/conf-available/phppgadmin.conf` comentaremos la siguiente línea.
+
+        #Require local
+
+* Crearemos una base de datos y usuario al que daremos permisos sobre esta base de datos.
+
+        postgres=# CREATE DATABASE prueba;
+        CREATE DATABASE
+        postgres=# CREATE USER usuario1 WITH PASSWORD 'usuario1';
+        CREATE ROLE
+        postgres=# GRANT ALL PRIVILEGES ON DATABASE prueba to usuario1;
+        GRANT
+
+* Una vez añadimos contenido a esta base de datos podremos conectarnos desde nuestro navegador.
+
+![phppgadmin](/servidores_bbdd/1.png)
+
+* Nos identificaremos con el usuario que creamos anteriormente y podremos acceder a las bases de datos sobre las que tiene privilegio y podríamos por ejemplo ver las tablas e información que tenemos en la misma. 
+
+![phppgadmin](/servidores_bbdd/2.png)
+
+![phppgadmin](/servidores_bbdd/3.png)
+
+* 
