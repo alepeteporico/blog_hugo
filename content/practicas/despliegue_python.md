@@ -92,9 +92,9 @@ menu = "main"
 
 ![polls](/despliegue_python/6.png)
 
-### ENTORNO DE DESARROLLO.
+### ENTORNO DE PRODUCCIÓN.
 
-* Pasemos al entorno de desarrollo, el cual será una maquina que tendremos en nuestro cloud. El primer paso en la misma será instalar los siguiente paquetes.
+* Pasemos al entorno de producción, el cual será una maquina que tendremos en nuestro cloud. El primer paso en la misma será instalar los siguiente paquetes.
 
         debian@python:~$ sudo apt-get install apache2
 
@@ -203,17 +203,17 @@ menu = "main"
 
         <VirtualHost *:80>
 
-                ServerName www.alegvdjango.es 
+                ServerName www.alegvdjango.es
 
                 ServerAdmin webmaster@localhost
-                WSGIDaemonProcess flask_temp user=www-data group=www-data processes=1 threads=5 python-path$
+                WSGIDaemonProcess app_python user=www-data group=www-data processes=1 threads=5 python-path=/var$
                 WSGIScriptAlias / /var/www/django_tutorial/django_tutorial/wsgi.py
                 DocumentRoot /var/www/html
 
                 Alias /static/ /var/www/django_tutorial/static/
 
-                <Directory /srv/django_tutorial>
-                        WSGIProcessGroup flask_temp
+                <Directory /var/www/django_tutorial>
+                        WSGIProcessGroup app_python
                         WSGIApplicationGroup %{GLOBAL}
                         Require all granted
                 </Directory>
@@ -232,3 +232,79 @@ menu = "main"
 
 * añadiremos al `/etc/hosts` de nuestra anfitriona la dirección de nuestra aplicación y comprobaremos su funcionamiento.
 
+![exito](/despliegue_python/7.png)
+
+* Podemos comprobar que nuestro sitio hace uso de las hojas de estilo
+
+![hojas estilo](/despliegue_python/8.png)
+
+* Para evitar que se pueda mostrar información sensible configuramos el fichero settings.py y quitamos el debug.
+
+        DEBUG = False
+
+### Modificación de la aplicación.
+
+* Primero realizaremos estos cambios en el entorno de desarrollo, el primero de ellos será que nuestro nombre aparezca en la pagina de admin. Para ello modificaremos el fichero `django_tutorial/polls/templates/polls/index.html`.
+
+        {% load static %}
+
+        <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}">
+
+        <h1>Alejandro Gutiérrez Valencia<h1>
+
+        {% if latest_question_list %}
+            <ul>
+            {% for question in latest_question_list %}
+            <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No polls are available.</p>
+        {% endif %}
+
+![nombre](/despliegue_python/8.png)
+
+* Vamos a modificar la imagen que se ve de fondo en la aplicación, para ello modificamos el archivo `django/lib/python3.7/site-packages/django/contrib/admin/static/admin/css/base.css` y podemos por ejemplo cambiar el color de fondo
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+            font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
+            color: #333;
+            background: #ebe10d;
+        }
+
+![fondo](/despliegue_python/10.png)
+
+* Añadiremos una nueva tabla en la base de datos, para ello añadimos el siguiente modelo a `polls/models.py`
+
+          class Categoria(models.Model):
+          	Abr = models.CharField(max_length=4)
+          	Nombre = models.CharField(max_length=50)
+
+          	def __str__(self):
+          		return self.Abr+" - "+self.Nombre 
+
+* El siguiente paso es crear una nueva migración:
+
+        (django) alejandrogv@AlejandroGV:~/django_tutorial$ python3 manage.py makemigrations
+        Migrations for 'polls':
+          polls/migrations/0002_categoria.py
+            - Create model Categoria
+
+* Ahora en `polls/admin.py` debemos añadir el nuevo modelo.
+
+        from .models import Choice, Question, Categoria
+
+        admin.site.register(Categoria)
+
+* Y migramos por supuesto.
+
+        (django) alejandrogv@AlejandroGV:~/django_tutorial$ python3 manage.py migrate
+        Operations to perform:
+          Apply all migrations: admin, auth, contenttypes, polls, sessions
+        Running migrations:
+          Applying polls.0002_categoria... OK
+
+![fondo](/despliegue_python/11.png)
