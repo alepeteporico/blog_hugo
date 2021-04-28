@@ -405,4 +405,101 @@ Database configuration completed successfully. The passwords were auto generated
 
 ![phppgadmin](/servidores_bbdd/3.png)
 
-* 
+### Instalación de mongodb y una herramienta de administración web.
+
+* Instalaremos mongodb, los pasos serían descargar el repositorio añadiendo la clave pública y añadir este repositorio a nuestro `sources.list`
+
+        vagrant@mongo:~$ sudo wget https://www.mongodb.org/static/pgp/server-4.4.asc -qO- | sudo apt-key add -
+
+        root@mongo:~# echo "deb http://repo.mongodb.org/apt/debian buster/mongodb-org/4.4 main" > /etc/apt/sources.list.d/mongodb-org-4.4.list
+
+* Una vez hecho esto podremos instalar mongodb
+
+        vagrant@mongo:~$ sudo apt install mongodb-org
+
+* Entramos en la base de datos y nos autentificaremos con el usuario administrador.
+
+        vagrant@mongo:~$ mongo
+        MongoDB shell version v4.4.5
+        connecting to: mongodb://127.0.0.1:27017/?compressors=disabled&gssapiServiceName=mongodb
+        Implicit session: session { "id" : UUID("ff7e45d7-a6fb-4505-abb4-036f43dd5c26") }
+        MongoDB server version: 4.4.5
+        Welcome to the MongoDB shell.
+        For interactive help, type "help".
+        For more comprehensive documentation, see
+        	https://docs.mongodb.com/
+        Questions? Try the MongoDB Developer Community Forums
+        	https://community.mongodb.com
+        ---
+        The server generated these startup warnings when booting: 
+                2021-04-28T08:05:23.509+00:00: Using the XFS filesystem is strongly recommended with the WiredTiger storage engine. See http://dochub.mongodb.org/core/ prodnotes-filesystem
+                2021-04-28T08:05:23.943+00:00: Access control is not enabled for the database. Read and write access to data and configuration is unrestricted
+        ---
+        ---
+                Enable MongoDB's free cloud-based monitoring service, which will then receive and display
+                metrics about your deployment (disk utilization, CPU, operation statistics, etc).
+
+                The monitoring data will be available on a MongoDB website with a unique URL accessible to you
+                and anyone you share the URL with. MongoDB may use this information to make product
+                improvements and to suggest MongoDB products and deployment options to you.
+
+                To enable free monitoring, run the following command: db.enableFreeMonitoring()
+                To permanently disable this reminder, run the following command: db.disableFreeMonitoring()
+        ---
+        > use admin
+        switched to db admin
+
+* Creamos un usuario.
+
+        > db.createUser(
+        ... {
+        ... user: "usuario",
+        ... pwd: "usuario",
+        ... roles: [ { role: "userAdminAnyDatabase", db: "admin" }, "readWriteAnyDatabase" ]
+        ... }
+        ... )
+        Successfully added user: {
+        	"user" : "usuario",
+        	"roles" : [
+        		{
+        			"role" : "userAdminAnyDatabase",
+        			"db" : "admin"
+        		},
+        		"readWriteAnyDatabase"
+        	]
+        }
+
+* Modificaremos el fichero `/etc/mongod.conf` para activar la autentificación y reiniciaremos el servicio para que haga efecto. 
+
+        security:
+          authorization: enabled
+
+        
+        vagrant@mongo:~$ sudo systemctl restart mongod
+
+* Veamos las bases de datos que tenemos, he creado una para tener un poco de contenido.
+
+        > show dbs
+        admin   0.000GB
+        config  0.000GB
+        libros  0.000GB
+        local   0.000GB
+
+* Una vez tenemos nuestra base de datos a punto instalaremos nuestro administrador web. He elegido Rockmongo para ello instalaremos las dependencias necesarias.
+
+        vagrant@mongo:~$ sudo apt install apache2 gcc php php-gd php-pear unzip wget
+
+* Necesitamos modificar el fichero `/etc/php/7.3/apache2/php.ini` y añadir la siguiente línea:
+
+        extension=mongo.so
+
+* Clonaremos el respositorio de github de Rockmongo y añadiremos esta aplicación a un DocumentRoot
+
+        vagrant@mongo:~$ git clone https://github.com/iwind/rockmongo.git
+
+        vagrant@mongo:~$ sudo mv rockmongo/ /var/www/
+
+* Y en el fichero `config.php` que está dentro del respositorio configuraremos la siguiente línea
+
+        $MONGO["servers"][$i]["mongo_host"] = "0.0.0.0";//mongo host
+

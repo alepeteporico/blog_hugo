@@ -223,7 +223,7 @@ menu = "main"
 
         </VirtualHost>
 
-* Creamos las carpetas para el contenido estático que tendremos que copiar de llos directorios que veremos a continuación:
+* Creamos las carpetas para el contenido estático que tendremos que copiar de los directorios que veremos a continuación:
 
         (django) root@python:/var/www/django_tutorial# mkdir -p static/{admin,polls}
 
