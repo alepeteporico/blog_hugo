@@ -487,11 +487,34 @@ Database configuration completed successfully. The passwords were auto generated
 
 * Una vez tenemos nuestra base de datos a punto instalaremos nuestro administrador web. He elegido Rockmongo para ello instalaremos las dependencias necesarias.
 
-        vagrant@mongo:~$ sudo apt install apache2 gcc php php-gd php-pear unzip wget
+        vagrant@mongo:~$ sudo apt install apache2 gcc php php-gd php-pear unzip wget php7.3-dev
 
 * Necesitamos modificar el fichero `/etc/php/7.3/apache2/php.ini` y añadir la siguiente línea:
 
         extension=mongo.so
+
+* Debemos clonar el repositorio del modulo de php para mongo.
+
+        vagrant@mongo:~ git clone https://github.com/mongodb/mongo-php-driver-legacy.git
+
+* Seguidamente entraremos en el repositorio y ejecutaremos el siguiente comando.
+
+        vagrant@mongo:~/mongo-php-driver$ phpize
+        Configuring for:
+        PHP Api Version:         20180731
+        Zend Module Api No:      20180731
+        Zend Extension Api No:   320180731
+
+* Ahora ejecutaremos el script que está dentro del repositorio `configure`.
+
+        vagrant@mongo:~/mongo-php-driver$ ./configure
+
+* Y por último instalaremos el módulo.
+
+        vagrant@mongo:~/mongo-php-driver$ sudo make all
+
+        vagrant@mongo:~/mongo-php-driver$ sudo make install
+        Installing shared extensions:     /usr/lib/php/20180731/
 
 * Clonaremos el respositorio de github de Rockmongo y añadiremos esta aplicación a un DocumentRoot
 
