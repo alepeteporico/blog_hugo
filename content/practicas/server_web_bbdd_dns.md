@@ -231,6 +231,27 @@ menu = "main"
 
         root@dulcinea:~# nft list ruleset > /etc/nftables.conf
 
+**Vamos a cambiar el nombre de dominio local en los /etc/hosts de todas las máquinas**
+
+### Dulciena
+
+        127.0.1.1 dulcinea.alegv.gonzalonazareno.org dulcinea.novalocal dulcinea
+        127.0.0.1 localhost
+
+### Sancho
+
+        127.0.0.1 sancho.alegv.gonzalonzareno.org
+        127.0.0.1 localhost
+
+### Feston
+
+        127.0.1.1 freston.alegv.gonzalonzareno.org freston.novalocal freston
+        127.0.0.1 localhost
+
+### Quijote
+
+        127.0.1.1 quijote.alegv.gonzalonazareno.org quijote
+
 **Cambiamos los ficheros de resolv de todas las instanacias:**
 
 ### Dulcinea
@@ -286,7 +307,7 @@ menu = "main"
         nameserver 10.0.1.9
         nameserver 192.168.200.2
         nameserver 192.168.202.2
-        search alegv.gonzalonazareno.org
+        search openstacklocal alegv.gonzalonazareno.org
 
         debian@freston:~$ cat /etc/resolvconf/resolv.conf.d/base
         nameserver 192.168.202.2
@@ -453,6 +474,7 @@ menu = "main"
 
         [centos@quijote ~]$ sudo semanage fcontext -a -t httpd_log_t "/var/www/alegv/log(/.*)?"
         [root@quijote ~]# sudo restorecon -R -v /var/www/alegv/log
+        
         [centos@quijote ~]$ sudo systemctl restart httpd
 
 **Creamos el fichero info.php**
@@ -460,4 +482,3 @@ menu = "main"
         [centos@quijote ~]$ cat /var/www/alegv/info.php 
         echo "<?php phpinfo(); ?>"
 
-**prueba**
