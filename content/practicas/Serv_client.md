@@ -482,12 +482,14 @@ Database configuration completed successfully. The passwords were auto generated
         > show dbs
         admin   0.000GB
         config  0.000GB
-        libros  0.000GB
+        local   0.000GB
         local   0.000GB
 
 * Una vez tenemos nuestra base de datos a punto instalaremos nuestro administrador web. He elegido Rockmongo para ello instalaremos las dependencias necesarias.
 
         vagrant@mongo:~$ sudo apt install apache2 gcc php php-gd php-pear unzip wget php7.3-dev
+
+        vagrant@mongo:~$ sudo pecl install mongodb
 
 * Necesitamos modificar el fichero `/etc/php/7.3/apache2/php.ini` y añadir la siguiente línea:
 
