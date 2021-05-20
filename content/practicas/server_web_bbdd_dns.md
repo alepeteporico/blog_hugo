@@ -8,6 +8,9 @@ date = "2021-03-16"
 menu = "main"
 +++
 
+
+### Servidor DNS
+
 **El servidor DNS estará instalado en freston, por ello instalaremos bind en esta máquina**
 
         root@freston:~# apt install bind9
@@ -98,7 +101,7 @@ menu = "main"
 
         dulcinea        IN      A       10.0.1.8
         sancho  IN      A       10.0.1.6
-        quijote IN      A       10.0.2.2
+        quijote IN      A       10.0.2.12
         freston IN      A       10.0.1.9
         www     IN      CNAME   quijote
         bd      IN      CNAME   sancho
@@ -119,7 +122,7 @@ menu = "main"
         
         dulcinea        IN      A       10.0.2.10
         sancho  IN      A       10.0.1.6
-        quijote IN      A       10.0.2.2
+        quijote IN      A       10.0.2.12
         freston IN      A       10.0.1.9
         www     IN      CNAME   quijote
         bd      IN      CNAME   sancho
@@ -179,7 +182,7 @@ menu = "main"
         $ORIGIN 2.0.10.in-addr.arpa.
         
         10      IN      PTR     dulcinea
-        2       IN      PTR     quijote
+        12      IN      PTR     quijote
 
 **Si quisieramos asegurarnos de que no tenemos ningún error de sintáxis podemos usar esto:**
 
@@ -350,7 +353,7 @@ menu = "main"
 
 ### Quijote
 
-        [centos@quijote ~]$ dig +short @10.0.1.9 -x 10.0.2.2
+        [centos@quijote ~]$ dig +short @10.0.1.9 -x 10.0.2.12
         quijote.2.0.10.in-addr.arpa.
         [centos@quijote ~]$ dig +short @10.0.1.9 -x 10.0.2.10
         dulcinea.2.0.10.in-addr.arpa.
@@ -393,6 +396,8 @@ menu = "main"
         ;; SERVER: 192.168.1.1#53(192.168.1.1)
         ;; WHEN: dom feb 21 17:47:52 CET 2021
         ;; MSG SIZE  rcvd: 100
+
+### Servidor web
 
 **Tenemos el servidor DNS, continuemos con el servidor web, este servidor estará situado en Quijote, será un servidor apache capaz de ejecutar php. Lo primero que deberemos hacer es instalar el servidor apache y php (el paquete de apache en CentOS se llama httpd)**
 
@@ -474,11 +479,43 @@ menu = "main"
 
         [centos@quijote ~]$ sudo semanage fcontext -a -t httpd_log_t "/var/www/alegv/log(/.*)?"
         [root@quijote ~]# sudo restorecon -R -v /var/www/alegv/log
-        
-        [centos@quijote ~]$ sudo systemctl restart httpd
+        [centos@quijote sites-available]$ sudo setsebool -P httpd_unified 1
+
+        [centos@quijote sites-available]$ sudo systemctl restart httpd
 
 **Creamos el fichero info.php**
 
         [centos@quijote ~]$ cat /var/www/alegv/info.php 
-        echo "<?php phpinfo(); ?>"
+        <?php phpinfo(); ?>
 
+**Comprobemos que funciona**
+
+![info](/dns_web_bbdd/1.png)
+
+### Servidor Base de datos.
+
+**Usaremos el gestor mariadb**
+
+        ubuntu@sancho:~$ sudo apt install mariadb-server
+
+**Y una vez instalado debemos configurarlo para permitir el uso de usuarios remoto accediendo al fichero `/etc/mysql/mariadb.conf.d/50-server.cnf` y modificando la línea `bind-address` tal como aparece a continuación**
+
+        bind-address            = 0.0.0.0
+
+**Ahora vamos a entrar y crear un usuario que usaremos remotamente.**
+
+        ubuntu@sancho:~$ sudo mysql -u root -p
+
+        MariaDB [(none)]> CREATE USER 'ale'@'10.0.2.12' IDENTIFIED BY 'ale';
+        Query OK, 0 rows affected (0.009 sec)
+
+**Crearemos una base de datos y daremos a nuestro usuario remoto privilegios sobre ella**
+
+        MariaDB [(none)]> CREATE DATABASE prueba;
+        Query OK, 1 row affected (0.010 sec)
+
+        MariaDB [(none)]> GRANT ALL PRIVILEGES ON *.* TO 'ale'@'10.0.2.12'
+            -> ;
+        Query OK, 0 rows affected (0.001 sec)
+
+**Ahora vayamos a centos, y lo primero que haremos será instalar el cliente de mariadb**
