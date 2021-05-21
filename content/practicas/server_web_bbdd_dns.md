@@ -101,7 +101,7 @@ menu = "main"
 
         dulcinea        IN      A       10.0.1.8
         sancho  IN      A       10.0.1.6
-        quijote IN      A       10.0.2.12
+        quijote IN      A       10.0.2.5
         freston IN      A       10.0.1.9
         www     IN      CNAME   quijote
         bd      IN      CNAME   sancho
@@ -122,7 +122,7 @@ menu = "main"
         
         dulcinea        IN      A       10.0.2.10
         sancho  IN      A       10.0.1.6
-        quijote IN      A       10.0.2.12
+        quijote IN      A       10.0.2.5
         freston IN      A       10.0.1.9
         www     IN      CNAME   quijote
         bd      IN      CNAME   sancho
@@ -182,7 +182,7 @@ menu = "main"
         $ORIGIN 2.0.10.in-addr.arpa.
         
         10      IN      PTR     dulcinea
-        12      IN      PTR     quijote
+        5       IN      PTR     quijote
 
 **Si quisieramos asegurarnos de que no tenemos ningún error de sintáxis podemos usar esto:**
 
@@ -339,7 +339,7 @@ menu = "main"
         debian@dulcinea:~$ dig +short @10.0.1.9 freston.alegv.gonzalonazareno.org
         10.0.1.9
         debian@dulcinea:~$ dig +short @10.0.1.9 quijote.alegv.gonzalonazareno.org
-        10.0.2.2
+        10.0.2.5
         debian@dulcinea:~$ dig +short @10.0.1.9 sancho.alegv.gonzalonazareno.org
         10.0.1.3
 
@@ -353,7 +353,7 @@ menu = "main"
 
 ### Quijote
 
-        [centos@quijote ~]$ dig +short @10.0.1.9 -x 10.0.2.12
+        [centos@quijote ~]$ dig +short @10.0.1.9 -x 10.0.2.5
         quijote.2.0.10.in-addr.arpa.
         [centos@quijote ~]$ dig +short @10.0.1.9 -x 10.0.2.10
         dulcinea.2.0.10.in-addr.arpa.
@@ -506,7 +506,7 @@ menu = "main"
 
         ubuntu@sancho:~$ sudo mysql -u root -p
 
-        MariaDB [(none)]> CREATE USER 'ale'@'10.0.2.12' IDENTIFIED BY 'ale';
+        MariaDB [(none)]> CREATE USER 'ale'@'10.0.2.5' IDENTIFIED BY 'ale';
         Query OK, 0 rows affected (0.009 sec)
 
 **Crearemos una base de datos y daremos a nuestro usuario remoto privilegios sobre ella**
@@ -514,8 +514,37 @@ menu = "main"
         MariaDB [(none)]> CREATE DATABASE prueba;
         Query OK, 1 row affected (0.010 sec)
 
-        MariaDB [(none)]> GRANT ALL PRIVILEGES ON *.* TO 'ale'@'10.0.2.12'
+        MariaDB [(none)]> GRANT ALL PRIVILEGES ON *.* TO 'ale'@'10.0.2.5'
             -> ;
         Query OK, 0 rows affected (0.001 sec)
 
 **Ahora vayamos a centos, y lo primero que haremos será instalar el cliente de mariadb**
+
+        [centos@quijote ~]$ sudo dnf install mariadb
+
+**Y procedemos a acceder al servidor mariadb con las credenciales que usamos anteriormente**
+
+        [root@quijote ~]# mysql -u ale -p -h bd.alegv.gonzalonazareno.org
+        Enter password: 
+        Welcome to the MariaDB monitor.  Commands end with ; or \g.
+        Your MariaDB connection id is 37
+        Server version: 10.3.29-MariaDB-0ubuntu0.20.04.1 Ubuntu 20.04
+        
+        Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+        
+        Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+        
+        MariaDB [(none)]>
+
+**Vamos a comprobar que funciona simplemente listando las bases de datos que tenemos**
+
+        MariaDB [(none)]> SHOW DATABASES;
+        +--------------------+
+        | Database           |
+        +--------------------+
+        | information_schema |
+        | mysql              |
+        | performance_schema |
+        | prueba             |
+        +--------------------+
+        4 rows in set (0.034 sec)
