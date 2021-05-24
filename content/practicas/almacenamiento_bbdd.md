@@ -419,3 +419,71 @@ menu = "main"
 
 * Instalamos en nuestro sistema el paquete `quota`
 
+        vagrant@postgres:~$ sudo apt install quota
+
+* Nos dirigimos al fichero `/etc/fstab` y lo modifcamos de la siguiente forma:
+
+        UUID=d3d2a9a3-92f6-4777-bb0f-1d806e57bfec	/	ext4	rw,discard,errors=remount-ro,usrquota,grpquota	0	1
+
+* Remontamos el raiz para que los cambios en el disco hagan efecto.
+
+        vagrant@postgres:~$ sudo mount -o remount /
+
+* Vamos a habilitar las cuotas
+
+        vagrant@postgres:~$ sudo quotacheck -ugm /
+        
+        vagrant@postgres:~$ sudo quotaon -v /
+        /dev/sda1 [/]: group quotas turned on
+        /dev/sda1 [/]: user quotas turned on
+
+* Y para modifcar las cuotas de los usuarios pues simplente usamos el siguiente comando:
+
+        vagrant@postgres:~$ sudo edquota -u vagrant
+
+* Como postgres crea un usuario "real" en el sistema por así decirlo cada vez que creamos uno en la base de datos, pues simplemente añadimos uno cuota al usuario al que queremos restringir el almacenamiento.
+
+### Averigua si existe el concepto de extensión en MySQL y si coincide con el existente en ORACLE.
+
+* Existe lo que se llaman motores de almacenamiento, existen distintos, pero los mas usados son `MyISAM` e `nnoDB`.
+
+* Un motor de almacenamiento es el encargado de almacenar, gestionar y recuperar toda la información de una tabla.
+
+* Veamos todos los que existen.
+
+        MariaDB [(none)]> SHOW ENGINES;
+        +--------------------+---------+----------------------------------------------------------------------------------+--------------+------+------------+
+        | Engine             | Support | Comment                                                                          | Transactions | XA   | Savepoints |
+        +--------------------+---------+----------------------------------------------------------------------------------+--------------+------+------------+
+        | MRG_MyISAM         | YES     | Collection of identical MyISAM tables                                            | NO           | NO   | NO         |
+        | CSV                | YES     | Stores tables as CSV files                                                       | NO           | NO   | NO         |
+        | MEMORY             | YES     | Hash based, stored in memory, useful for temporary tables                        | NO           | NO   | NO         |
+        | MyISAM             | YES     | Non-transactional engine with good performance and small data footprint          | NO           | NO   | NO         |
+        | Aria               | YES     | Crash-safe tables with MyISAM heritage                                           | NO           | NO   | NO         |
+        | InnoDB             | DEFAULT | Supports transactions, row-level locking, foreign keys and encryption for tables | YES          | YES  | YES        |
+        | PERFORMANCE_SCHEMA | YES     | Performance Schema                                                               | NO           | NO   | NO         |
+        | SEQUENCE           | YES     | Generated tables filled with sequential values                                   | YES          | NO   | YES        |
+        +--------------------+---------+----------------------------------------------------------------------------------+--------------+------+------------+
+        8 rows in set (0.001 sec)
+
+* Vemos que nos da un listado de los que tenemos a disposición y un poco de las características de los mismos.
+
+### Averigua si en MongoDB puede saberse el espacio disponible para almacenar nuevos documentos.
+
+* Por supuesto, mongo ofrece diferentes opciones para gestionar el almacenamiento y los datos que maneja, veamos algunos de ellos
+
+* Ver el tamaño de los datos en la colección.
+
+        db.collection.dataSize(): 
+
+* Ver el tamaño de los índices.
+
+        db.collection.totalIndexSize():
+
+* Ver el tamaño de un índice.
+
+        db.collection.index.stats().indexSizes: 
+
+* Ver el tamaño de los datos más el de los índices.
+
+        db.collection.totalSize():
