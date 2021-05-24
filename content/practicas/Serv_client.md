@@ -498,6 +498,7 @@ Database configuration completed successfully. The passwords were auto generated
 * Debemos clonar el repositorio del modulo de php para mongo.
 
         vagrant@mongo:~ git clone https://github.com/mongodb/mongo-php-driver-legacy.git
+        vagrant@mongo:~/mongo-php-driver$ git submodule sync && git submodule update --init
 
 * Seguidamente entraremos en el repositorio y ejecutaremos el siguiente comando.
 
@@ -528,3 +529,4 @@ Database configuration completed successfully. The passwords were auto generated
 
         $MONGO["servers"][$i]["mongo_host"] = "0.0.0.0";//mongo host
 
+* Y ya tendriamos instalado rockmongo.
