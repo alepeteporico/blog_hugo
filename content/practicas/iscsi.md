@@ -193,6 +193,30 @@ menu = "main"
         └─sda1   8:1    0  20G  0 part /
         sdb      8:16   0   1G  0 disk /prueba1
 
-* Ahora si podremos abrir nuestro cliente windows y nos dirigiremos a `panel de control > sistema y seguridad > herramientas administrativas > iniciador iSCSI`
+* Ahora si podremos abrir nuestro cliente windows y nos dirigiremos a `panel de control > sistema y seguridad > herramientas administrativas > iniciador iSCSI` una vez ahí, en `conexión rápida` añadiremos la IP de nuestro servidor y aparcerán las targets que tenemos configuradas.
 
-![escenario](/iscsi/1.png)
+![targets](/iscsi/1.png)
+
+* Elegiriamos la 2 que configuramos al principio con usuario y contraseña concienciudamente y clicaremos en opciones avanzadas dentro de las pestaña que aparece habilitando el `inicio de sesion CHAP` y escribiendo nuestro usuario y contraseña configurados anteriormente.
+
+![targets](/iscsi/2.png)
+
+![targets](/iscsi/3.png)
+
+* Después de esto podemos comprobar que este target está activo.
+
+![targets](/iscsi/4.png)
+
+* Para montar este disco iriamos a la aplicacion de particiones.
+
+![targets](/iscsi/5.png)
+
+* Y dentro nos aparecerá una ventana avisando de que se ha encontrado un nuevo disco.
+
+![targets](/iscsi/6.png)
+
+* Le daremos el formato estandar de windows NTFS y comprobaremos que se encuentra en nuestro sistema
+
+![targets](/iscsi/7.png)
+
+![targets](/iscsi/8.png)
