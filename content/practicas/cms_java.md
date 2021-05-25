@@ -116,4 +116,4 @@ menu = "main"
 
 * Después de añadir a nuestro `/etc/hosts` la ip podremos entrar.
 
-![guacamole](/iscsi/1.png)
+![guacamole](/guacamole/1.png)
