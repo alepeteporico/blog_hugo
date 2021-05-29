@@ -2,7 +2,7 @@
 title = "Despliegue de un cluster de kubernetes"
 description = ""
 tags = [
-    "HLC
+    "HLC"
 ]
 date = "2021-05-27"
 menu = "main"
