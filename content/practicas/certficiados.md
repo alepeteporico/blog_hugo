@@ -91,3 +91,139 @@ menu = "main"
 
 #### HTTPS 
 
+* Crearemos una clave privada que asociaremos a nuestra solicitud de firma.
+
+        root@https:~# openssl genrsa 4096 > /etc/ssl/private/alegv.key
+        Generating RSA private key, 4096 bit long modulus (2 primes)
+        ............++++
+        ......++++
+        e is 65537 (0x010001)
+
+* Con esta clave generaremos un fichero csr.
+
+        openssl req -new -key /etc/ssl/private/alegv.key -out alegv.csr      
+
+* Una vez se nos firme nuestro certificado como veremos posteriormente podemos añadirlo a nuestra página, primero debemos configurar el módulo de ssl de apache configurando el fichero `/etc/apache2/sites-available/default-ssl.conf`.
+
+        <IfModule mod_ssl.c>
+                <VirtualHost _default_:443>
+                        ServerAdmin webmaster@localhost
+                        ServerName alegv.iesgn.org
+                        DocumentRoot /var/www/iesgn
+
+                        ErrorLog ${APACHE_LOG_DIR}/error.log
+                        CustomLog ${APACHE_LOG_DIR}/access.log combined
+
+                        SSLEngine on
+
+                        SSLCertificateFile      /etc/ssl/certs/alegv.crt
+                        SSLCertificateKeyFile /etc/ssl/private/alegv.key
+                        SSLCACertificateFile /etc/ssl/certs/prueba.pem
+
+                        <FilesMatch \"\.\(cgi|shtml|phtml|php)\$\">
+                                        SSLOptions +StdEnvVars
+                        </FilesMatch>
+                        <Directory /usr/lib/cgi-bin>
+                                        SSLOptions +StdEnvVars
+                        </Directory>
+                </VirtualHost>
+        </IfModule>
+
+* Y en el virtual host deberíamos añadir la siguiente línea:
+
+        Redirect 301 / https://alegv.iesgn.com/
+
+----------------------------------
+
+* Vamos a crear los directorios necesarios para realizar esta parte.
+
+        root@https2:/# tree CA/
+        CA/
+        ├── certs
+        ├── crl
+        ├── nuevos
+        └── privado
+
+* Debemos crear un fichero que nos servira como base de datos sobre los certificados creados.
+
+        root@https2:/CA# touch index.txt
+
+* También copiaremos un fichero llamado `openssl.cnf`:
+
+        root@https2:/CA# cp /etc/ssl/openssl.cnf /CA
+
+* Ahora podemos crear nuestro certificado autofirmado.
+
+        root@https:/CA# openssl req -config openssl.cnf -new -x509 -extensions v3_ca -keyout privado/ca.key -out ./certs/caalegv.crt
+
+* Vamos a modificar nuestro fichero openssl para personalizar los directorios que se usan.
+
+        [ CA_default ]
+
+        dir             = /CA           # Where everything is kept
+        certs           = $dir/certs            # Where the issued certs are kept
+        crl_dir         = $dir/crl              # Where the issued crl are kept
+        database        = $dir/index.txt        # database index file.
+        #unique_subject = no                    # Set to 'no' to allow creation of
+                                                # several certs with same subject.
+        new_certs_dir   = $dir/nuevos           # default place for new certs.
+
+        certificate     = $dir/certs/ca.crt 
+        serial          = $dir/serial 
+                                                # must be commented out to leave a V1 CRL
+        crl             = $dir/crl.pem 
+        private_key     = $dir/privado/ca.key 
+
+        x509_extensions = usr_cert
+
+* Vamos a generar nuestro par de calves.
+
+        root@https2:/CA# openssl req -new -newkey rsa:2048 -keyout privado/caprueba.key -out caclave.pem -config ./openssl.cnf
+
+* Posteriormente autofirmaremos nuestro certificado.
+
+        root@https2:/CA# openssl ca -create_serial -out cacerts.pem -days 365 -keyfile privado/caprueba.key -selfsign -extensions v3_ca -config ./openssl.cnf -infiles caclave.pem
+        Using configuration from ./openssl.cnf
+        Enter pass phrase for privado/caprueba.key:
+        Check that the request matches the signature
+        Signature ok
+        Certificate Details:
+                Serial Number: 1 (0x1)
+                Validity
+                    Not Before: Jun  2 18:17:01 2021 GMT
+                    Not After : Jun  2 18:17:01 2022 GMT
+                Subject:
+                    countryName               = ES
+                    stateOrProvinceName       = Sevilla
+                    organizationName          = Prueba SL
+                    organizationalUnitName    = prueba
+                    commonName                = alejandro
+                    emailAddress              = prueba@yahoo.es
+                X509v3 extensions:
+                    X509v3 Subject Key Identifier: 
+                        B4:A9:FB:C0:3B:A8:BB:74:97:93:6F:6E:B9:C7:AB:2D:E6:61:F4:BD
+                    X509v3 Authority Key Identifier: 
+                        keyid:B4:A9:FB:C0:3B:A8:BB:74:97:93:6F:6E:B9:C7:AB:2D:E6:61:F4:BD
+
+                    X509v3 Basic Constraints: critical
+                        CA:TRUE
+        Certificate is to be certified until Jun  2 18:17:01 2022 GMT (365 days)
+        Sign the certificate? [y/n]:y
+
+
+        1 out of 1 certificate requests certified, commit? [y/n]y
+        Write out database with 1 new entries
+        Data Base Updated
+
+* Vamos a ver todos los ficheros que se han generado.
+
+        root@https2:/CA# ls
+        cacerts.pem  certs  index.txt	    index.txt.old  openssl.cnf	serial
+        caclave.pem  crl    index.txt.attr  nuevos	   privado	serial.old
+
+* firmamos el certificado.
+
+        root@https2:/CA# openssl ca -config openssl.cnf -out certs/caalegv.crt -infiles nuevos/alegv.csr 
+        Using configuration from openssl.cnf
+
+* Ahora enviariamos el certificado firmado.
