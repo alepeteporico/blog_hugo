@@ -376,6 +376,93 @@ ___
         ;; WHEN: Tue May 18 12:14:14 UTC 2021
         ;; MSG SIZE  rcvd: 254
 
+### DNS esclavo
+
+#### Realiza la instalación del servidor DNS esclavo. Documenta los siguientes apartados: 
+
+1. **Entrega la configuración de las zonas del maestro y del esclavo.**
+2. **Comprueba si las zonas definidas en el maestro tienen algún error con el comando adecuado.**
+3. **Comprueba si la configuración de named.conf tiene algún error con el comando adecuado.**
+4. **Reinicia los servidores y comprueba en los logs si hay algún error. No olvides incrementar el número de serie en el registro SOA si has modificado la zona en el maestro.**
+5. **Muestra la salida del log donde se demuestra que se ha realizado la transferencia de zona.**
+
+#### Documenta los siguientes apartados: 
+
+1. **Configura un cliente para que utilice los dos servidores como servidores DNS.**
+2. **Realiza una consulta con dig tanto al maestro como al esclavo para comprobar que las respuestas son autorizadas. ¿En qué te tienes que fijar?**
+3. **Solicita una copia completa de la zona desde el cliente ¿qué tiene que ocurrir?. Solicita una copia completa desde el esclavo ¿qué tiene que ocurrir?**
+
+* En nuestro `/etc/bind/named.conf.options` del nuestro servidor maestro añadimos la siguientes líneas apuntando al que será el DNS secundario.
+
+                allow-transfer { 172.22.100.15; };
+                notify yes;
+
+* Y en nuestro ficheros `db.iesgn.org` y `db.100.22.172` añadimos también el DNS secundario.
+
+        secundario      IN      A       172.22.100.15
+
+* En la máquina que servira como DNS secundario instalaremos bind9.
+
+        vagrant@dnsesclavo:~$ sudo apt install bind9
+
+* Añadimos esto a `named.conf.options`
+
+        allow-transfer { none; };
+
+* Y definimos las zonas que están en el servidor primario en el fichero `named.conf.local`
+
+        zone "iesgn.org" {
+                type slave;
+                file "db.iesgn.org";
+                masters { 172.22.100.10; };
+        };
+        
+        zone "100.22.172.in-addr.arpa" {
+                type slave;
+                file "db.100.22.172";
+                masters { 172.22.100.10; };
+        };
+
+* Configuraremos el cliente para que use los dos servidores modificando su `/etc/resolv.conf`
+
+        nameserver 172.22.100.10
+        nameserver 172.22.100.15
+
+* Comprobamos que podemos hacer una consulta a traves del DNS secundario.
+
+        vagrant@cliente:~$ dig @172.22.100.15 ftp.iesgn.org
+
+        ; <<>> DiG 9.11.5-P4-5.1+deb10u5-Debian <<>> @172.22.100.15 ftp.iesgn.org
+        ; (1 server found)
+        ;; global options: +cmd
+        ;; Got answer:
+        ;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 56695
+        ;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 2, ADDITIONAL: 3
+
+        ;; OPT PSEUDOSECTION:
+        ; EDNS: version: 0, flags:; udp: 4096
+        ; COOKIE: 6ec8f9bfe693967950f7ab1d60bdf891fda2bd761dee9b9b (good)
+        ;; QUESTION SECTION:
+        ;ftp.iesgn.org.			IN	A
+
+        ;; ANSWER SECTION:
+        ftp.iesgn.org.		86400	IN	A	172.22.100.201
+
+        ;; AUTHORITY SECTION:
+        iesgn.org.		86400	IN	NS	secundario.iesgn.org.
+        iesgn.org.		86400	IN	NS	alegv.iesgn.org.
+
+        ;; ADDITIONAL SECTION:
+        alegv.iesgn.org.	86400	IN	A	172.22.100.10
+        secundario.iesgn.org.	86400	IN	A	172.22.100.15
+
+        ;; Query time: 0 msec
+        ;; SERVER: 172.22.100.15#53(172.22.100.15)
+        ;; WHEN: Mon Jun 07 10:44:33 UTC 2021
+        ;; MSG SIZE  rcvd: 163
+
+-------------------------------------------------------------------
+
 ### Delegación de dominios.
 
 #### Realiza la instalación y configuración del nuevo servidor dns con las características anteriormente señaladas. Muestra el resultado al profesor.
