@@ -141,7 +141,7 @@ menu = "main"
         SQL> CREATE TABLE prueba
           2  AS (SELECT *
           3  FROM prueba1@oracle1link);
-        
+
         Tabla creada.
 
 ## Conexión entre Postgres.
@@ -318,7 +318,86 @@ menu = "main"
         Trace           = 0
         TraceFile	= /tmp/sql.log
 
-* 
+* Vamos a comprobar la conexión.
+
+        [vagrant@oracle ~]$ sudo isql PSQLU
+        +---------------------------------------+
+        | Connected!                            |
+        |                                       |
+        | sql-statement                         |
+        | help \[tablename]                      |
+        | quit                                  |
+        |                                       |
+        +---------------------------------------+
+
+* Vamos a configurar un fichero que debemos generar en `/opt/oracle/product/19c/dbhome_1/hs/admin/initPSQLU.ora` donde debemos añadir las siguientes líneas.
+
+        HS_FDS_CONNECT_INFO = PSQLU
+        HS_FDS_TRACE_LEVEL = DEBUG
+        HS_FDS_SHAREABLE_NAME = /usr/lib64/psqlodbcw.so
+        HS_LANGUAGE = AMERICAN_AMERICA.WE8ISO8859P1
+        set ODBCINI=/etc/odbc.ini
+
+* Ahora configuramos nuestro fichero listener, donde deberemos añadir la escucha al driver de ODBC y especificando nuestro DNS.
+
+        LISTENER =
+          (DESCRIPTION_LIST =
+            (DESCRIPTION =
+              (ADDRESS = (PROTOCOL = TCP)(HOST = oracle.alegv.bd)(PORT = 1521))
+              (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
+            )
+          )
+
+        SID_LIST_LISTENER=
+          (SID_LIST=
+              (SID_DESC=
+                 (SID_NAME=PSQLU)
+                 (ORACLE_HOME=/opt/oracle/product/19c/dbhome_1)
+                 (PROGRAM=dg4odbc)
+              )
+          )
+
+* También vamos a configurar el fichero tnsnames.ora donde definiremos la nueva conexión que realmente será a nuestra propia máquina.
+
+        ORCLCDB =
+          (DESCRIPTION =
+            (ADDRESS = (PROTOCOL = TCP)(HOST = myhost)(PORT = 1521))
+            (CONNECT_DATA =
+              (SERVER = DEDICATED)
+              (SERVICE_NAME = ORCLCDB)
+            )
+          )
+
+        LISTENER_ORCLCDB =
+          (ADDRESS = (PROTOCOL = TCP)(HOST = myhost)(PORT = 1521))
+
+
+        ORACLE2 =
+          (DESCRIPTION =
+            (ADDRESS = (PROTOCOL = TCP)(HOST = 172.22.100.20)(PORT = 1521))
+            (CONNECT_DATA =
+              (SERVER = DEDICATED)
+              (SERVICE_NAME = ORCLCDB)
+            )
+          )
+
+        PSQLU  =
+          (DESCRIPTION=
+            (ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=1521))
+            (CONNECT_DATA=(SID=PSQLU))
+            (HS=OK)
+          )
+
+* Tras esto reiniciamos el servicio, accedemos a nuestra base de datos y comprobamos que funciona el enlace.
+
+        [oracle@oracle ~]$ lsnrctl stop
+        [oracle@oracle1 ~]$ lsnrctl start
+
+        SQL> CREATE DATABASE LINK postgreslink
+        CONNECT TO "remoto1" IDENTIFIED BY "remoto1"
+        USING 'PSQLU';
+
+        Enlace con la base de datos creado.
 
 ### postgres
 
@@ -348,9 +427,97 @@ menu = "main"
 
 * Realizamos una conexión
 
-vagrant@postgres:/home/postgres$ sqlplus ale/ale@172.22.100.15/ORCLCDB
+        postgres@postgres:~$ sqlplus c##ale/ale@172.22.100.15/ORCLCDB
 
-SQL*Plus: Release 21.0.0.0.0 - Production on Fri May 28 15:33:56 2021
-Version 21.1.0.0.0
+        SQL*Plus: Release 21.0.0.0.0 - Production on Tue Jun 8 15:41:37 2021
+        Version 21.1.0.0.0
 
-Copyright (c) 1982, 2020, Oracle.  All rights reserved.
+        Copyright (c) 1982, 2020, Oracle.  All rights reserved.
+
+        Hora de Ultima Conexion Correcta: Mar Jun 08 2021 17:36:17 -05:00
+
+        Conectado a:
+        Oracle Database 19c Enterprise Edition Release 19.0.0.0.0 - Production
+        Version 19.3.0.0.0
+
+* Vemos que hemos podido conectarnos con exito, sin embargo no hemos terminado, debemos compliar el programa oracle_fdw que encontraremos en un repositorio en github.
+
+        vagrant@postgres:~$ git clone https://github.com/laurenz/oracle_fdw.git
+
+* Compilamos este programa.
+
+        vagrant@postgres:~/oracle_fdw$ sudo make
+        gcc -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fexcess-precision=standard -Wno-format-truncation -Wno-stringop-truncation -g -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -fno-omit-frame-pointer -fPIC -I/home/postgres/instantclient_21_1/sdk/include -I/home/postgres/instantclient_21_1/oci/include -I/home/postgres/instantclient_21_1/rdbms/public -I/home/postgres/instantclient_21_1 -I/usr/include/oracle/19.9/client -I/usr/include/oracle/19.9/client64 -I/usr/include/oracle/19.8/client -I/usr/include/oracle/19.8/client64 -I/usr/include/oracle/19.6/client -I/usr/include/oracle/19.6/client64 -I/usr/include/oracle/19.3/client -I/usr/include/oracle/19.3/client64 -I/usr/include/oracle/18.5/client -I/usr/include/oracle/18.5/client64 -I/usr/include/oracle/18.3/client -I/usr/include/oracle/18.3/client64 -I/usr/include/oracle/12.2/client -I/usr/include/oracle/12.2/client64 -I/usr/include/oracle/12.1/client -I/usr/include/oracle/12.1/client64 -I/usr/include/oracle/11.2/client -I/usr/include/oracle/11.2/client64 -I/usr/include/oracle/11.1/client -I/usr/include/oracle/11.1/client64 -I/usr/include/oracle/10.2.0.5/client -I/usr/include/oracle/10.2.0.5/client64 -I/usr/include/oracle/10.2.0.4/client -I/usr/include/oracle/10.2.0.4/client64 -I/usr/include/oracle/10.2.0.3/client -I/usr/include/oracle/10.2.0.3/client64 -I. -I./ -I/usr/include/postgresql/11/server -I/usr/include/postgresql/internal  -Wdate-time -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -I/usr/include/libxml2  -I/usr/include/mit-krb5  -c -o oracle_fdw.o oracle_fdw.c
+        gcc -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fexcess-precision=standard -Wno-format-truncation -Wno-stringop-truncation -g -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -fno-omit-frame-pointer -fPIC -I/home/postgres/instantclient_21_1/sdk/include -I/home/postgres/instantclient_21_1/oci/include -I/home/postgres/instantclient_21_1/rdbms/public -I/home/postgres/instantclient_21_1 -I/usr/include/oracle/19.9/client -I/usr/include/oracle/19.9/client64 -I/usr/include/oracle/19.8/client -I/usr/include/oracle/19.8/client64 -I/usr/include/oracle/19.6/client -I/usr/include/oracle/19.6/client64 -I/usr/include/oracle/19.3/client -I/usr/include/oracle/19.3/client64 -I/usr/include/oracle/18.5/client -I/usr/include/oracle/18.5/client64 -I/usr/include/oracle/18.3/client -I/usr/include/oracle/18.3/client64 -I/usr/include/oracle/12.2/client -I/usr/include/oracle/12.2/client64 -I/usr/include/oracle/12.1/client -I/usr/include/oracle/12.1/client64 -I/usr/include/oracle/11.2/client -I/usr/include/oracle/11.2/client64 -I/usr/include/oracle/11.1/client -I/usr/include/oracle/11.1/client64 -I/usr/include/oracle/10.2.0.5/client -I/usr/include/oracle/10.2.0.5/client64 -I/usr/include/oracle/10.2.0.4/client -I/usr/include/oracle/10.2.0.4/client64 -I/usr/include/oracle/10.2.0.3/client -I/usr/include/oracle/10.2.0.3/client64 -I. -I./ -I/usr/include/postgresql/11/server -I/usr/include/postgresql/internal  -Wdate-time -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -I/usr/include/libxml2  -I/usr/include/mit-krb5  -c -o oracle_utils.o oracle_utils.c
+        gcc -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fexcess-precision=standard -Wno-format-truncation -Wno-stringop-truncation -g -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -fno-omit-frame-pointer -fPIC -I/home/postgres/instantclient_21_1/sdk/include -I/home/postgres/instantclient_21_1/oci/include -I/home/postgres/instantclient_21_1/rdbms/public -I/home/postgres/instantclient_21_1 -I/usr/include/oracle/19.9/client -I/usr/include/oracle/19.9/client64 -I/usr/include/oracle/19.8/client -I/usr/include/oracle/19.8/client64 -I/usr/include/oracle/19.6/client -I/usr/include/oracle/19.6/client64 -I/usr/include/oracle/19.3/client -I/usr/include/oracle/19.3/client64 -I/usr/include/oracle/18.5/client -I/usr/include/oracle/18.5/client64 -I/usr/include/oracle/18.3/client -I/usr/include/oracle/18.3/client64 -I/usr/include/oracle/12.2/client -I/usr/include/oracle/12.2/client64 -I/usr/include/oracle/12.1/client -I/usr/include/oracle/12.1/client64 -I/usr/include/oracle/11.2/client -I/usr/include/oracle/11.2/client64 -I/usr/include/oracle/11.1/client -I/usr/include/oracle/11.1/client64 -I/usr/include/oracle/10.2.0.5/client -I/usr/include/oracle/10.2.0.5/client64 -I/usr/include/oracle/10.2.0.4/client -I/usr/include/oracle/10.2.0.4/client64 -I/usr/include/oracle/10.2.0.3/client -I/usr/include/oracle/10.2.0.3/client64 -I. -I./ -I/usr/include/postgresql/11/server -I/usr/include/postgresql/internal  -Wdate-time -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE -I/usr/include/libxml2  -I/usr/include/mit-krb5  -c -o oracle_gis.o oracle_gis.c
+        gcc -Wall -Wmissing-prototypes -Wpointer-arith -Wdeclaration-after-statement -Wendif-labels -Wmissing-format-attribute -Wformat-security -fno-strict-aliasing -fwrapv -fexcess-precision=standard -Wno-format-truncation -Wno-stringop-truncation -g -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -fno-omit-frame-pointer -fPIC -shared -o oracle_fdw.so oracle_fdw.o oracle_utils.o oracle_gis.o -L/usr/lib/x86_64-linux-gnu  -Wl,-z,relro -Wl,-z,now -L/usr/lib/llvm-7/lib  -L/usr/lib/x86_64-linux-gnu/mit-krb5 -Wl,--as-needed  -L/home/postgres/instantclient_21_1 -L/home/postgres/instantclient_21_1/bin -L/home/postgres/instantclient_21_1/lib -L/home/postgres/instantclient_21_1/lib/amd64 -lclntsh -L/usr/lib/oracle/19.9/client/lib -L/usr/lib/oracle/19.9/client64/lib -L/usr/lib/oracle/19.8/client/lib -L/usr/lib/oracle/19.8/client64/lib -L/usr/lib/oracle/19.6/client/lib -L/usr/lib/oracle/19.6/client64/lib -L/usr/lib/oracle/19.3/client/lib -L/usr/lib/oracle/19.3/client64/lib -L/usr/lib/oracle/18.5/client/lib -L/usr/lib/oracle/18.5/client64/lib -L/usr/lib/oracle/18.3/client/lib -L/usr/lib/oracle/18.3/client64/lib -L/usr/lib/oracle/12.2/client/lib -L/usr/lib/oracle/12.2/client64/lib -L/usr/lib/oracle/12.1/client/lib -L/usr/lib/oracle/12.1/client64/lib -L/usr/lib/oracle/11.2/client/lib -L/usr/lib/oracle/11.2/client64/lib -L/usr/lib/oracle/11.1/client/lib -L/usr/lib/oracle/11.1/client64/lib -L/usr/lib/oracle/10.2.0.5/client/lib -L/usr/lib/oracle/10.2.0.5/client64/lib -L/usr/lib/oracle/10.2.0.4/client/lib -L/usr/lib/oracle/10.2.0.4/client64/lib -L/usr/lib/oracle/10.2.0.3/client/lib -L/usr/lib/oracle/10.2.0.3/client64/lib
+
+----------------------------------------------
+
+        vagrant@postgres:~/oracle_fdw$ sudo make install
+        /bin/mkdir -p '/usr/lib/postgresql/11/lib'
+        /bin/mkdir -p '/usr/share/postgresql/11/extension'
+        /bin/mkdir -p '/usr/share/postgresql/11/extension'
+        /bin/mkdir -p '/usr/share/doc/postgresql-doc-11/extension'
+        /usr/bin/install -c -m 755  oracle_fdw.so '/usr/lib/postgresql/11/lib/oracle_fdw.so'
+        /usr/bin/install -c -m 644 .//oracle_fdw.control '/usr/share/postgresql/11/extension/'
+        /usr/bin/install -c -m 644 .//oracle_fdw--1.2.sql .//oracle_fdw--1.0--1.1.sql .//oracle_fdw--1.1--1.2.sql  '/usr/share/postgresql/11/extension/'
+        /usr/bin/install -c -m 644 .//README.oracle_fdw '/usr/share/doc/postgresql-doc-11/extension/'
+
+* Crearemos un enlace que posteriormente usaremos.
+
+        postgres@postgres:/home/postgres/oracle_fdw$ psql -d prueba
+        psql (11.12 (Debian 11.12-0+deb10u1))
+        Type "help" for help.
+
+* Hacemos la conexión creando una extensión.
+
+        prueba=# CREATE EXTENSION oracle_fdw;
+        CREATE EXTENSION
+
+* Vamos a comprobar que está creada.
+
+        prueba2=# \dx
+                                           List of installed extensions
+            Name    | Version |   Schema   |                         Description                          
+        ------------+---------+------------+--------------------------------------------------------------
+
+         oracle\_fdw | 1.2     | public     | foreign data wrapper for Oracle access
+         plpgsql    | 1.0     | pg\_catalog | PL/pgSQL procedural language
+        (3 rows)
+
+* Ahora que está creada la extensión tenemos que crear un esquema donde mas adelante volcaremos las tablas de oracle.
+
+        prueba=# CREATE SCHEMA oracle;
+        CREATE SCHEMA
+
+* Una vez creado importamos las tablas.
+
+        prueba=# CREATE SERVER oracle FOREIGN DATA WRAPPER oracle_fdw OPTIONS (dbserver '//172.22.100.15/ORCLCDB');
+        CREATE SERVER
+
+* Pero el usuario que estamos usando realmente no existe en nuestra base de datos remota, por ello debemos mapear nuestro usuario local en el gestor remoto.
+
+        prueba=# CREATE USER MAPPING FOR remoto1 SERVER oracle OPTIONS (user 'c##ale', password 'ale');
+        CREATE USER MAPPING
+
+* Le damos los permisos necesarios a nuestro usuario sobre el esquema y el servidor.
+
+        prueba=# GRANT ALL PRIVILEGES ON SCHEMA oracle TO remoto1;
+        GRANT
+
+        prueba=# GRANT ALL PRIVILEGES ON FOREIGN SERVER oracle TO remoto1;
+        GRANT
+
+* Ahora podemos acceder a nuestra base de datos remota.
+
+        postgres@postgres:~$ psql -h localhost -U remoto1 -d prueba
+        Password for user remoto1: 
+        psql (11.12 (Debian 11.12-0+deb10u1))
+        SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
+        Type "help" for help.
+
+* Para comprobar su funcionamiento podríamos importar las tablas del esquema remoto de nuestro usuario c##ale.
+
+        prueba1=# IMPORT FOREIGN SCHEMA "C##ALVARO1" FROM SERVER oracle INTO oracle;
+        IMPORT FOREIGN SCHEMA
