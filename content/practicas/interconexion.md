@@ -519,5 +519,5 @@ menu = "main"
 
 * Para comprobar su funcionamiento podríamos importar las tablas del esquema remoto de nuestro usuario c##ale.
 
-        prueba1=# IMPORT FOREIGN SCHEMA "C##ALVARO1" FROM SERVER oracle INTO oracle;
+        prueba1=# IMPORT FOREIGN SCHEMA "C##ALE" FROM SERVER oracle INTO oracle;
         IMPORT FOREIGN SCHEMA
