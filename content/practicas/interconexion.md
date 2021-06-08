@@ -484,7 +484,7 @@ menu = "main"
 
          oracle\_fdw | 1.2     | public     | foreign data wrapper for Oracle access
          plpgsql    | 1.0     | pg\_catalog | PL/pgSQL procedural language
-        (3 rows)
+        (2 rows)
 
 * Ahora que está creada la extensión tenemos que crear un esquema donde mas adelante volcaremos las tablas de oracle.
 
