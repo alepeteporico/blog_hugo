@@ -41,55 +41,49 @@ menu = "main"
             volumes:
               - /opt/mysql_wp:/var/lib/mysql
 
-* Vamos a levantarlo.
-
-        alejandrogv@AlejandroGV:~/docker/php/php_docker/deploy$ sudo docker-compose up -d
-        Creating network "deploy_default" with the default driver
-        Creating mysql ... done
-
-* Dentro del primer repositorio que clonamos tenemos un fichero llamado `schema.sql` debemos acceder y comentar la siguiente línea.
-
-        #create database bookmedik;
-
-* Cargaremos el contenido de este fichero en nuestra base de datos.
-
-        root@AlejandroGV:/home/alejandrogv/docker/php/bookmedik# cat schema.sql | docker exec -i mysql /usr/bin/mysql -u root --password=admin bookmedik
-
-* Vamos a configurar un fichero `script.sh` que estará localizado en `/usr/local/bin`
-
-        #!/bin/bash
-
-        sed -i "s/$this->user=\"root\";/$this->user=\"$DATABASE_USER\";/g" /var/www/html/core/controller/Database.php
-        sed -i "s/$this->pass=\"\";/$this->pass=\"$DATABASE_PASSWORD\";/g" /var/www/html/core/controller/Database.php
-        sed -i "s/$this->host=\"localhost\";/$this->host=\"$DATABASE_HOST\";/g" /var/www/html/core/controller/Database.php
-        apache2ctl -D FOREGROUND
-
-* Vamos a configurar el Dockerfile.
+* Y en la carpeta build crearemos un fichero Dockerfile que rellenaremos de la siguiente forma.
 
         FROM debian
-        MAINTAINER Ale Gutierrez "tojandro@gmail.com"
 
-        RUN apt-get update && apt-get install -y apache2 \
-        libapache2-mod-php7.3 \
-        php7.3 \
-        php7.3-mysql \
-        && apt-get clean \
-        && rm -rf /var/lib/apt/lists/*
+        RUN apt-get update && apt-get install -y apache2 libapache2-mod-php7.3 php7.3 php7.3-mysql && apt-get cl$
+        RUN rm /var/www/html/index.html
+
+        ENV APACHE_SERVER_NAME=www.bookmedik-alegv.org
+        ENV DATABASE_USER=admin    
+        ENV DATABASE_PASSWORD=admin    
+        ENV DATABASE_HOST=bd
 
         EXPOSE 80
 
-        RUN rm /var/www/html/index.html
-        COPY bookmedik /var/www/html/
-        ADD script.sh /usr/local/bin/
+        COPY ./bookmedik /var/www/html
+        ADD script.sh /usr/local/bin/script.sh
 
         RUN chmod +x /usr/local/bin/script.sh
 
-        ENV DATABASE_USER bookmedik
-        ENV DATABASE_PASSWORD admin    
-        ENV DATABASE_HOST db
+        CMD ["/usr/local/bin/script.sh"]
 
-        CMD ["script.sh"]
+* Y en el mismo directorio crearemos un fichero script.sh en cual tendrá el siguiente contenido.
 
-* Y a ejecutarlo.
+        #!/bin/bash
 
-        root@AlejandroGV:/home/alejandrogv/docker/php# docker build -t alegv/book_debian .
+        sed -i 's/$this->usuario="admin";/$this->usuario="'${DATABASE_USER}'";/g' /var/www/html/core/controller/Database.php
+        sed -i 's/$this->pass="";/$this->pass="'${DATABASE_PASSWORD}'";/g' /var/www/html/core/controller/Database.php
+        sed -i 's/$this->host="localhost";/$this->host="'${DATABASE_HOST}'";/g' /var/www/html/core/controller/Database.php
+        apache2ctl -D FOREGROUND
+
+* Vamos a levantarlo.
+
+        root@AlejandroGV:/home/alejandrogv/docker/php/php_docker/build# docker build -t alegv/bookmedik:v1 .
+
+* Ahora tenemos que modifcar nuestro fichero docker-compose.yml añadiendo un nuevo contenedor donde alojaremos nuestra aplicación.
+
+        bookmedik:
+           container_name: bookmedik
+           image: alegv/bookmedik:v1
+           restart: always
+           ports:
+             - 8082:80
+           volumes:
+             - /opt/bookmedik:/var/log/apache2
+
+* vamos a usar el script de generación de tablas sobre nuestro contenedor de mariadb.

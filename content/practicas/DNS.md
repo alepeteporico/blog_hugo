@@ -517,7 +517,8 @@ ___
 
         listen-on { any; };
 
-        allow-transfer { none; };
+        allow-transfer { 172.22.100.15; };
+        notify yes;
 
 * Ahora editaremos el fichero `/etc/bind/named.conf.local` dejandolo de la siguiente manera.
 
@@ -534,3 +535,45 @@ ___
                 file "db.200.22.172";
                 masters { 172.22.100.10; };
         };
+
+* Añadiremos un nuevo registro ORIGIN para realizar la delegación de dominio.
+
+
+
+* Vamos a añadir un nuevo registro. Para que surta efecto en el dns secundario deberemos cambiar también el valor del serial.
+
+        cosa    IN      A       172.22.100.24
+
+* Vamos a apagar el DNS primario y a preguntar sobre la nueva zona desde el cliente, comprobando que se ha realizado la delegación 
+
+        $ORIGIN delegacion.iesgn.org.
+
+        @       IN      NS      secundario
+        secundario        IN      A       172.22.100.15
+
+* Nos dirigimos al DNS secundario y añadimos una nueva zona a nuestro named.conf.local.
+
+        zone "delegacion.iesgn.org" {
+                type master;
+                file "db.delegacion.iesgn.org";
+        };
+
+* Crearemos el fichero db.delegacion.iesgn.org
+
+        $TTL    86400
+        @       IN      SOA     delegacion.delegacion.iesgn.org. admin.delegacion.iesgn.org. (
+                               20120401         ; Serial
+                                 604800         ; Refresh
+                                  86400         ; Retry
+                                2419200         ; Expire
+                                  86400 )       ; Negative Cache TTL
+        ;
+        @       IN      NS      secundario.delegacion.iesgn.org.
+        @       IN      MX      10      correo.delegacion.iesgn.org.
+
+        $ORIGIN delegacion.iesgn.org.
+
+        secundario        IN      A       172.22.100.15
+        correo  IN      A       172.22.100.200
+        www     IN      A       172.22.100.201
+        ftp     IN      CNAME   secundario
