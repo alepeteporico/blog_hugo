@@ -509,6 +509,42 @@ ___
         201     IN      PTR     ftp.iesgn.org.
         15      IN      PTR     secundario.iesgn.org.
 
+* Vamos a añadir un nuevo registro. Para que surta efecto en el dns secundario deberemos cambiar también el valor del serial.
+
+        algo    IN      A       172.22.100.33
+
+* Comprobamos que funciona después de apagar el dns primario.
+
+        vagrant@cliente:~$ dig algo.iesgn.org
+        
+        ; <<>> DiG 9.11.5-P4-5.1+deb10u5-Debian <<>> algo.iesgn.org
+        ;; global options: +cmd
+        ;; Got answer:
+        ;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 58246
+        ;; flags: qr aa rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 2, ADDITIONAL: 3
+        
+        ;; OPT PSEUDOSECTION:
+        ; EDNS: version: 0, flags:; udp: 4096
+        ; COOKIE: f7a45f64a6c02d8cfa88cdb160c9da90526d10b9630c1119 (good)
+        ;; QUESTION SECTION:
+        ;algo.iesgn.org.			IN	A
+        
+        ;; ANSWER SECTION:
+        algo.iesgn.org.		86400	IN	A	172.22.100.33
+        
+        ;; AUTHORITY SECTION:
+        iesgn.org.		86400	IN	NS	secundario.iesgn.org.
+        iesgn.org.		86400	IN	NS	alegv.iesgn.org.
+        
+        ;; ADDITIONAL SECTION:
+        alegv.iesgn.org.	86400	IN	A	172.22.100.10
+        secundario.iesgn.org.	86400	IN	A	172.22.100.15
+        
+        ;; Query time: 0 msec
+        ;; SERVER: 172.22.100.15#53(172.22.100.15)
+        ;; WHEN: Wed Jun 16 11:03:44 UTC 2021
+        ;; MSG SIZE  rcvd: 164
+
 * Reiniciamos el servicio y nos dirijimos a nuestro DNS esclavo, después de instalar el paquete bind9 configuraremos el archivo `/etc/bind/named.conf.options` tal como hicimos en nuestro servidor maestro anteriormente añadiendo estas líneas.
 
         recursion yes;
@@ -538,11 +574,10 @@ ___
 
 * Añadiremos un nuevo registro ORIGIN para realizar la delegación de dominio.
 
+        $ORIGIN delegacion.iesgn.org.
 
-
-* Vamos a añadir un nuevo registro. Para que surta efecto en el dns secundario deberemos cambiar también el valor del serial.
-
-        cosa    IN      A       172.22.100.24
+        @       IN      NS      secundario
+        secundario        IN      A       172.22.100.15
 
 * Vamos a apagar el DNS primario y a preguntar sobre la nueva zona desde el cliente, comprobando que se ha realizado la delegación 
 
@@ -577,3 +612,5 @@ ___
         correo  IN      A       172.22.100.200
         www     IN      A       172.22.100.201
         ftp     IN      CNAME   secundario
+
+* 
