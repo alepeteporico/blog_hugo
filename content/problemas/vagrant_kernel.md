@@ -1,5 +1,5 @@
 +++
-title = "Kernel de Vbox no carga con el kernel"
+title = "Módulo de Vbox no carga con el kernel"
 description = ""
 tags = [
     "Vbox"
