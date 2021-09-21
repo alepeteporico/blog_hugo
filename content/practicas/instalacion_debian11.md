@@ -47,6 +47,7 @@ menu = "main"
         GRUB_CMDLINE_LINUX="nouveau.modeset=0"
 
 * Con este cambio ya arrancará nuestro sistema con normalidad y podremos acceder al entorno gráfico, nuestra primera tarea dentro de el será instalar el firmware de la tarjeta inalámbrica, la cual al principio de la instalación nos advirtió que no se instalarían, aquí vemos la imagen.
+
 ![](/instalacion/11.png)
 
 * Para instalarlo deberemos añadir en el fichero sources.list los repositorios de backports e instalar el firmware que corresponde con el siguiente comando.
@@ -138,7 +139,46 @@ menu = "main"
         [ifupdown]
         managed=true
 
-* Por último tenemos los drivers de la gráfica, los cuales no he sido capaz de instalar, lo he intentado de varias formas según las páginas oficiales de debian, entre ellas descargar el paquete "nvidia-detect" que detecta que gráfica tienes y que driver te convendría instalar para usarla en debian, aunque instalé el recomendado daba muchos conflictos con varias cosas, entre ellas el nouveau, aunque hemos hecho que debian no cargue el modulo. Quizás se podría solucionar el problema instalando drivers no oficiales, instalando un kernel mas nuevo u de otras formas no oficiales. Sin embargo dejaremos al sistema trabajando con gráfica integrada del procesador, ya que funciona bien y no necesitaremos más para nuestro caso.
+* Por último tenemos los drivers de la gráfica, el primer paso para su instalación será añadir al fichero `/etc/apt/sources.list` los repositorios non-free y los backports, vamos a visualizar como quedaría este fichero.
+
+        deb https://deb.debian.org/debian/ bullseye main contrib non-free
+        # deb-src http://deb.debian.org/debian/ buster main
+
+        #deb http://security.debian.org/debian-security buster/updates main
+        # deb-src http://security.debian.org/debian-security buster/updates main
+
+        # buster-updates, previously known as 'volatile'
+        deb https://deb.debian.org/debian/ bullseye-updates main contrib non-free
+        # deb-src http://deb.debian.org/debian/ buster-updates main
+
+        deb https://deb.debian.org/debian/ bullseye-backports main contrib non-free
+
+* Ahora actualizamos e instalamos el paquete `nvidia-detect`
+
+        alejandrogv@AlejandroGV:~$ sudo apt install nvidia-detect
+
+* Vamos a visualizar la salida de este comando que nos dirá que paquete o paquetes debemos instalar para el correcto funcionamiento de nuestra gráfica.
+
+        alejandrogv@AlejandroGV:~$ nvidia-detect 
+        Detected NVIDIA GPUs:
+        01:00.0 3D controller [0302]: NVIDIA Corporation GP107M [GeForce GTX 1050 Mobile] [10de:1c8d] (rev a1)
+
+        Checking card:  NVIDIA Corporation GP107M [GeForce GTX 1050 Mobile] (rev a1)
+        Your card is supported by all driver versions.
+        Your card is also supported by the Tesla 460 drivers series.
+        Your card is also supported by the Tesla 450 drivers series.
+        Your card is also supported by the Tesla 418 drivers series.
+        It is recommended to install the
+            nvidia-driver
+        package.
+
+* Vamos a instalar el paquete que se nos recomienda de `nvidia-driver` y a reiniciar el sistema para que inicie con la nueva configuración.
+
+        alejandrogv@AlejandroGV:~$ sudo apt install nvidia-driver
+
+* Una vez reiniciado el sistema podemos usar el comando `nvidia-settings` que abrirá una ventana donde podremos comprobar que nuestro sistema reconoce nuestra tarjeta gráfica.
+
+![](/instalacion/14.png)
 
 * Veamos todos los dispositivos que tenemos conectados y nuestro sitema reconoce.
         
