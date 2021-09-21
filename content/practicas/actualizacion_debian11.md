@@ -90,4 +90,25 @@ menu = "main"
         Leyendo la información de estado... Hecho
         Se pueden actualizar 2126 paquetes. Ejecute «apt list --upgradable» para verlos.
 
-        
+* Por último y después de actualizar comprobaremos que nuestro sistema se ha actualizado a debian 11.
+
+        alejandrogv@AlejandroGV:~$ neofetch
+               _,met$$$$$gg.          alejandrogv@AlejandroGV 
+            ,g$$$$$$$$$$$$$$$P.       ----------------------- 
+          ,g$$P"     """Y$$.".        OS: Debian GNU/Linux 11 (bullseye) x86_64 
+         ,$$P'              `$$$.     Host: TUF GAMING FX504GD_FX80GD 1.0 
+        ',$$P       ,ggs.     `$$b:   Kernel: 5.10.0-8-amd64 
+        `d$$'     ,$P"'   .    $$$    Uptime: 4 hours, 20 mins 
+         $$P      d$'     ,    $$P    Packages: 2753 (dpkg) 
+         $$:      $$.   -    ,d$$'    Shell: bash 5.1.4 
+         $$;      Y$b._   _,d$P'      Resolution: 1920x1080 
+         Y$$.    `.`"Y$$$$P"'         DE: GNOME 3.38.4 
+         `$$b      "-.__              WM: Mutter 
+          `Y$$                        WM Theme: Adwaita 
+           `Y$$.                      Theme: Adwaita [GTK2/3] 
+             `$$b.                    Icons: Adwaita [GTK2/3] 
+               `Y$$b.                 Terminal: gnome-terminal 
+                  `"Y$b._             CPU: Intel i7-8750H (12) @ 4.100GHz 
+                      `"""            GPU: NVIDIA GeForce GTX 1050 Mobile 
+                                      GPU: Intel CoffeeLake-H GT2 [UHD Graphics 630] 
+                                      Memory: 5034MiB / 7810MiB
