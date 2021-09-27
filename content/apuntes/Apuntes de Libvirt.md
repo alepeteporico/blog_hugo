@@ -502,5 +502,10 @@ virsh -c qemu:///system list --all
 
 Si queremos iniciar el dominio, lo haremos con el comando `start`
 ~~~
+virsh -c qemu:///system start dominio1
+~~~
 
+Para apagarla usamos `shutdown`
+~~~
+virsh -c qemu:///system shutdown dominio1
 ~~~
