@@ -139,6 +139,14 @@ menu = "main"
         # Grub is the default boot loader (for x86). If you want lilo installed
         # instead, uncomment this:
         # d-i grub-installer/skip boolean true
+        d-i apt-setup/use_mirror boolean true
+        d-i apt-setup/services-select multiselect security, updates
+        d-i apt-setup/security_host string security.debian.org
+        d-i apt-setup/local0/repository string \
+        http://local.server/debian stable main
+        d-i apt-setup/local0/comment string local server
+        d-i apt-setup/local0/source boolean true
+        d-i apt-setup/multiarch string i386
         # To also skip installing lilo, and install no bootloader, uncomment this
         # too:
         # d-i lilo-installer/skip boolean true
@@ -168,6 +176,7 @@ menu = "main"
                select medium
         xserver-xorg xserver-xorg/config/monitor/mode-list \
                select 1024×768 @ 60 Hz
+        
 
 * Ahora debemos crear una carpeta llamada `respuestas` y añadir este fichero dentro de ella.
 
@@ -182,9 +191,9 @@ menu = "main"
                 kernel /install.amd/vmlinuz
                 append vga=788 initrd=/install.amd/initrd.gz -- quiet
         label unattended-gnome
-         menu label ^Instalación Debian Desatendida Preseed
-         kernel /install.amd/gtk/vmlinuz
-         append vga=788 initrd=/install.amd/gtk/initrd.gz preseed/file=/cdrom/respuestas/preseed.cfg locale=es_ES console-setup/ask_detect=false keyboard-configuration xkb-keymap=es --
+        menu label ^Instalación Debian Desatendida Preseed
+        kernel /install.amd/gtk/vmlinuz
+        append vga=788 initrd=/install.amd/gtk/initrd.gz preseed/file=/cdrom/respuestas/preseed.cfg locale=es_ES console-setup/ask_detect=false keyboard-configuration xkb-keymap=es --
 
 * El siguiente paso será generar la imagen ISO a partir de este directorio usando `genisoimage`.
 
