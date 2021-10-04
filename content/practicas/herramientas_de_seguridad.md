@@ -187,3 +187,49 @@ Sep 30 11:34:45 suricata systemd[1]: Reloading Suricata IDS/IDP daemon.
 Sep 30 11:35:10 suricata suricatasc[7296]: {"message": "done", "return": "OK"}
 Sep 30 11:35:10 suricata systemd[1]: Reloaded Suricata IDS/IDP daemon.
 ~~~
+
+* En el fichero `fast.log` podremos ver si ha habido alguna alerta de nuestra aplicación.
+
+~~~
+vagrant@suricata:~$ tail -f /var/log/suricata/fast.log
+10/03/2021-18:23:49.243586  [**] [1:0:0] ICMP detected [**] [Classification: (null)] [Priority: 3] {ICMP} 192.168.121.44:8 -> 8.8.8.8:0
+10/03/2021-18:23:49.264020  [**] [1:0:0] ICMP detected [**] [Classification: (null)] [Priority: 3] {ICMP} 8.8.8.8:0 -> 192.168.121.44:0
+10/03/2021-18:24:18.439774  [**] [1:2013504:5] ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management [**] [Classification: Not Suspicious Traffic] [Priority: 3] {TCP} 192.168.121.44:56238 -> 199.232.182.132:80
+10/03/2021-18:24:18.487175  [**] [1:2013504:5] ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management [**] [Classification: Not Suspicious Traffic] [Priority: 3] {TCP} 192.168.121.44:56238 -> 199.232.182.132:80
+10/03/2021-18:24:18.487175  [**] [1:2013504:5] ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management [**] [Classification: Not Suspicious Traffic] [Priority: 3] {TCP} 192.168.121.44:56238 -> 199.232.182.132:80
+10/03/2021-18:24:18.487175  [**] [1:2013504:5] ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management [**] [Classification: Not Suspicious Traffic] [Priority: 3] {TCP} 192.168.121.44:56238 -> 199.232.182.132:80
+10/03/2021-18:24:18.487175  [**] [1:2013504:5] ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management [**] [Classification: Not Suspicious Traffic] [Priority: 3] {TCP} 192.168.121.44:56238 -> 199.232.182.132:80
+10/03/2021-18:24:18.487175  [**] [1:2013504:5] ET POLICY GNU/Linux APT User-Agent Outbound likely related to package management [**] [Classification: Not Suspicious Traffic] [Priority: 3] {TCP} 192.168.121.44:56238 -> 199.232.182.132:80
+10/03/2021-18:26:24.036738  [**] [1:0:0] ICMP detected [**] [Classification: (null)] [Priority: 3] {IPv6-ICMP} fe80:0000:0000:0000:fc54:00ff:fe02:38c7:133 -> ff02:0000:0000:0000:0000:0000:0000:0002:0
+10/03/2021-19:23:11.905888  [**] [1:0:0] ICMP detected [**] [Classification: (null)] [Priority: 3] {IPv6-ICMP} fe80:0000:0000:0000:fc54:00ff:fe02:38c7:133 -> ff02:0000:0000:0000:0000:0000:0000:0002:0
+~~~
+
+* Una vez hecho esto debemos saber que las reglas que estamos aplicando son reglas "snort" una vez sepamos esto la busqueda de reglas que se apliquen a nuestras necesidades son muy faciles, por ejemplo, hagamos una regla que nos avise si hay estamos teniendo un ataque por fuerza bruta ssh, la regla sería la siguiente, veamosla entera y después la analizaremos.
+
+~~~
+alert tcp $EXTERNAL_NET any -> $HOME_NET 22 (msg:"SCAN SSH BRUTE FORCE login attempt"; GID:1; sid:10000011; rev:001; flow:to_server,established; content:"SSH-"; depth:4; detection_filter:track by_src, count 5, seconds 60; metadata:service ssh; classtype:misc-activity;)
+~~~
+
+--------------------------------
+
+### Analizando ejemplo complejo de regla snort.
+
+* `alert` aunque pueda parecer algo muy sencillo pero vamos a verlo todo paso a paso, este alert es la definición de lo que pasará cuando detecte la activación de esta regla, en este caso el tipo de alerta que hayamos definido, por defecto es la que vimos anteriormente la cual añade una entrada al log de suricata.
+
+* `tcp $EXTERNAL_NET any` cualquier conexion que venga de fuera usando tcp usado para los ataques de fuerza bruta ssh.
+
+* `$HOME_NET 22` Hacía nuestro puerto local 22.
+
+* `msg:"SCAN SSH BRUTE FORCE login attempt";` el mensaje que aparecerá en el log.
+
+* `GID:1; sid:10000011; rev:001;` números de referencia, como esta regla es inventada por nosotros podemos ponerle el que queramos, hay algunas ya establecidas que tienen su propio numero de referencia.
+
+* `flow:to_server,established;` indicamos que la regla se aplique solo en uno de los sentidos, en este caso trafico entrante y con established indicamos en concreto TCP.
+
+* `content:"SSH-"; depth:4;` Indicamos que el contenido del paquete entrante es ssh y con el depth simplemente hacemos mas eficiente esta regla, pues establece un número determinado de bytes a buscar en el payload del paquete (una carga que se ejecuta en una vulnerabilidad para aprovechar la misma) esto reducirá la carga enormemente.
+
+* `detection_filter:track by_src, count 5, seconds 60;` el detection_filter:track by_src inicia un contador para el tráfico del tipo que hemos especificado proveniente de una misma IP, el contador y los segundos establecidos después indican que este contador podrá llegar como máximo a en 60 segundos antes de que salte la alerta.
+
+* `metadata:service ssh;` simplemente un comparador para ver que el servicio que estamos intentando detectar es ssh.
+
+* `classtype:misc-activity;` Para detectar el tipo de ataque que estamos sufriendo, en este caso un misc-activity.

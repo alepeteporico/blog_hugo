@@ -19,7 +19,102 @@ Tras la instalación de cada servidor,  debe crearse una base de datos con al me
 
 * Hemos creado una maquina vagrant con centos 8 para instalar nuestro servidor de Oracle 19c, lo descargaremos de la [página oficial de Oracle](https://www.oracle.com/es/database/technologies/oracle19c-linux-downloads.html#license-lightbox) y llevamos el fichero de instalación a nuestra máquina usando scp.
 
-        [vagrant@oracle ~]$ scp alejandrogv@192.168.1.15:/home/alejandrogv/Descargas/oracle-database-ee-19c-1.0-1.x86_64.rpm .
+~~~
+[oracle@oracle ~]$ scp alejandrogv@172.22.6.119:/home/alejandrogv/Descargas/SOLARIS.X64_195000_db_home.zip .
+~~~
+
+* Debemos instalar las dependencias necesarias:
+
+~~~
+[vagrant@oracle ~]$ sudo dnf install -y bc binutils elfutils-libelf elfutils-libelf-devel fontconfig-devel glibc glibc-devel ksh libaio libaio-devel libXrender libXrender-devel libX11 libXau libXi libXtst libgcc librdmacm-devel libstdc++ libstdc++-devel libxcb make net-tools smartmontools sysstat unzip libnsl libnsl2
+~~~
+
+* Creamos los grupos y usuarios que necesitará oracle.
+
+~~~
+[vagrant@oracle ~]$ sudo groupadd -g 1501 oinstall
+[vagrant@oracle ~]$ sudo groupadd -g 1502 dba
+[vagrant@oracle ~]$ sudo groupadd -g 1503 oper
+[vagrant@oracle ~]$ sudo groupadd -g 1504 backupdba
+[vagrant@oracle ~]$ sudo groupadd -g 1505 dgdba
+[vagrant@oracle ~]$ sudo groupadd -g 1507 racdba
+~~~
+
+* Y cambiamos la contraseña del usuario "oracle".
+
+~~~
+[root@oracle ~]# echo "oracle" | passwd oracle --stdin
+Changing password for user oracle.
+passwd: all authentication tokens updated successfully.
+~~~
+
+* Cambiamos el modo de selinux a permisivo para que no nos de problemas.
+
+~~~
+[root@oracle ~]# sed -i 's/^SELINUX=.*/SELINUX=permissive/g' /etc/sysconfig/selinux
+[root@oracle ~]# setenforce permissive
+~~~
+
+* Creamos los diferentes directorios que necesitará oracle y le damos permisos a los usuarios necesarios sobre ellos.
+
+~~~
+[root@oracle ~]# mkdir -p /u01/app/oracle/product/19.3.0/dbhome_1
+[root@oracle ~]# mkdir -p /u02/oradata
+[root@oracle ~]# chown -R oracle:oinstall /u01 /u02
+[root@oracle ~]# chmod -R 775 /u01 /u02
+~~~
+
+* Ahora entramos en el usuario oracle y en su fichero `.bash_profile` añadimos las siguientes variables de entorno.
+
+~~~
+# Oracle Settings
+export TMP=/tmp
+export TMPDIR=$TMP
+
+export ORACLE_HOSTNAME=oracle-db-19c.centlinux.com
+export ORACLE_UNQNAME=cdb1
+export ORACLE_BASE=/u01/app/oracle
+export ORACLE_HOME=$ORACLE_BASE/product/19.3.0/dbhome_1
+export ORA_INVENTORY=/u01/app/oraInventory
+export ORACLE_SID=cdb1
+export PDB_NAME=pdb1
+export DATA_DIR=/u02/oradata
+
+export PATH=$ORACLE_HOME/bin:$PATH
+
+export LD_LIBRARY_PATH=$ORACLE_HOME/lib:/lib:/usr/lib
+export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
+~~~
+
+* ejecutamos este fichero.
+
+~~~
+[oracle@oracle ~]$ source ~/.bash_profile
+~~~
+
+* Una vez seguidos todos estos pasos descomprimimos el instalador de oracle que descargamos antes en los directorios de oracle que creamos antes y para ello usamos una de las variables que definimos anteriormente.
+
+~~~
+[oracle@oracle ~]$ unzip SOLARIS.X64_195000_db_home.zip -d $ORACLE_HOME
+~~~
+
+* Parace que el instalador de oracle 19c tiene problemas para detectar centos 8, por ello vamos a exportar la siguiente variable.
+
+[oracle@oracle dbhome_1]$ ./runInstaller -ignorePrereq -waitforcompletion -silent \
+> oracle.install.option=INSTALL_DB_SWONLY \
+> ORACLE_HOSTNAME=${ORACLE_HOSTNAME} \
+> UNIX_GROUP_NAME=oinstall \
+> INVENTORY_LOCATION=${ORA_INVENTORY} \
+> ORACLE_HOME=${ORACLE_HOME} \
+> ORACLE_BASE=${ORACLE_BASE} \
+> oracle.install.db.InstallEdition=EE \
+> oracle.install.db.OSDBA_GROUP=dba \
+> oracle.install.db.OSBACKUPDBA_GROUP=backupdba \
+> oracle.install.db.OSDGDBA_GROUP=dgdba \
+> oracle.install.db.OSKMDBA_GROUP=kmdba \
+> oracle.install.db.OSRACDBA_GROUP=racdba \
+> SECURITY_UPDATES_VIA_MYORACLESUPPORT=false \
+> DECLINE_SECURITY_UPDATES=true
 
 * El siguiente paso será obviamente instalarlo.
 
