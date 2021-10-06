@@ -20,7 +20,7 @@ Tras la instalación de cada servidor,  debe crearse una base de datos con al me
 * Hemos creado una maquina vagrant con centos 8 para instalar nuestro servidor de Oracle 19c, lo descargaremos de la [página oficial de Oracle](https://www.oracle.com/es/database/technologies/oracle19c-linux-downloads.html#license-lightbox) y llevamos el fichero de instalación a nuestra máquina usando scp.
 
 ~~~
-[oracle@oracle ~]$ scp alejandrogv@172.22.6.119:/home/alejandrogv/Descargas/SOLARIS.X64_195000_db_home.zip .
+[vagrant@oracle ~]$ scp alejandrogv@172.22.6.119:/home/alejandrogv/Descargas/LINUX.X64_193000_db_home.zip .
 ~~~
 
 * Debemos instalar las dependencias necesarias:
@@ -38,6 +38,7 @@ Tras la instalación de cada servidor,  debe crearse una base de datos con al me
 [vagrant@oracle ~]$ sudo groupadd -g 1504 backupdba
 [vagrant@oracle ~]$ sudo groupadd -g 1505 dgdba
 [vagrant@oracle ~]$ sudo groupadd -g 1507 racdba
+[vagrant@oracle ~]$ sudo groupadd -g 1506 kmdba
 ~~~
 
 * Y cambiamos la contraseña del usuario "oracle".
@@ -95,104 +96,49 @@ export CLASSPATH=$ORACLE_HOME/jlib:$ORACLE_HOME/rdbms/jlib
 * Una vez seguidos todos estos pasos descomprimimos el instalador de oracle que descargamos antes en los directorios de oracle que creamos antes y para ello usamos una de las variables que definimos anteriormente.
 
 ~~~
-[oracle@oracle ~]$ unzip SOLARIS.X64_195000_db_home.zip -d $ORACLE_HOME
+[oracle@oracle ~]$ unzip LINUX.X64_193000_db_home.zip -d $ORACLE_HOME
 ~~~
 
-* Parace que el instalador de oracle 19c tiene problemas para detectar centos 8, por ello vamos a exportar la siguiente variable.
+* En el fichero `$ORACLE_HOME/cv/admin/cvu_config` descomentamos la siguiente línea.
 
+~~~
+CV_ASSUME_DISTID=OEL5
+~~~
+
+* ahora usemos el instalador de oracle.
+
+~~~
 [oracle@oracle dbhome_1]$ ./runInstaller -ignorePrereq -waitforcompletion -silent \
-> oracle.install.option=INSTALL_DB_SWONLY \
-> ORACLE_HOSTNAME=${ORACLE_HOSTNAME} \
-> UNIX_GROUP_NAME=oinstall \
-> INVENTORY_LOCATION=${ORA_INVENTORY} \
-> ORACLE_HOME=${ORACLE_HOME} \
-> ORACLE_BASE=${ORACLE_BASE} \
-> oracle.install.db.InstallEdition=EE \
-> oracle.install.db.OSDBA_GROUP=dba \
-> oracle.install.db.OSBACKUPDBA_GROUP=backupdba \
-> oracle.install.db.OSDGDBA_GROUP=dgdba \
-> oracle.install.db.OSKMDBA_GROUP=kmdba \
-> oracle.install.db.OSRACDBA_GROUP=racdba \
-> SECURITY_UPDATES_VIA_MYORACLESUPPORT=false \
-> DECLINE_SECURITY_UPDATES=true
+oracle.install.option=INSTALL_DB_SWONLY \
+ORACLE_HOSTNAME=${ORACLE_HOSTNAME} \
+UNIX_GROUP_NAME=oinstall \
+INVENTORY_LOCATION=${ORA_INVENTORY} \
+ORACLE_HOME=${ORACLE_HOME} \
+ORACLE_BASE=${ORACLE_BASE} \
+oracle.install.db.InstallEdition=EE \
+oracle.install.db.OSDBA_GROUP=dba \
+oracle.install.db.OSBACKUPDBA_GROUP=backupdba \
+oracle.install.db.OSDGDBA_GROUP=dgdba \
+oracle.install.db.OSKMDBA_GROUP=kmdba \
+oracle.install.db.OSRACDBA_GROUP=racdba \
+SECURITY_UPDATES_VIA_MYORACLESUPPORT=false \    
+DECLINE_SECURITY_UPDATES=true
+~~~
 
-* El siguiente paso será obviamente instalarlo.
+* Una vez instalada podemos comprobar que accedemos a la misma.
 
-        [vagrant@oracle ~]$ sudo dnf install https://yum.oracle.com/repo/OracleLinux/OL8/baseos/latest/x86_64/getPackage/oracle-database-preinstall-19c-1.0-1.el8.x86_64.rpm
+~~~
+[oracle@oracle ~]$ sqlplus / as sysdba 
 
-        [vagrant@oracle ~]$ sudo yum -y localinstall oracle-database-ee-19c-1.0-1.x86_64.rpm
-        
-* Antes de crear la base de datos de ejemplo debemos tener en cuenta que nos dará error si nuestra memoria RAM es inferior a 2GB. También he experimentado un error ya que no me resolvía el DNS de oracle, por eso he tenido que modificar mi /etc/hosts y añadir la siguiente línea:
+SQL*Plus: Release 19.0.0.0.0 - Production on Tue Oct 5 09:01:50 2021
+Version 19.3.0.0.0
 
-        10.0.2.15 myhost
+Copyright (c) 1982, 2019, Oracle.  All rights reserved.
 
-* Ahora si, creamos la base de datos de ejemplo
+Connected to an idle instance.
 
-        [oracle@oracle ~]$ sudo /etc/init.d/oracledb_ORCLCDB-19c configure
-        Configuring Oracle Database ORCLCDB.
-        Prepare for db operation
-        8% complete
-        Copying database files
-        31% complete
-        Creating and starting Oracle instance
-        32% complete
-        36% complete
-        40% complete
-        43% complete
-        46% complete
-        Completing Database Creation
-        51% complete
-        54% complete
-        Creating Pluggable Databases
-        58% complete
-        77% complete
-        Executing Post Configuration Actions
-        100% complete
-        Database creation complete. For details check the logfiles at:
-         /opt/oracle/cfgtoollogs/dbca/ORCLCDB.
-        Database Information:
-        Global Database Name:ORCLCDB
-        System Identifier(SID):ORCLCDB
-        Look at the log file "/opt/oracle/cfgtoollogs/dbca/ORCLCDB/ORCLCDB5.log" for further details.
-
-Database configuration completed successfully. The passwords were auto generated, you must change them by connecting to the database using 'sqlplus / as sysdba' as the oracle user.
-
-* Continuemos con los usuarios, accedamos al usuario que se ha creado por defecto al instalar el paquete de oracle con su mismo nombre.
-
-        [vagrant@oracle ~]$ sudo su - oracle
-
-* Y tendremos que modifcar el fichero `~/.bash_profile` añadiendo algunas lineas como las que vemos a continuación
-
-        [oracle@oracle ~]$ cat .bash_profile 
-        # .bash_profile
-        
-        # Get the aliases and functions
-        if [ -f ~/.bashrc ]; then
-        	. ~/.bashrc
-        fi
-        
-        umask 022
-        export ORACLE_SID=ORCLCDB
-        export ORACLE_BASE=/opt/oracle/oradata
-        export ORACLE_HOME=/opt/oracle/product/19c/dbhome_1
-        export PATH=$PATH:$ORACLE_HOME/bin
-
-* Este fichero se ejecuta cada vez que iniciamos sesión en este usuario. sin necesidad de tener que salir ni reiniciar la máquina podemos usar `source` para ejecutarlo
-
-        [oracle@oracle ~]$ source .bash_profile
-
-* Finalmente podremos entrar en sqlplus.
-
-        [oracle@oracle ~]$ sqlplus / as sysdba
-
-        SQL*Plus: Release 19.0.0.0.0 - Production on Mon Apr 5 12:03:44 2021
-        Version 19.3.0.0.0
-
-        Copyright (c) 1982, 2019, Oracle.  All rights reserved.
-
-        Connected to an idle instance.
-
-        SQL>
+SQL>
+~~~
 
 * Podemos comprobar una pequeña información para ver que nuestra base de datos está operativa
 
