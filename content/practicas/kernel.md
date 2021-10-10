@@ -72,10 +72,8 @@ menu = "main"
 * Cada vez que realizemos este proceso, sería bueno hacer una copia de seguridad del fichero `.config` antes, así si el sistema no carga correctamente podríamos usar la configuración anterior. Vamos a comprobar el fichero `.config` después de quitar algunos módulos.
 
         alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel/linux-4.19.16$ egrep '=y' .config | wc -l
-        1352
-        alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel/linux-4.19.16$ egrep '=m' .config | wc -l
-        197
-
+        1576
+        
 * Como vemos el número ha disminuido. Ahora vamos a compilar este kernel.
 
         alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel/linux-4.19.16$ make -j12 bindeb-pkg

@@ -233,3 +233,18 @@ alert tcp $EXTERNAL_NET any -> $HOME_NET 22 (msg:"SCAN SSH BRUTE FORCE login att
 * `metadata:service ssh;` simplemente un comparador para ver que el servicio que estamos intentando detectar es ssh.
 
 * `classtype:misc-activity;` Para detectar el tipo de ataque que estamos sufriendo, en este caso un misc-activity.
+
+### Prueba en máquina grupal.
+
+* Hemos hecho una prueba de ataque con la herramienta hydra. Vemos en el log que nuestro sistema detecta el ataque con la regla que hemos visto para detectar ataques por fuerza bruta ssh.
+
+~~~
+davidrg@pc-256:~$ tail -f /var/log/suricata/fast.log
+10/07/2021-12:49:13.180596  [**] [1:2260002:1] SURICATA Applayer Detect protocol only one direction [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.22.8.253:22 -> 172.22.6.58:41854
+10/07/2021-12:50:04.295783  [**] [1:2260002:1] SURICATA Applayer Detect protocol only one direction [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.22.8.253:22 -> 172.22.6.58:41906
+10/07/2021-12:50:51.543040  [**] [1:2260002:1] SURICATA Applayer Detect protocol only one direction [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.22.8.253:22 -> 172.22.6.58:41940
+10/07/2021-12:50:51.648206  [**] [1:2260002:1] SURICATA Applayer Detect protocol only one direction [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.22.8.253:22 -> 172.22.6.58:41944
+10/07/2021-12:50:51.660465  [**] [1:2260002:1] SURICATA Applayer Detect protocol only one direction [**] [Classification: Generic Protocol Command Decode] [Priority: 3] {TCP} 172.22.8.253:22 -> 172.22.6.58:41948
+~~~
+
+* Como vemos no indica la ip desde la que están haciendo este ataque de fuerza bruta
