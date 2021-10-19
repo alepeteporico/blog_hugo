@@ -71,25 +71,33 @@ menu = "main"
 
 * Cada vez que realizemos este proceso, sería bueno hacer una copia de seguridad del fichero `.config` antes, así si el sistema no carga correctamente podríamos usar la configuración anterior. Vamos a comprobar el fichero `.config` después de quitar algunos módulos.
 
-        alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel/linux-4.19.16$ egrep '=y' .config | wc -l
+        alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel/linux-5.10$ egrep '=y' .config | wc -l
         1576
         
-* Como vemos el número ha disminuido. Ahora vamos a compilar este kernel.
+* Antes de realizar la compilación puede que necesitemos instalar el siguiente paquete:
 
-        alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel/linux-4.19.16$ make -j12 bindeb-pkg
+~~~
+alejandrogv@AlejandroGV:~$ sudo apt install dwarves
+~~~
+
+* Ahora vamos a compilar este kernel.
+
+        alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel/linux-5.10$ make -j12 bindeb-pkg
 
 * Una vez compilado tendremos como resultado un archivo `.deb`, veamos cuanto pesa para compararlo más adelante con el kernel final.
 
-        alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel$ ls -lh linux-image-4.19.16_4.19.16-1_amd64.deb 
-        -rw-r--r-- 1 alejandrogv alejandrogv 9,2M may 29 18:56 linux-image-4.19.16_4.19.16-1_amd64.deb
+~~~
+alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel$ ls -lh linux-image-5.10.0_5.10.0-2_amd64.deb 
+-rw-r--r-- 1 alejandrogv alejandrogv 13M oct 18 10:44 linux-image-5.10.0_5.10.0-2_amd64.deb
+~~~
 
 * Después de haber quitado algunos modulos tenemos un kernel resultante de 9,2 MB ahora solo lo instalariamos con `dpkg -i` y al reiniciar el sistema entramos con el kernel que acabamos de compilar.
 
 * Después de varias pruebas tenemos nuestro kernel compilado lo mas simple posible, vamos a contar nuevamente los módulos del fichero `.config`
 
-        alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel/linux-4.19.16$ egrep '=y' .config | wc -l
+        alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel/linux-5.10$ egrep '=y' .config | wc -l
         610
-        alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel/linux-4.19.16$ egrep '=m' .config | wc -l
+        alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel/linux-5.10$ egrep '=m' .config | wc -l
         89
 
 * Si vemos también el kernel compilado como vimos anteriormente, notaremos que pesa bastante menos, en concreto 5 MB menos.

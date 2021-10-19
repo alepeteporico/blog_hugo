@@ -48,11 +48,11 @@ menu = "main"
 
 **Y por últimos realizaremos la instalación de php**
 
-    vagrant@cmsalegv:~$ sudo apt install php7.3 libapache2-mod-php7.3 php7.3-mysql php-common php7.3-cli php7.3-common php7.3-json php7.3-opcache php7.3-readline
+    vagrant@cmsalegv:~$ sudo apt install php7.4 libapache2-mod-php7.4 php7.4-mysql php-common php7.4-cli php7.4-common php7.4-json php7.4-opcache php7.4-readline
 
 **Tendremos que habilitar el mod de apache de PHP**
 
-    vagrant@cmsalegv:~$ sudo a2enmod php7.3
+    vagrant@cmsalegv:~$ sudo a2enmod php7.4
     vagrant@cmsalegv:~$ sudo systemctl restart apache2
 
 #### Base de datos
@@ -121,7 +121,7 @@ menu = "main"
 
 **Nos ha aparecido un error, como bien se ve al parecer faltan algunas librerias de php.**
 
-![error](/cms_php/3.png)
+![error](/cms_php/4.png)
 
 **La solución es tan sencilla como instalarlas, en nuestro caso debemos instalar las siguientes:**
 
@@ -312,7 +312,7 @@ menu = "main"
 
 **Como nuestro objetivo es usar esta base de datos nueva eliminaremos la que teniamos al principio en nuestro servidor principal.**
 
-    vagrant@cmsagv:~$ sudo apt purge mariadb-client-10.3 mariadb-server-10.3
+    vagrant@cmsagv:~$ sudo apt purge mariadb-client-10.4 mariadb-server-10.4
 
 **Por supuesto esto hará que nuestro drupal deje de funcionar, por ello tendremos que configurarlo para que use esta nueva base de datos. y para ello en primer lugar tendremos que configurar el fichero `/var/www/drupal/sites/default/settings.php` donde encontraremos un bloque de código como el siguiente con la información de nuestro antiguo servidor de bbdd.**
 
