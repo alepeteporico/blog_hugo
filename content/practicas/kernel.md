@@ -100,6 +100,22 @@ alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel$ ls -lh linux-image-5.
         alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel/linux-5.10$ egrep '=m' .config | wc -l
         89
 
+* Una vez hayamos hecho la comprobación de que el kernel que hemos compilado funciona para ver los que tenemos instalados usamos el siguiente comando:
+
+~~~
+alejandrogv@AlejandroGV:~$ dpkg -l | grep linux-image
+ii  linux-image-5.10.0                    5.10.0-7                               amd64        Linux kernel, version 5.10.0
+ii  linux-image-5.10.0-8-amd64            5.10.46-5                              amd64        Linux 5.10 for 64-bit PCs (signed)
+ii  linux-image-5.10.0-9-amd64            5.10.70-1                              amd64        Linux 5.10 for 64-bit PCs (signed)
+ii  linux-image-amd64                     5.10.70-1                              amd64        Linux for 64-bit PCs (meta-package)
+~~~
+
+* Y si queremos desinstalar algunos hacemos:
+
+~~~
+alejandrogv@AlejandroGV:~$ sudo apt remove --purge linux-image-5.10.0
+~~~
+
 * Si vemos también el kernel compilado como vimos anteriormente, notaremos que pesa bastante menos, en concreto 5 MB menos.
 
         alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel$ ls -lh linux-image-4.19.16_4.19.16-1_amd64.deb 
