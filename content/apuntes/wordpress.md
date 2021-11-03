@@ -28,21 +28,22 @@ menu = "main"
     vagrant@cmsagv:~$ sudo apt install php-bcmath php-curl php-imagick php-zip
 
 **El siguiente paso será crear nuestro nuevo virtualhost, este tendrá el siguiente aspecto:**
+~~~
+<VirtualHost *:80>
+        ServerName www.alegv-wordpress.org
+        ServerAdmin webmaster@localhost
+        DocumentRoot /var/www/wordpress
+        <Directory /var/www/html/wordpress/>
+                Options Indexes FollowSymLinks
+                AllowOverride All
+                Require all granted
+        </Directory>
 
-    <VirtualHost *:80>
-            ServerName www.alegv-wordpress.org
-            ServerAdmin webmaster@localhost
-            DocumentRoot /var/www/wordpress
-            <Directory /var/www/html/wordpress/>
-                    Options Indexes FollowSymLinks
-                    AllowOverride All
-                    Require all granted
-            </Directory>
+        ErrorLog /var/log/apache2/drupal_error.log
+        CustomLog /var/log/apache2/drupal_access.log combined
 
-            ErrorLog /var/log/apache2/drupal_error.log
-            CustomLog /var/log/apache2/drupal_access.log combined
-
-    </VirtualHost>
+</VirtualHost>
+~~~
 
 **Una vez hecho esto simplemente reinciamos apache, añadimos en el `/etc/hosts` de nuestra anfitriona y ya podremos acceder a nuestro wordpress**
 
