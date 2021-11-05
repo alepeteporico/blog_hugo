@@ -80,6 +80,19 @@ BEGIN
 END;
 ~~~
 
+* Actualización de departamento en cascada:
+
+~~~
+CREATE OR REPLACE TRIGGER OnUpdateCacade
+AFTER UPDATE OF deptno ON dept
+FOR EACH ROW
+BEGIN
+  UPDATE emp
+  SET emp.deptno = new.deptno
+  WHERE emp.deptno = :old.deptno
+END;
+~~~
+
 ### Diccionario de datos:
 
 * [Pagina de referencia](https://ss64.com/)
