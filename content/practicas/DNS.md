@@ -191,7 +191,7 @@ ___
 
         $ORIGIN iesgn.org.
 
-        alvaro  IN      A       172.22.100.10
+        alegv   IN      A       172.22.100.10
         correo  IN      A       172.22.100.200
         ftp     IN      A       172.22.100.201
         www     IN      CNAME   alegv

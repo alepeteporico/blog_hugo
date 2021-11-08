@@ -19,6 +19,11 @@ disqusShortname = "Alepetepórico"
     name = "problemas"
     weight = 0
     url = "problemas"
+  
+  [[menu.header]]
+    name = "ejercicios"
+    weight = 0
+    url = "ejercicios"
 
 #  [[menu.header]]
 #    name = "about"
