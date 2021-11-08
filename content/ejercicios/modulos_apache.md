@@ -31,4 +31,4 @@ vagrant@cmsagv:~$ sudo chmod 0755 public_html/
 
 * Vamos a añadir contenido y probar nuestra web.
 
-![userdir](/modulos_apache/)
+![userdir](/modulos_apache/1.png)
