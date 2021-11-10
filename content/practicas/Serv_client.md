@@ -32,7 +32,7 @@ Tras la instalación de cada servidor,  debe crearse una base de datos con al me
 * Descargamos el preinstall de oracle.
 
 ~~~
-curl -o oracle-database-preinstall-19c-1.0-2.el8.x86_64.rpm https://yum.oracle.com/repo/OracleLinux/OL8/appstream/x86_64/getPackage/oracle-database-preinstall-19c-1.0-2.el8.x86_64.rpm
+curl -o oracle-database-preinstall-19c-1.0-1.el8.x86_64.rpm https://yum.oracle.com/repo/OracleLinux/OL8/appstream/x86_64/getPackage/oracle-database-preinstall-19c-1.0-1.el8.x86_64.rpm
 ~~~
 
 * Ahora instalamos el preinstall y la base de datos en si:
@@ -45,7 +45,7 @@ curl -o oracle-database-preinstall-19c-1.0-2.el8.x86_64.rpm https://yum.oracle.c
 * Y procedemos a configurarlo:
 
 ~~~
-[vagrant@oracle ~]$ sudo /etc/init.d/oracledb_ORCLCDB-19c configure
+[vagrant@oracle ~]$ sudo        
 ~~~
 
 * Creamos los grupos y usuarios que necesitará oracle.
