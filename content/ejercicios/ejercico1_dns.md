@@ -8,19 +8,7 @@ date = "2021-11-08"
 menu = "main"
 +++
 
-* El primer paso será configurar el fichero `/etc/bind/named.conf.options` añadiendo las siguientes líneas.
-
-~~~
-recursion yes;
-
-allow-recursion { any; };
-
-listen-on { any; };
-
-allow-transfer { none; };
-~~~
-
-* Y ahora empezaremos a añadir las zonas de las que nuestro servidor tiene autoridad en el fichero `/etc/bind/named.conf.local`, dejandolo tal que así (tener en cuenta que hay que descomentar la primera línea).
+* Empezaremos a añadir las zonas de las que nuestro servidor tiene autoridad en el fichero `/etc/bind/named.conf.local`, dejandolo tal que así (tener en cuenta que hay que descomentar la primera línea).
 
 ~~~
 include "/etc/bind/zones.rfc1918";
