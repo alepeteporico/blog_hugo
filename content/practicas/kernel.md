@@ -120,3 +120,21 @@ alejandrogv@AlejandroGV:~$ sudo apt remove --purge linux-image-5.10.0
 
         alejandrogv@AlejandroGV:~/Escritorio/ASIR/sistemas/kernel$ ls -lh linux-image-4.19.16_4.19.16-1_amd64.deb 
         -rw-r--r-- 1 alejandrogv alejandrogv 4,0M may 30 19:45 linux-image-4.19.16_4.19.16-1_amd64.deb
+
+* Se queremos ver los kernels que tenemos instalados debemos listar los headers y los image instalados en nuestro sistema
+
+~~~
+alejandrogv@AlejandroGV:~$ dpkg --get-selections | grep linux-image
+linux-image-5.10.0				install
+linux-image-5.10.0-8-amd64			install
+linux-image-5.10.0-9-amd64			install
+linux-image-amd64				install
+
+alejandrogv@AlejandroGV:~$ dpkg --get-selections | grep linux-headers
+linux-headers-5.10.0				install
+linux-headers-5.10.0-8-amd64			install
+linux-headers-5.10.0-8-common			install
+linux-headers-5.10.0-9-amd64			install
+linux-headers-5.10.0-9-common			install
+linux-headers-amd64				install
+~~~
