@@ -45,7 +45,34 @@ curl -o oracle-database-preinstall-19c-1.0-1.el8.x86_64.rpm https://yum.oracle.c
 * Y procedemos a configurarlo:
 
 ~~~
-[vagrant@oracle ~]$ sudo        
+[root@localhost ~]# /etc/init.d/oracledb_ORCLCDB-19c configure
+Configuring Oracle Database ORCLCDB.
+Preparar para funcionamiento de base de datos
+8% finalizado
+Copiando archivos de base de datos
+31% finalizado
+Creando e iniciando instancia Oracle
+32% finalizado
+36% finalizado
+40% finalizado
+43% finalizado
+46% finalizado
+Terminando creación de base de datos
+51% finalizado
+54% finalizado
+Creando Bases de Datos de Conexión
+58% finalizado
+77% finalizado
+Ejecutando acciones posteriores a la configuración
+100% finalizado
+Creación de la base de datos terminada. Consulte los archivos log de /opt/oracle/cfgtoollogs/dbca/ORCLCDB
+ para obtener más información.
+Información de Base de Datos:
+Nombre de la Base de Datos Global:ORCLCDB
+Identificador del Sistema (SID):ORCLCDB
+Para obtener información detallada, consulte el archivo log "/opt/oracle/cfgtoollogs/dbca/ORCLCDB/ORCLCDB.log".
+
+Database configuration completed successfully. The passwords were auto generated, you must change them by connecting to the database using 'sqlplus / as sysdba' as the oracle user.        
 ~~~
 
 * Creamos los grupos y usuarios que necesitará oracle.

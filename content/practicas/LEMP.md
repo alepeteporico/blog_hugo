@@ -10,28 +10,30 @@ menu = "main"
 
 * Vamos a instalar todos los paquetes necesarios.
 
-        debian@sputnik:~$ sudo apt install nginx mariadb-client mariadb-server php php-mysql php-fpm
+        debian@mrrobot:~$ sudo apt install nginx mariadb-client mariadb-server php php-mysql php-fpm
 
 * Crearemos el directorio sobre el que trabajaremos en nuestro virtual host.
 
-        root@sputnik:~# mkdir /var/www/iesgn06
+        root@:~# mkdir /var/www/iesgn06
 
 * Crearemos un virtual host en `sites-available`
 
-        server {
-                listen 80;
-                listen [::]:80;
+~~~
+server {
+        listen 80;
+        listen [::]:80;
 
-                root /var/www/iesgn06;
+        root /var/www/iesgn06;
 
-                index index.html index.htm index.nginx-debian.html;
+        index index.html index.htm index.nginx-debian.html;
 
-                server_name www.iesgn06.es;
+        server_name www.iesgn06.es;
 
-                location / {
-                        try_files $uri $uri/ =404;
-                }
+        location / {
+                try_files $uri $uri/ =404;
         }
+}
+~~~
 
 * Y creamos el enlace simbólico en sites-enabled.
 
