@@ -4,45 +4,112 @@ description = ""
 tags = [
     "SAD"
 ]
-date = "2021-05-30"
+date = "2021-11-18"
 menu = "main"
 +++
 
 ### Tarea 1:
 
+* Firmamos un fichero que enviaremos a nuestros compañeros para que comprueben nuestra firma:
+
+~~~
+alejandrogv@AlejandroGV:~/Descargas$ gpg --output fichero.sign --sign fichero.txt
+~~~
+
 * He enviado un archivo firmado a un compañero que dispone de mi clave pública, los dos hemos verificado la firma.
 
-        alejandrogv@AlejandroGV:~/Descargas$ gpg --verify firma2.pdf.gpg 
-        gpg: Firmado el jue 22 oct 2020 12:11:31 CEST
-        gpg:                usando RSA clave 28ED3C3112ED8846BEDFFAF657112B319F2A6170
-        gpg:                emisor "frandh1997@gmail.com"
-        gpg: Firma correcta de "Francisco Javier Madueño Jurado <frandh1997@gmail.com>" [desconocido]
-        gpg: ATENCIÓN: ¡Esta clave no está certificada por una firma de confianza!
-        gpg:          No hay indicios de que la firma pertenezca al propietario.
-        Huellas dactilares de la clave primaria: 28ED 3C31 12ED 8846 BEDF  FAF6 5711 2B31 9F2A 6170
+~~~
+alejandrogv@AlejandroGV:~/Descargas$ gpg --verify p2pdf.pdf.sign 
+gpg: Firmado el jue 18 nov 2021 12:25:18 CET
+gpg:                usando RSA clave 47742CCB469EB70E132966EDEDA6F79F602CACBD
+gpg: Firma correcta de "Daniel Miguel Mesa Mejias <danimesamejias@gmail.com>" [desconocido]
+gpg: ATENCIÓN: ¡Esta clave no está certificada por una firma de confianza!
+gpg:          No hay indicios de que la firma pertenezca al propietario.
+Huellas dactilares de la clave primaria: 4774 2CCB 469E B70E 1329  66ED EDA6 F79F 602C ACBD
+~~~
 
 * Ahora firmaremos la clave de este compañero:
 
-        gpg --sign-key 9F2A6170
+~~~
+alejandrogv@AlejandroGV:~/Descargas$ gpg --sign-key 602CACBD
+
+pub  rsa3072/EDA6F79F602CACBD
+     creado: 2021-11-11  caduca: 2023-11-11  uso: SC  
+     confianza: desconocido   validez: desconocido
+sub  rsa3072/1F89D944C5945202
+     creado: 2021-11-11  caduca: 2023-11-11  uso: E   
+[desconocida] (1). Daniel Miguel Mesa Mejias <danimesamejias@gmail.com>
+
+
+pub  rsa3072/EDA6F79F602CACBD
+     creado: 2021-11-11  caduca: 2023-11-11  uso: SC  
+     confianza: desconocido   validez: desconocido
+ Huella clave primaria: 4774 2CCB 469E B70E 1329  66ED EDA6 F79F 602C ACBD
+
+     Daniel Miguel Mesa Mejias <danimesamejias@gmail.com>
+
+Esta clave expirará el 2023-11-11.
+¿Está realmente seguro de querer firmar esta clave
+con su clave: "alegv <tojandro@gmail.com>" (EAC60E9B2330736A)?
+
+¿Firmar de verdad? (s/N) s
+~~~
 
 * Cuando hacemos un gpg --list-key vemos que la confianza a cambiado a total:
 
-        alejandrogv@AlejandroGV:~/claves$ gpg --list-key
-        /home/alejandrogv/.gnupg/pubring.kbx
-        ------------------------------------
-        pub   rsa3072 2020-10-08 [SC] [caduca: 2020-11-07]
-              443D661D9AAF3ABAEDCA93E1C3B291882C4EE5DF
-        uid        [  absoluta ] Alejandro Gutierrez Valencia <tojandro@gmail.com>
-        sub   rsa3072 2020-10-08 [E] [caduca: 2020-11-07]
+~~~
+alejandrogv@AlejandroGV:~$ gpg --list-key
+/home/alejandrogv/.gnupg/pubring.kbx
+------------------------------------
+....
+....
+....
+pub   rsa3072 2021-11-11 [SC] [caduca: 2023-11-11]
+      47742CCB469EB70E132966EDEDA6F79F602CACBD
+uid        [   total   ] Daniel Miguel Mesa Mejias <danimesamejias@gmail.com>
+sub   rsa3072 2021-11-11 [E] [caduca: 2023-11-11]
+~~~
 
-        pub   rsa3072 2020-10-06 [SC] [caduca: 2022-10-06]
-              28ED3C3112ED8846BEDFFAF657112B319F2A6170
-        uid        [   total   ] Francisco Javier Madueño Jurado <frandh1997@gmail.com>
-        sub   rsa3072 2020-10-06 [E] [caduca: 2022-10-06]
+* Nuestros compañeros también firmarán nuestra clave:
+
+~~~
+vagrant@nodo1:~$ gpg --sign-key 2330736A
+
+pub  rsa3072/EAC60E9B2330736A
+     created: 2021-11-18  expires: 2023-11-18  usage: SC  
+     trust: unknown       validity: unknown
+sub  rsa3072/AA2E5C8DE5614F8A
+     created: 2021-11-18  expires: 2023-11-18  usage: E  
+[ unknown] (1). alegv <tojandro@gmail.com>
+
+
+pub  rsa3072/EAC60E9B2330736A
+     created: 2021-11-18  expires: 2023-11-18  usage: SC  
+     trust: unknown       validity: unknown
+ Primary key fingerprint: DA5A 4DEF 66D2 5FCE EA83  D8BE EAC6 0E9B 2330 736A
+
+     alegv <tojandro@gmail.com>
+
+This key is due to expire on 2023-11-18.
+Are you sure that you want to sign this key with your
+key "Daniel Miguel Mesa Mejias <danimesamejias@gmail.com>" (EDA6F79F602CACBD)
+
+Really sign? (y/N) y
+
+vagrant@nodo1:~$ gpg --list-key
+...
+...
+pub   rsa3072 2021-11-18 [SC] [expires: 2023-11-18]
+      DA5A4DEF66D25FCEEA83D8BEEAC60E9B2330736A
+uid           [  full  ] alegv <tojandro@gmail.com>
+sub   rsa3072 2021-11-18 [E] [expires: 2023-11-18]
+~~~
 
 * Ahora debemos exportar la calve:
 
-        gpg -a --export josemiguelcalderonfrutos@gamil.com > jose.asc
+~~~
+gpg -a --export danimesamejias@gmail.com > dani.asc
+~~~
 
 * Ahora recogemos nuestra clave firmada por nuestros compañeros y la importamos, vamos a ver que nuestra clave está firmada:
 
@@ -96,10 +163,6 @@ menu = "main"
         sig          C3B291882C4EE5DF 2020-11-06  Alejandro Gutierrez Valencia <tojandro@gmail.com>
         sub   rsa3072 2020-10-06 [E] [caduca: 2022-10-06]
         sig          CFCF1D130D5A52C5 2020-10-06  sergio ibañez <sergio_hd_sony@hotmail.com>
-
-* Firmamos un fichero que enviaremos a nuestros compañeros para que comprueben nuestra firma:
-
-        alejandrogv@AlejandroGV:~/Descargas$ gpg --output fichero.sign --sign fichero.txt
 
 * Nostros también hemos recibido un fichero firmado de dos compañeros, uno de alguien que pertenece a nuestro anillo de confianza y otro que no, pero otra persona con la que tenemos confianza total:
 
