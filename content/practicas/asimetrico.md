@@ -197,13 +197,13 @@ Hola Alejandro
 * Para crear la clave de revocación usamos el siguiente comando al que deberemos darle el ID de nuestra clave:
 
 ~~~
-alejandrogv@AlejandroGV:~$ gpg --gen-revoke 92237AE50A42DFD422F5A0B1F40E3F8DD4E6DA1D
+alejandrogv@AlejandroGV:~$ gpg --gen-revoke DA5A4DEF66D25FCEEA83D8BEEAC60E9B2330736A
 ~~~
 
 * Enviamos nuestra clave pública al servidor pgp.rediris.es 
 
 ~~~
-alejandrogv@AlejandroGV:~$ gpg --keyserver pgp.rediris.es --send-key 92237AE50A42DFD422F5A0B1F40E3F8DD4E6DA1D
+alejandrogv@AlejandroGV:~$ gpg --keyserver pgp.rediris.es --send-key DA5A4DEF66D25FCEEA83D8BEEAC60E9B2330736A
 gpg: enviando clave F40E3F8DD4E6DA1D a hkp://pgp.rediris.es
 ~~~
 
@@ -217,7 +217,7 @@ alejandrogv@AlejandroGV:~$ gpg --delete-secret-key user-javier
 * Ahora cogeremos la clave del servidor que usamos antes, para ello necesitaremos saber la ID del compañero.
 
 ~~~
-alejandrogv@AlejandroGV:~$ gpg --keyserver pgp.rediris.org --recv-keys A0BE5CA7A9DC70AD3D619467CC02797F092855F6
+alejandrogv@AlejandroGV:~$ gpg --keyserver pgp.rediris.org --recv-keys DA5A4DEF66D25FCEEA83D8BEEAC60E9B2330736A
 ~~~
 
 #### Cifrado asimétrico con openssl

@@ -115,70 +115,80 @@ gpg -a --export danimesamejias@gmail.com > dani.asc
 
 * Ahora recogemos nuestra clave firmada por nuestros compañeros y la importamos, vamos a ver que nuestra clave está firmada:
 
-        alejandrogv@AlejandroGV:~/Descargas$ gpg --list-sign
-        /home/alejandrogv/.gnupg/pubring.kbx
-        ------------------------------------
-        pub   rsa3072 2020-10-08 [SC] [caduca: 2020-11-07]
-              443D661D9AAF3ABAEDCA93E1C3B291882C4EE5DF
-        uid        [  absoluta ] Alejandro Gutierrez Valencia <tojandro@gmail.com>
-        sig 3        C3B291882C4EE5DF 2020-10-08  Alejandro Gutierrez Valencia <tojandro@gmail.com>
-        sig          57112B319F2A6170 2020-10-22  Francisco Javier Madueño Jurado <frandh1997@gmail.com>
-        sig          A52A681834F0E596 2020-10-28  José Miguel Calderón Frutos <josemiguelcalderonfrutos@gamil.com
+~~~
+alejandrogv@AlejandroGV:~/Descargas$ gpg --list-sign
+/home/alejandrogv/.gnupg/pubring.kbx
+------------------------------------
+pub   rsa3072 2021-11-18 [SC] [caduca: 2023-11-18]
+      DA5A4DEF66D25FCEEA83D8BEEAC60E9B2330736A
+uid        [  absoluta ] alegv <tojandro@gmail.com>
+sig 3        EAC60E9B2330736A 2021-11-18  alegv <tojandro@gmail.com>
+sig          EDA6F79F602CACBD 2021-11-18  Daniel Miguel Mesa Mejias <danimesamejias@gmail.com>
+sig          A5FE3E3D9D2AE56F 2021-11-22  user-vega (esto es la tarea 1)
+sub   rsa3072 2021-11-18 [E] [caduca: 2023-11-18]
+sig          EAC60E9B2330736A 2021-11-18  alegv <tojandro@gmail.com>
+~~~
         
 * También se pueden ver las firmas de las claves de nuestros compañeros, si no tenemos a alguien que ha firmado su clave en nuestro anillo de claves nos aparecerá como ID de usuario no encontrado:
 
-        alejandrogv@AlejandroGV:~$ gpg --list-sign
-        /home/alejandrogv/.gnupg/pubring.kbx
-        ------------------------------------
-        pub   rsa3072 2020-10-08 [SC] [caduca: 2022-11-10]
-              443D661D9AAF3ABAEDCA93E1C3B291882C4EE5DF
-        uid        [  absoluta ] Alejandro Gutierrez Valencia <tojandro@gmail.com>
-        sig 3        C3B291882C4EE5DF 2020-11-10  Alejandro Gutierrez Valencia <tojandro@gmail.com>
-        sig          57112B319F2A6170 2020-10-22  Francisco Javier Madueño Jurado <frandh1997@gmail.com>
-        sig          A52A681834F0E596 2020-10-28  José Miguel Calderón Frutos <josemiguelcalderonfrutos@gamil.com>
-        sig          CFCF1D130D5A52C5 2020-11-06  sergio ibañez <sergio_hd_sony@hotmail.com>
-        sub   rsa3072 2020-10-08 [E] [caduca: 2022-11-10]
-        sig          C3B291882C4EE5DF 2020-11-10  Alejandro Gutierrez Valencia <tojandro@gmail.com>
+~~~
+alejandrogv@AlejandroGV:~$ gpg --list-sign
+/home/alejandrogv/.gnupg/pubring.kbx
+------------------------------------
+pub   rsa3072 2020-10-08 [SC] [caduca: 2022-11-10]
+      443D661D9AAF3ABAEDCA93E1C3B291882C4EE5DF
+uid        [  absoluta ] Alejandro Gutierrez Valencia <tojandro@gmail.com>
+sig 3        C3B291882C4EE5DF 2020-11-10  Alejandro Gutierrez Valencia <tojandro@gmail.com>
+sig          57112B319F2A6170 2020-10-22  Francisco Javier Madueño Jurado <frandh1997@gmail.com>
+sig          A52A681834F0E596 2020-10-28  José Miguel Calderón Frutos <josemiguelcalderonfrutos@gamil.com>
+sig          CFCF1D130D5A52C5 2020-11-06  sergio ibañez <sergio_hd_sony@hotmail.com>
+sub   rsa3072 2020-10-08 [E] [caduca: 2022-11-10]
+sig          C3B291882C4EE5DF 2020-11-10  Alejandro Gutierrez Valencia <tojandro@gmail.com>
 
-        pub   rsa3072 2020-10-07 [SC] [caducó: 2020-11-07]
-              DCFB091C5495684E59BC061EA52A681834F0E596
-        uid        [  caducada ] José Miguel Calderón Frutos <josemiguelcalderonfrutos@gamil.com>
-        sig 3        A52A681834F0E596 2020-10-08  José Miguel Calderón Frutos <josemiguelcalderonfrutos@gamil.com>
-        sig          4F54B5799987B52D 2020-10-22  [ID de usuario no encontrado]
-        sig          636AE9EBCB7E3294 2020-10-28  [ID de usuario no encontrado]
-        sig          C3B291882C4EE5DF 2020-10-28  Alejandro Gutierrez Valencia <tojandro@gmail.com>
+pub   rsa3072 2020-10-07 [SC] [caducó: 2020-11-07]
+      DCFB091C5495684E59BC061EA52A681834F0E596
+uid        [  caducada ] José Miguel Calderón Frutos <josemiguelcalderonfrutos@gamil.com>
+sig 3        A52A681834F0E596 2020-10-08  José Miguel Calderón Frutos <josemiguelcalderonfrutos@gamil.com>
+sig          4F54B5799987B52D 2020-10-22  [ID de usuario no encontrado]
+sig          636AE9EBCB7E3294 2020-10-28  [ID de usuario no encontrado]
+sig          C3B291882C4EE5DF 2020-10-28  Alejandro Gutierrez Valencia <tojandro@gmail.com>
 
-        pub   rsa3072 2020-10-06 [SC] [caduca: 2022-10-06]
-              28ED3C3112ED8846BEDFFAF657112B319F2A6170
-        uid        [   total   ] Francisco Javier Madueño Jurado <frandh1997@gmail.com>
-        sig 3        57112B319F2A6170 2020-10-06  Francisco Javier Madueño Jurado <frandh1997@gmail.com>
-        sig          C3B291882C4EE5DF 2020-10-28  Alejandro Gutierrez Valencia <tojandro@gmail.com>
-        sub   rsa3072 2020-10-06 [E] [caduca: 2022-10-06]
-        sig          57112B319F2A6170 2020-10-06  Francisco Javier Madueño Jurado <frandh1997@gmail.com>
+pub   rsa3072 2020-10-06 [SC] [caduca: 2022-10-06]
+      28ED3C3112ED8846BEDFFAF657112B319F2A6170
+uid        [   total   ] Francisco Javier Madueño Jurado <frandh1997@gmail.com>
+sig 3        57112B319F2A6170 2020-10-06  Francisco Javier Madueño Jurado <frandh1997@gmail.com>
+sig          C3B291882C4EE5DF 2020-10-28  Alejandro Gutierrez Valencia <tojandro@gmail.com>
+sub   rsa3072 2020-10-06 [E] [caduca: 2022-10-06]
+sig          57112B319F2A6170 2020-10-06  Francisco Javier Madueño Jurado <frandh1997@gmail.com>
 
-        pub   rsa3072 2020-10-06 [SC] [caduca: 2022-10-06]
-              547D6FBDF49CD2340F1D5DB6CFCF1D130D5A52C5
-        uid        [   total   ] sergio ibañez <sergio_hd_sony@hotmail.com>
-        sig 3        CFCF1D130D5A52C5 2020-10-06  sergio ibañez <sergio_hd_sony@hotmail.com>
-        sig          4F54B5799987B52D 2020-10-28  [ID de usuario no encontrado]
-        sig          7A01A1F808950F41 2020-11-04  [ID de usuario no encontrado]
-        sig          C3B291882C4EE5DF 2020-11-06  Alejandro Gutierrez Valencia <tojandro@gmail.com>
-        sub   rsa3072 2020-10-06 [E] [caduca: 2022-10-06]
-        sig          CFCF1D130D5A52C5 2020-10-06  sergio ibañez <sergio_hd_sony@hotmail.com>
+pub   rsa3072 2020-10-06 [SC] [caduca: 2022-10-06]
+      547D6FBDF49CD2340F1D5DB6CFCF1D130D5A52C5
+uid        [   total   ] sergio ibañez <sergio_hd_sony@hotmail.com>
+sig 3        CFCF1D130D5A52C5 2020-10-06  sergio ibañez <sergio_hd_sony@hotmail.com>
+sig          4F54B5799987B52D 2020-10-28  [ID de usuario no encontrado]
+sig          7A01A1F808950F41 2020-11-04  [ID de usuario no encontrado]
+sig          C3B291882C4EE5DF 2020-11-06  Alejandro Gutierrez Valencia <tojandro@gmail.com>
+sub   rsa3072 2020-10-06 [E] [caduca: 2022-10-06]
+sig          CFCF1D130D5A52C5 2020-10-06  sergio ibañez <sergio_hd_sony@hotmail.com>
+~~~
 
 * Nostros también hemos recibido un fichero firmado de dos compañeros, uno de alguien que pertenece a nuestro anillo de confianza y otro que no, pero otra persona con la que tenemos confianza total:
 
-        alejandrogv@AlejandroGV:~/Descargas$ gpg --verify doc.sig 
-        gpg: Firmado el mar 10 nov 2020 08:19:38 CET
-        gpg:                usando RSA clave 547D6FBDF49CD2340F1D5DB6CFCF1D130D5A52C5
-        gpg: Firma correcta de "sergio ibañez <sergio_hd_sony@hotmail.com>" [total]
+~~~
+alejandrogv@AlejandroGV:~/Descargas$ gpg --verify doc.sig 
+gpg: Firmado el mar 10 nov 2020 08:19:38 CET
+gpg:                usando RSA clave 547D6FBDF49CD2340F1D5DB6CFCF1D130D5A52C5
+gpg: Firma correcta de "sergio ibañez <sergio_hd_sony@hotmail.com>" [total]
+~~~
 
 * Veamos que sucede con la otro fichero firmado:
 
-        alejandrogv@AlejandroGV:~/Descargas$ gpg --verify saludo.sig 
-        gpg: Firmado el mar 10 nov 2020 10:14:48 CET
-        gpg:                usando RSA clave AD19812061DA946F8DA70E0C4F54B5799987B52D
-        gpg: Imposible comprobar la firma: No public key
+~~~
+alejandrogv@AlejandroGV:~/Descargas$ gpg --verify saludo.sig 
+gpg: Firmado el mar 10 nov 2020 10:14:48 CET
+gpg:                usando RSA clave AD19812061DA946F8DA70E0C4F54B5799987B52D
+gpg: Imposible comprobar la firma: No public key
+~~~
 
 ### Tarea 2:
 
@@ -206,15 +216,19 @@ gpg -a --export danimesamejias@gmail.com > dani.asc
 
 * Tenemos descargada una imagen de debian 10, también hemos descargado de la página oficial su archivo md5sums correspondiente y con el siguiete comando comprobaremos las sumas:
 
-        alejandrogv@AlejandroGV:~/Descargas$ sudo md5sum -c MD5SUMS 2> /dev/null | grep debian-10.6.0-amd64-netinst.iso 
-        debian-10.6.0-amd64-netinst.iso: La suma coincide
+~~~
+alejandrogv@AlejandroGV:~/Descargas$ sudo md5sum -c MD5SUMS 2> /dev/null | grep debian-10.6.0-amd64-netinst.iso 
+debian-10.6.0-amd64-netinst.iso: La suma coincide
+~~~
 
 * Haremos el mismo proceso con con SHA256 y SHA512 y vemos que también coinciden:
 
-        alejandrogv@AlejandroGV:~/Descargas$ sha256sum -c SHA256SUMS 2> /dev/null | grep debian-10.6.0-amd64-netinst.iso 
-        debian-10.6.0-amd64-netinst.iso: La suma coincide
-        alejandrogv@AlejandroGV:~/Descargas$ sha512sum -c SHA512SUMS 2> /dev/null | grep debian-10.6.0-amd64-netinst.iso 
-        debian-10.6.0-amd64-netinst.iso: La suma coincide
+~~~
+alejandrogv@AlejandroGV:~/Descargas$ sha256sum -c SHA256SUMS 2> /dev/null | grep debian-10.6.0-amd64-netinst.iso 
+debian-10.6.0-amd64-netinst.iso: La suma coincide
+alejandrogv@AlejandroGV:~/Descargas$ sha512sum -c SHA512SUMS 2> /dev/null | grep debian-10.6.0-amd64-netinst.iso 
+debian-10.6.0-amd64-netinst.iso: La suma coincide
+~~~
 
 ### Tarea 4:
 
@@ -228,107 +242,109 @@ gpg -a --export danimesamejias@gmail.com > dani.asc
 
 * Vemos la salida del comando apt-key list:
 
-        alejandrogv@AlejandroGV:~/Descargas$ apt-key list
-        /etc/apt/trusted.gpg
-        --------------------
-        pub   rsa4096 2018-05-23 [SC] [caducó: 2020-08-21]
-              931F F8E7 9F08 7613 4EDD  BDCC A87F F9DF 48BF 1C90
-        uid        [  caducada ] Spotify Public Repository Signing Key <tux@spotify.com>
+~~~
+alejandrogv@AlejandroGV:~/Descargas$ apt-key list
+/etc/apt/trusted.gpg
+--------------------
+pub   rsa4096 2018-05-23 [SC] [caducó: 2020-08-21]
+      931F F8E7 9F08 7613 4EDD  BDCC A87F F9DF 48BF 1C90
+uid        [  caducada ] Spotify Public Repository Signing Key <tux@spotify.com>
 
-        pub   rsa4096 2019-07-15 [SC] [caducó: 2020-10-07]
-              2EBF 997C 15BD A244 B6EB  F5D8 4773 BD5E 130D 1D45
-        uid        [  caducada ] Spotify Public Repository Signing Key <tux@spotify.com>
+pub   rsa4096 2019-07-15 [SC] [caducó: 2020-10-07]
+      2EBF 997C 15BD A244 B6EB  F5D8 4773 BD5E 130D 1D45
+uid        [  caducada ] Spotify Public Repository Signing Key <tux@spotify.com>
 
-        pub   rsa2048 2015-10-28 [SC]
-              BC52 8686 B50D 79E3 39D3  721C EB3E 94AD BE12 29CF
-        uid        [desconocida] Microsoft (Release signing) <gpgsecurity@microsoft.com>
+pub   rsa2048 2015-10-28 [SC]
+      BC52 8686 B50D 79E3 39D3  721C EB3E 94AD BE12 29CF
+uid        [desconocida] Microsoft (Release signing) <gpgsecurity@microsoft.com>
 
-        pub   rsa4096 2016-04-22 [SC]
-              B9F8 D658 297A F3EF C18D  5CDF A2F6 83C5 2980 AECF
-        uid        [desconocida] Oracle Corporation (VirtualBox archive signing key) <info@virtualbox.org>
-        sub   rsa4096 2016-04-22 [E]
+pub   rsa4096 2016-04-22 [SC]
+      B9F8 D658 297A F3EF C18D  5CDF A2F6 83C5 2980 AECF
+uid        [desconocida] Oracle Corporation (VirtualBox archive signing key) <info@virtualbox.org>
+sub   rsa4096 2016-04-22 [E]
 
-        /etc/apt/trusted.gpg.d/debian-archive-buster-automatic.gpg
-        ----------------------------------------------------------
-        pub   rsa4096 2019-04-14 [SC] [caduca: 2027-04-12]
-              80D1 5823 B7FD 1561 F9F7  BCDD DC30 D7C2 3CBB ABEE
-        uid        [desconocida] Debian Archive Automatic Signing Key (10/buster) <ftpmaster@debian.org>
-        sub   rsa4096 2019-04-14 [S] [caduca: 2027-04-12]
+/etc/apt/trusted.gpg.d/debian-archive-buster-automatic.gpg
+----------------------------------------------------------
+pub   rsa4096 2019-04-14 [SC] [caduca: 2027-04-12]
+      80D1 5823 B7FD 1561 F9F7  BCDD DC30 D7C2 3CBB ABEE
+uid        [desconocida] Debian Archive Automatic Signing Key (10/buster) <ftpmaster@debian.org>
+sub   rsa4096 2019-04-14 [S] [caduca: 2027-04-12]
 
-        /etc/apt/trusted.gpg.d/debian-archive-buster-security-automatic.gpg
-        -------------------------------------------------------------------
-        pub   rsa4096 2019-04-14 [SC] [caduca: 2027-04-12]
-              5E61 B217 265D A980 7A23  C5FF 4DFA B270 CAA9 6DFA
-        uid        [desconocida] Debian Security Archive Automatic Signing Key (10/buster) <ftpmaster@debian.org>
-        sub   rsa4096 2019-04-14 [S] [caduca: 2027-04-12]
+/etc/apt/trusted.gpg.d/debian-archive-buster-security-automatic.gpg
+-------------------------------------------------------------------
+pub   rsa4096 2019-04-14 [SC] [caduca: 2027-04-12]
+      5E61 B217 265D A980 7A23  C5FF 4DFA B270 CAA9 6DFA
+uid        [desconocida] Debian Security Archive Automatic Signing Key (10/buster) <ftpmaster@debian.org>
+sub   rsa4096 2019-04-14 [S] [caduca: 2027-04-12]
 
-        /etc/apt/trusted.gpg.d/debian-archive-buster-stable.gpg
-        -------------------------------------------------------
-        pub   rsa4096 2019-02-05 [SC] [caduca: 2027-02-03]
-              6D33 866E DD8F FA41 C014  3AED DCC9 EFBF 77E1 1517
-        uid        [desconocida] Debian Stable Release Key (10/buster) <debian-release@lists.debian.org>
+/etc/apt/trusted.gpg.d/debian-archive-buster-stable.gpg
+-------------------------------------------------------
+pub   rsa4096 2019-02-05 [SC] [caduca: 2027-02-03]
+      6D33 866E DD8F FA41 C014  3AED DCC9 EFBF 77E1 1517
+uid        [desconocida] Debian Stable Release Key (10/buster) <debian-release@lists.debian.org>
 
-        /etc/apt/trusted.gpg.d/debian-archive-jessie-automatic.gpg
-        ----------------------------------------------------------
-        pub   rsa4096 2014-11-21 [SC] [caduca: 2022-11-19]
-              126C 0D24 BD8A 2942 CC7D  F8AC 7638 D044 2B90 D010
-        uid        [desconocida] Debian Archive Automatic Signing Key (8/jessie) <ftpmaster@debian.org>
+/etc/apt/trusted.gpg.d/debian-archive-jessie-automatic.gpg
+----------------------------------------------------------
+pub   rsa4096 2014-11-21 [SC] [caduca: 2022-11-19]
+      126C 0D24 BD8A 2942 CC7D  F8AC 7638 D044 2B90 D010
+uid        [desconocida] Debian Archive Automatic Signing Key (8/jessie) <ftpmaster@debian.org>
 
-        /etc/apt/trusted.gpg.d/debian-archive-jessie-security-automatic.gpg
-        -------------------------------------------------------------------
-        pub   rsa4096 2014-11-21 [SC] [caduca: 2022-11-19]
-              D211 6914 1CEC D440 F2EB  8DDA 9D6D 8F6B C857 C906
-        uid        [desconocida] Debian Security Archive Automatic Signing Key (8/jessie) <ftpmaster@debian.org>
+/etc/apt/trusted.gpg.d/debian-archive-jessie-security-automatic.gpg
+-------------------------------------------------------------------
+pub   rsa4096 2014-11-21 [SC] [caduca: 2022-11-19]
+      D211 6914 1CEC D440 F2EB  8DDA 9D6D 8F6B C857 C906
+uid        [desconocida] Debian Security Archive Automatic Signing Key (8/jessie) <ftpmaster@debian.org>
 
-        /etc/apt/trusted.gpg.d/debian-archive-jessie-stable.gpg
-        -------------------------------------------------------
-        pub   rsa4096 2013-08-17 [SC] [caduca: 2021-08-15]
-              75DD C3C4 A499 F1A1 8CB5  F3C8 CBF8 D6FD 518E 17E1
-        uid        [desconocida] Jessie Stable Release Key <debian-release@lists.debian.org>
+/etc/apt/trusted.gpg.d/debian-archive-jessie-stable.gpg
+-------------------------------------------------------
+pub   rsa4096 2013-08-17 [SC] [caduca: 2021-08-15]
+      75DD C3C4 A499 F1A1 8CB5  F3C8 CBF8 D6FD 518E 17E1
+uid        [desconocida] Jessie Stable Release Key <debian-release@lists.debian.org>
 
-        /etc/apt/trusted.gpg.d/debian-archive-stretch-automatic.gpg
-        -----------------------------------------------------------
-        pub   rsa4096 2017-05-22 [SC] [caduca: 2025-05-20]
-              E1CF 20DD FFE4 B89E 8026  58F1 E0B1 1894 F66A EC98
-        uid        [desconocida] Debian Archive Automatic Signing Key (9/stretch) <ftpmaster@debian.org>
-        sub   rsa4096 2017-05-22 [S] [caduca: 2025-05-20]
+/etc/apt/trusted.gpg.d/debian-archive-stretch-automatic.gpg
+-----------------------------------------------------------
+pub   rsa4096 2017-05-22 [SC] [caduca: 2025-05-20]
+      E1CF 20DD FFE4 B89E 8026  58F1 E0B1 1894 F66A EC98
+uid        [desconocida] Debian Archive Automatic Signing Key (9/stretch) <ftpmaster@debian.org>
+sub   rsa4096 2017-05-22 [S] [caduca: 2025-05-20]
 
-        /etc/apt/trusted.gpg.d/debian-archive-stretch-security-automatic.gpg
-        --------------------------------------------------------------------
-        pub   rsa4096 2017-05-22 [SC] [caduca: 2025-05-20]
-              6ED6 F5CB 5FA6 FB2F 460A  E88E EDA0 D238 8AE2 2BA9
-        uid        [desconocida] Debian Security Archive Automatic Signing Key (9/stretch) <ftpmaster@debian.org>
-        sub   rsa4096 2017-05-22 [S] [caduca: 2025-05-20]
+/etc/apt/trusted.gpg.d/debian-archive-stretch-security-automatic.gpg
+--------------------------------------------------------------------
+pub   rsa4096 2017-05-22 [SC] [caduca: 2025-05-20]
+      6ED6 F5CB 5FA6 FB2F 460A  E88E EDA0 D238 8AE2 2BA9
+uid        [desconocida] Debian Security Archive Automatic Signing Key (9/stretch) <ftpmaster@debian.org>
+sub   rsa4096 2017-05-22 [S] [caduca: 2025-05-20]
 
-        /etc/apt/trusted.gpg.d/debian-archive-stretch-stable.gpg
-        --------------------------------------------------------
-        pub   rsa4096 2017-05-20 [SC] [caduca: 2025-05-18]
-              067E 3C45 6BAE 240A CEE8  8F6F EF0F 382A 1A7B 6500
-        uid        [desconocida] Debian Stable Release Key (9/stretch) <debian-release@lists.debian.org>
+/etc/apt/trusted.gpg.d/debian-archive-stretch-stable.gpg
+--------------------------------------------------------
+pub   rsa4096 2017-05-20 [SC] [caduca: 2025-05-18]
+      067E 3C45 6BAE 240A CEE8  8F6F EF0F 382A 1A7B 6500
+uid        [desconocida] Debian Stable Release Key (9/stretch) <debian-release@lists.debian.org>
 
-        /etc/apt/trusted.gpg.d/microsoft.gpg
-        ------------------------------------
-        pub   rsa2048 2015-10-28 [SC]
-              BC52 8686 B50D 79E3 39D3  721C EB3E 94AD BE12 29CF
-        uid        [desconocida] Microsoft (Release signing) <gpgsecurity@microsoft.com>
+/etc/apt/trusted.gpg.d/microsoft.gpg
+------------------------------------
+pub   rsa2048 2015-10-28 [SC]
+      BC52 8686 B50D 79E3 39D3  721C EB3E 94AD BE12 29CF
+uid        [desconocida] Microsoft (Release signing) <gpgsecurity@microsoft.com>
 
-        /etc/apt/trusted.gpg.d/spotify-2018-05-23-48BF1C90.gpg
-        ------------------------------------------------------
-        pub   rsa4096 2018-05-23 [SC] [caducó: 2020-08-21]
-              931F F8E7 9F08 7613 4EDD  BDCC A87F F9DF 48BF 1C90
-        uid        [  caducada ] Spotify Public Repository Signing Key <tux@spotify.com>
+/etc/apt/trusted.gpg.d/spotify-2018-05-23-48BF1C90.gpg
+------------------------------------------------------
+pub   rsa4096 2018-05-23 [SC] [caducó: 2020-08-21]
+      931F F8E7 9F08 7613 4EDD  BDCC A87F F9DF 48BF 1C90
+uid        [  caducada ] Spotify Public Repository Signing Key <tux@spotify.com>
 
-        /etc/apt/trusted.gpg.d/spotify-2019-07-15-4773BD5E130D1D45.gpg
-        --------------------------------------------------------------
-        pub   rsa4096 2019-07-15 [SC] [caducó: 2020-10-07]
-              2EBF 997C 15BD A244 B6EB  F5D8 4773 BD5E 130D 1D45
-        uid        [  caducada ] Spotify Public Repository Signing Key <tux@spotify.com>
+/etc/apt/trusted.gpg.d/spotify-2019-07-15-4773BD5E130D1D45.gpg
+--------------------------------------------------------------
+pub   rsa4096 2019-07-15 [SC] [caducó: 2020-10-07]
+      2EBF 997C 15BD A244 B6EB  F5D8 4773 BD5E 130D 1D45
+uid        [  caducada ] Spotify Public Repository Signing Key <tux@spotify.com>
 
-        /etc/apt/trusted.gpg.d/spotify-2020-09-08-D1742AD60D811D58.gpg
-        --------------------------------------------------------------
-        pub   rsa4096 2020-09-08 [SC] [caduca: 2021-12-02]
-              8FD3 D9A8 D380 0305 A9FF  F259 D174 2AD6 0D81 1D58
-        uid        [desconocida] Spotify Public Repository Signing Key <tux@spotify.com>
+/etc/apt/trusted.gpg.d/spotify-2020-09-08-D1742AD60D811D58.gpg
+--------------------------------------------------------------
+pub   rsa4096 2020-09-08 [SC] [caduca: 2021-12-02]
+      8FD3 D9A8 D380 0305 A9FF  F259 D174 2AD6 0D81 1D58
+uid        [desconocida] Spotify Public Repository Signing Key <tux@spotify.com>
+~~~
 
 * Vemos que lista todas las claves que usa apt para verificar los paquetes.
 
@@ -348,11 +364,15 @@ gpg -a --export danimesamejias@gmail.com > dani.asc
 
 * Añadimos en `/etc/apt/sources.list.d/oracle-virtualbox.list` esta línea:
 
-        deb https://download.virtualbox.org/virtualbox/debian buster contrib
+~~~
+deb https://download.virtualbox.org/virtualbox/debian buster contrib
+~~~
 
 * Y ahora al descargar la versión de virtualbox directamente podemos añadir la clave de la siguiete forma:
 
-        wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+~~~
+wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
+~~~
 
 ### Tarea 5:
 
@@ -378,21 +398,23 @@ gpg -a --export danimesamejias@gmail.com > dani.asc
 
 #### En ocasiones cuando estamos trabajando en el cloud, y reutilizamos una ip flotante nos aparece este mensaje:
 
-        $ ssh debian@172.22.200.74
-         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-         @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
-         @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-         IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
-         Someone could be eavesdropping on you right now (man-in-the-middle attack)!
-         It is also possible that a host key has just been changed.
-         The fingerprint for the ECDSA key sent by the remote host is
-         SHA256:W05RrybmcnJxD3fbwJOgSNNWATkVftsQl7EzfeKJgNc.
-         Please contact your system administrator.
-         Add correct host key in /home/jose/.ssh/known_hosts to get rid of this message.
-         Offending ECDSA key in /home/jose/.ssh/known_hosts:103
-           remove with:
-           ssh-keygen -f "/home/jose/.ssh/known_hosts" -R "172.22.200.74"
-         ECDSA host key for 172.22.200.74 has changed and you have requested strict checking.
+~~~
+$ ssh debian@172.22.200.74
+ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+ @    WARNING: REMOTE HOST IDENTIFICATION HAS CHANGED!     @
+ @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+ IT IS POSSIBLE THAT SOMEONE IS DOING SOMETHING NASTY!
+ Someone could be eavesdropping on you right now (man-in-the-middle attack)!
+ It is also possible that a host key has just been changed.
+ The fingerprint for the ECDSA key sent by the remote host is
+ SHA256:W05RrybmcnJxD3fbwJOgSNNWATkVftsQl7EzfeKJgNc.
+ Please contact your system administrator.
+ Add correct host key in /home/jose/.ssh/known_hosts to get rid of this message.
+ Offending ECDSA key in /home/jose/.ssh/known_hosts:103
+   remove with:
+   ssh-keygen -f "/home/jose/.ssh/known_hosts" -R "172.22.200.74"
+ ECDSA host key for 172.22.200.74 has changed and you have requested strict checking.
+~~~
 
 * Esto significa que la clave de este equipo ha cambiado. Este mensaje puede aparecer por ejemplo si nos conectamos a un equipo con una IP con la que ya nos hemos conectado anteriormente, sin embargo es un equipo diferente, la clave e IP de este equipo están almacenadas en el fichero `known_hosts` y al ver que no coinciden nos saltará este mensaje de advertencia.
 
