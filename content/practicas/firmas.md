@@ -28,6 +28,8 @@ gpg:          No hay indicios de que la firma pertenezca al propietario.
 Huellas dactilares de la clave primaria: 4774 2CCB 469E B70E 1329  66ED EDA6 F79F 602C ACBD
 ~~~
 
+* El mensaje de error que aparece se debe a que no hemos firmado esta clave. El sistema no tiene seguridad de que esta clave pertenece a la persona que dice ser.
+
 * Ahora firmaremos la clave de este compañero:
 
 ~~~
