@@ -217,7 +217,7 @@ alejandrogv@AlejandroGV:~$ gpg --delete-secret-key user-javier
 * Ahora cogeremos la clave del servidor que usamos antes, para ello necesitaremos saber la ID del compañero.
 
 ~~~
-alejandrogv@AlejandroGV:~$ gpg --keyserver pgp.rediris.org --recv-keys DA5A4DEF66D25FCEEA83D8BEEAC60E9B2330736A
+alejandrogv@AlejandroGV:~$ gpg --keyserver pgp.rediris.es --recv-keys DA5A4DEF66D25FCEEA83D8BEEAC60E9B2330736A
 ~~~
 
 #### Cifrado asimétrico con openssl

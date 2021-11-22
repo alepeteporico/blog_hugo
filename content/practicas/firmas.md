@@ -212,6 +212,12 @@ gpg: Imposible comprobar la firma: No public key
 
 ![envio](/firmas/6.png)
 
+* Enviamos un correo a Raúl firmado.
+
+![correo](/firmas/7.png)
+
+![envio](/firmas/8.png)
+
 ### Tarea 3:
 
 * Tenemos descargada una imagen de debian 10, también hemos descargado de la página oficial su archivo md5sums correspondiente y con el siguiete comando comprobaremos las sumas:
