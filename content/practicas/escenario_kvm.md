@@ -61,8 +61,34 @@ root@zeus:~# echo 1 > /proc/sys/net/ipv4/ip_forward
 * Ahora añadiremos las reglas de iptables:
 
 ~~~
-root@zeus:~# iptables -t nat -A POSTROUTING -s 172.16.0.0/16 -o enp3s0 -j MASQUERADE
-root@zeus:~# iptables -t nat -A POSTROUTING -s 10.0.1.0/24 -o enp3s0 -j MASQUERADE
+root@zeus:~# iptables -t nat -A POSTROUTING -s 172.16.0.0/16 -o ens3 -j MASQUERADE
+root@zeus:~# iptables -t nat -A POSTROUTING -s 10.0.1.0/24 -o ens3 -j MASQUERADE
 ~~~
+
+* Configuramos las interfaces de red en el `/etc/network/interfaces`.
+
+~~~
+# The primary network interface
+allow-hotplug ens3
+iface ens3 inet dhcp
+
+# Additional interfaces, just in case we're using
+# multiple networks
+auto ens4
+iface ens4 inet static
+ address 10.0.1.1
+ netmask 255.255.255.0
+ broadcast 10.0.1.255
+ gateway 10.0.1.1
+
+auto ens5
+iface ens5 inet static
+ address 172.16.0.1
+ netmask 255.255.0.0
+ broadcast 172.16.255.255
+ gateway 172.16.0.1
+~~~
+
+* Ahora instalariamos las demás máquinas y configurariamos sus interfaces tal y como hemos hecho aquí.
 
 * 
