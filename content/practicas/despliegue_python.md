@@ -253,7 +253,7 @@ server
 
     listen 80;
 
-    server_name www.alegvdjango.site;
+    server_name django.alejandrogv.site;
 
     index index.php index.html index.htm default.php default.htm default.html;
 

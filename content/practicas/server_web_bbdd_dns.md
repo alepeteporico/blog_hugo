@@ -87,24 +87,26 @@ menu = "main"
 
 ### db.alegv.interna
 
-        $TTL    86400
-        @       IN      SOA     freston.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. (
-                                      1         ; Serial
-                                 604800         ; Refresh
-                                  86400         ; Retry
-                                2419200         ; Expire
-                                  86400 )       ; Negative Cache TTL
-        ;
-        @       IN      NS      freston.alegv.gonzalonazareno.org.
+~~~
+$TTL    86400
+@       IN      SOA     freston.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. (
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                          86400 )       ; Negative Cache TTL
+;
+@       IN      NS      freston.alegv.gonzalonazareno.org.
 
-        $ORIGIN alegv.gonzalonazareno.org.
+$ORIGIN alegv.gonzalonazareno.org.
 
-        dulcinea        IN      A       10.0.1.8
-        sancho  IN      A       10.0.1.6
-        quijote IN      A       10.0.2.5
-        freston IN      A       10.0.1.9
-        www     IN      CNAME   quijote
-        bd      IN      CNAME   sancho
+dulcinea        IN      A       10.0.1.8
+sancho  IN      A       10.0.1.6
+quijote IN      A       10.0.2.5
+freston IN      A       10.0.1.9
+www     IN      CNAME   quijote
+bd      IN      CNAME   sancho
+~~~
 
 ### db.alegv.dmz
 
