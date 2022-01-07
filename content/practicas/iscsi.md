@@ -4,7 +4,7 @@ description = ""
 tags = [
     "ASO"
 ]
-date = "2021-05-25"
+date = "2022-01-06"
 menu = "main"
 +++
 
@@ -26,134 +26,124 @@ menu = "main"
 
 * Ahora realizaremos nuestra configuración, si lo hicieramos desde línea de comandos al cerrar la sesión se eliminaria nuestra configuración, por ello vamos a configurarlo mediante los ficheros de configuración empezaremos con `/etc/tgt/conf.d/target1.conf` para definir dos targets, uno para el cliente windows y otro para el cliente debian, notaremos que el target 2 tiene una línea que no está en el primero, esto es porque lo usaremos para windows y necesitaremos un usuario y una contraseña para el mismo.
 
-        <target iqn.2021-05.es.alegv:target1>
-                backing-store /dev/sdb
-        </target>
-        <target iqn.2021-05.es.alegv:target2>
-                backing-store /dev/sdc
-                incominguser admin admin
-        </target>
+~~~
+<target iqn.2022-01.es.alegv:target1>
+        backing-store /dev/sdb
+</target>
+<target iqn.2022-01.es.alegv:target2>
+        backing-store /dev/sdc
+        incominguser admin admin
+</target>
+~~~
 
 * Después de reiniciar el servicio vamos a ver las targets que acabamos de configurar.
 
-        vagrant@maquina1:~$ sudo systemctl restart tgt
+~~~
+vagrant@maquina1:~$ sudo systemctl restart tgt
 
-        vagrant@maquina1:~$ sudo tgtadm --op show --mode target
-        Target 1: iqn.2021-05.es.alegv:target1
-            System information:
-                Driver: iscsi
-                State: ready
-            I_T nexus information:
-            LUN information:
-                LUN: 0
-                    Type: controller
-                    SCSI ID: IET     00010000
-                    SCSI SN: beaf10
-                    Size: 0 MB, Block size: 1
-                    Online: Yes
-                    Removable media: No
-                    Prevent removal: No
-                    Readonly: No
-                    SWP: No
-                    Thin-provisioning: No
-                    Backing store type: null
-                    Backing store path: None
-                    Backing store flags: 
-                LUN: 1
-                    Type: disk
-                    SCSI ID: IET     00010001
-                    SCSI SN: beaf11
-                    Size: 1074 MB, Block size: 512
-                    Online: Yes
-                    Removable media: No
-                    Prevent removal: No
-                    Readonly: No
-                    SWP: No
-                    Thin-provisioning: No
-                    Backing store type: rdwr
-                    Backing store path: /dev/sdb
-                    Backing store flags: 
-            Account information:
-            ACL information:
-                ALL
-        Target 2: iqn.2021-05.es.alegv:target2
-            System information:
-                Driver: iscsi
-                State: ready
-            I_T nexus information:
-            LUN information:
-                LUN: 0
-                    Type: controller
-                    SCSI ID: IET     00020000
-                    SCSI SN: beaf20
-                    Size: 0 MB, Block size: 1
-                    Online: Yes
-                    Removable media: No
-                    Prevent removal: No
-                    Readonly: No
-                    SWP: No
-                    Thin-provisioning: No
-                    Backing store type: null
-                    Backing store path: None
-                    Backing store flags: 
-                LUN: 1
-                    Type: disk
-                    SCSI ID: IET     00020001
-                    SCSI SN: beaf21
-                    Size: 1074 MB, Block size: 512
-                    Online: Yes
-                    Removable media: No
-                    Prevent removal: No
-                    Readonly: No
-                    SWP: No
-                    Thin-provisioning: No
-                    Backing store type: rdwr
-                    Backing store path: /dev/sdc
-                    Backing store flags: 
-            Account information:
-            ACL information:
-                ALL
+vagrant@maquina1:~$ sudo tgtadm --op show --mode target
+Target 1: iqn.2022-01.es.alegv:target1
+    System information:
+        Driver: iscsi
+        State: ready
+    I_T nexus information:
+    LUN information:
+        LUN: 0
+            Type: controller
+            SCSI ID: IET     00010000
+            SCSI SN: beaf10
+            Size: 0 MB, Block size: 1
+            Online: Yes
+            Removable media: No
+            Prevent removal: No
+            Readonly: No
+            SWP: No
+            Thin-provisioning: No
+            Backing store type: null
+            Backing store path: None
+            Backing store flags: 
+    Account information:
+    ACL information:
+        ALL
+Target 2: iqn.2022-01.es.alegv:target2
+    System information:
+        Driver: iscsi
+        State: ready
+    I_T nexus information:
+    LUN information:
+        LUN: 0
+            Type: controller
+            SCSI ID: IET     00020000
+            SCSI SN: beaf20
+            Size: 0 MB, Block size: 1
+            Online: Yes
+            Removable media: No
+            Prevent removal: No
+            Readonly: No
+            SWP: No
+            Thin-provisioning: No
+            Backing store type: null
+            Backing store path: None
+            Backing store flags: 
+    Account information:
+        admin
+    ACL information:
+        ALL
+~~~
 
 * Vamos a dirigirnos al cliente linux ahora e instalar el paquete `open-iscsi`.
 
-        vagrant@maquina2:~$ sudo apt-get install open-iscsi
+~~~
+vagrant@maquina2:~$ sudo apt install open-iscsi
+~~~
 
 * Podemos comprobar que esta máquina solo tiene un disco duro.
 
-        NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-        sda      8:0    0  20G  0 disk 
-        └─sda1   8:1    0  20G  0 part /
+~~~
+vagrant@maquina2:~$ lsblk
+NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vda    254:0    0  20G  0 disk 
+└─vda1 254:1    0  20G  0 part /
+~~~
 
 * Vamos a ver las targets que tenemos disponibles.
 
-        root@maquina2:~# iscsiadm --mode discovery --type sendtargets --portal 172.22.100.15
-        172.22.100.15:3260,1 iqn.2021-05.es.alegv:target1
-        172.22.100.15:3260,1 iqn.2021-05.es.alegv:target2
+~~~
+root@maquina2:~# iscsiadm --mode discovery --type sendtargets --portal 192.168.121.231
+192.168.121.231:3260,1 iqn.2022-01.es.alegv:target1
+192.168.121.231:3260,1 iqn.2022-01.es.alegv:target2
+~~~
 
 * Vamos a conectarnos a la que queramos.
 
-        root@maquina2:~# sudo iscsiadm --mode node -T iqn.2021-05.es.alegv:target1 --portal 172.22.100.15 --login
-        Logging in to [iface: default, target: iqn.2021-05.es.     alegv:target1, portal: 172.22.100.15,3260] (multiple)
-        Login to [iface: default, target: iqn.2021-05.es.alegv:target1, portal: 172.22.100.15,3260] successful.
+~~~
+root@maquina2:~# sudo iscsiadm --mode node -T iqn.2022-01.es.alegv:target1 --portal 192.168.121.231 --login
+Logging in to [iface: default, target: iqn.2022-01.es.alegv:target1, portal: 192.168.121.231,3260]
+Login to [iface: default, target: iqn.2022-01.es.alegv:target1, portal: 192.168.121.231,3260] successful.
+~~~
 
 * Si ahora listamos nuestros dispositivos veremos que se ha añadido un nuevo volumen.
 
-        root@maquina2:~# lsblk
-        NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-        sda      8:0    0  20G  0 disk 
-        └─sda1   8:1    0  20G  0 part /
-        sdb      8:16   0   1G  0 disk 
+~~~
+vagrant@maquina2:~$ lsblk
+NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vda    254:0    0  20G  0 disk 
+└─vda1 254:1    0  20G  0 part /
+vdb    254:16   0   1G  0 disk
+~~~
 
 * Vamos a darle formato y montarlo.
 
-        root@maquina2:~# mkfs.ext4 /dev/sdb
-        root@maquina2:~# mount /dev/sdb /mnt/prueba
+~~~
+root@maquina2:~# mkfs.ext4 /dev/vdb
+root@maquina2:~# mount /dev/vdb /mnt/prueba
 
-        root@maquina2:~# lsblk
-        NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-        sda      8:0    0  20G  0 disk 
-        └─sda1   8:1    0  20G  0 part /
-        sdb      8:16   0   1G  0 disk /mnt/prueba
+root@maquina2:~$ lsblk
+NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vda    254:0    0  20G  0 disk 
+└─vda1 254:1    0  20G  0 part /
+vdb    254:16   0   1G  0 disk /mnt/prueba
+~~~
 
 ### systemd mount
 
@@ -167,7 +157,7 @@ menu = "main"
         Description= Montaje del target1         
 
         [Mount]
-        What=/dev/sdb
+        What=/dev/vdb
         Where=/prueba1  
         Type=ext4
         Options=_netdev
@@ -187,11 +177,13 @@ menu = "main"
 
 * Vamos a ver que se ha realizado el cambio, podremos comprobarlo porque hemos cambiado el punto de montaje, ahora está en `/prueba1`.
 
-        root@maquina2:~# lsblk
-        NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
-        sda      8:0    0  20G  0 disk 
-        └─sda1   8:1    0  20G  0 part /
-        sdb      8:16   0   1G  0 disk /prueba1
+~~~
+root@maquina2:~$ lsblk
+NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vda    254:0    0  20G  0 disk 
+└─vda1 254:1    0  20G  0 part /
+vdb    254:16   0   1G  0 disk prueba1
+~~~
 
 * Ahora si podremos abrir nuestro cliente windows y nos dirigiremos a `panel de control > sistema y seguridad > herramientas administrativas > iniciador iSCSI` una vez ahí, en `conexión rápida` añadiremos la IP de nuestro servidor y aparcerán las targets que tenemos configuradas.
 
@@ -203,11 +195,7 @@ menu = "main"
 
 ![targets](/iscsi/3.png)
 
-* Después de esto podemos comprobar que este target está activo.
-
-![targets](/iscsi/4.png)
-
-* Para montar este disco iriamos a la aplicacion de particiones.
+* Después de activar nuestro targer debemos montarlo, para ello iriamos a la aplicacion de particiones.
 
 ![targets](/iscsi/5.png)
 
