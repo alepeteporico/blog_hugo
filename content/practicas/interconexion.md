@@ -4,7 +4,7 @@ description = ""
 tags = [
     "ABD"
 ]
-date = "2021-05-05"
+date = "2022-01-03"
 menu = "main"
 +++
 
@@ -148,11 +148,11 @@ menu = "main"
 
 * Usaremos dos máquinas vagrant con debian buster.
 
-* primero configuraremos postgres1 que nos servirá como servidor principal, el primer archivo que configuraremos será `/etc/postgresql/11/main/postgresql.conf` y podremos el listener a 0.
+* primero configuraremos postgres1 que nos servirá como servidor principal, el primer archivo que configuraremos será `/etc/postgresql/13/main/postgresql.conf` y podremos el listener a 0.
 
         listen_addresses = '0'
 
-* Seguidamente configuraremos `/etc/postgresql/11/main/pg_hba.conf` añadiendo la siguiente línea.
+* Seguidamente configuraremos `/etc/postgresql/13/main/pg_hba.conf` añadiendo la siguiente línea.
 
         host     all             all             0.0.0.0/0
 
@@ -165,52 +165,26 @@ menu = "main"
 
 * Lo que deberemos hacer es crear un nuevo cluster ya que el que tenemos está apagado.
 
-        vagrant@postgres1:~$ sudo pg_dropcluster --stop 11 main
-
-        root@postgres1:~# pg_createcluster --locale es_ES.UTF-8 --start 11 main
-        Creating new PostgreSQL cluster 11/main ...
-        /usr/lib/postgresql/11/bin/initdb -D /var/lib/postgresql/11/main --auth-local peer --auth-host md5 --locale es_ES.UTF-8
-        The files belonging to this database system will be owned by user "postgres".
-        This user must also own the server process.
-
-        The database cluster will be initialized with locale "es_ES.UTF-8".
-        The default database encoding has accordingly been set to "UTF8".
-        The default text search configuration will be set to "spanish".
-
-        Data page checksums are disabled.
-
-        fixing permissions on existing directory /var/lib/postgresql/11/main ... ok
-        creating subdirectories ... ok
-        selecting default max_connections ... 100
-        selecting default shared_buffers ... 128MB
-        selecting default timezone ... Etc/UTC
-        selecting dynamic shared memory implementation ... posix
-        creating configuration files ... ok
-        running bootstrap script ... ok
-        performing post-bootstrap initialization ... ok
-        syncing data to disk ... ok
-
-        Success. You can now start the database server using:
-
-            pg_ctlcluster 11 main start
-
-        Ver Cluster Port Status Owner    Data directory              Log file
-        11  main    5432 online postgres /var/lib/postgresql/11/main /var/log/postgresql/postgresql-11-main.log
+~~~
+postgres@postgres1:~$ sudo pg_ctlcluster 13 main restart
+~~~
 
 * Podemos comprobar que ahora podemos entrar sin problemas.
 
-        postgres@postgres1:~$ psql
-        psql (11.12 (Debian 11.12-0+deb10u1))
-        Type "help" for help.
+~~~
+postgres@postgres1:~$ psql
+psql (13.5 (Debian 13.5-0+deb11u1))
+Type "help" for help.
 
-        postgres=#
+postgres=# 
+~~~
 
-* Pasemos a nuestro cliente, postgres2 configuraremos los archivos `/etc/postgresql/11/main/postgresql.conf` y `/etc/postgresql/11/main/pg_hba.conf` tal como hicimos con el servidor.
+* Pasemos a nuestro cliente, postgres2 configuraremos los archivos `/etc/postgresql/13/main/postgresql.conf` y `/etc/postgresql/13/main/pg_hba.conf` tal como hicimos con el servidor.
 
-        vagrant@postgres2:~$ cat /etc/postgresql/11/main/postgresql.conf
+        vagrant@postgres2:~$ cat /etc/postgresql/13/main/postgresql.conf
         listen_addresses = '*'
 
-        vagrant@postgres2:~$ cat /etc/postgresql/11/main/pg_hba.conf 
+        vagrant@postgres2:~$ cat /etc/postgresql/13/main/pg_hba.conf 
         host    all             all             0.0.0.0/0
         host    all             all             all                     md5
 
@@ -225,6 +199,17 @@ menu = "main"
         CREATE DATABASE
         postgres=# GRANT ALL PRIVILEGES ON DATABASE prueba1 to postgres1;
         GRANT
+        
+        postgres=# CREATE TABLE Propietarios
+        (
+        NIF     VARCHAR(9),
+        Nombre  VARCHAR(15),
+        Apellidos       VARCHAR(20),
+        Cuota   NUMERIC(6,2),
+        CONSTRAINT pk_propietarios PRIMARY KEY(NIF),
+        CONSTRAINT NIFPropietario_ok CHECK(NIF ~* '^[K,L,M,Z,Y,X][0-9]{7}[A-Z]{1}$' OR NIF ~* '[0-9]{8}[A-Z]')
+        );
+        CREATE TABLE
 
         prueba1=> INSERT INTO Propietarios(NIF,Nombre,Apellidos,Cuota)
         prueba1-> VALUES('61219065B','Mario','Gutiérrez Valencia',300);
@@ -267,7 +252,7 @@ menu = "main"
         prueba1=# create extension dblink;
         CREATE EXTENSION
 
-        prueba1=> SELECT * FROM dblink('dbname=prueba2 host=172.22.100.30 user=postgres2 password=postgres2, 'select * from Propietarios') AS Propietarios (NIF varchar, Nombre varchar, Apellidos varchar, Cuota numeric);
+        prueba1=> SELECT * FROM dblink('dbname=prueba2 host=192.168.121.221 user=postgres2 password=postgres2, 'select * from Propietarios') AS Propietarios (NIF varchar, Nombre varchar, Apellidos varchar, Cuota numeric);
             nif    | nombre  |   apellidos   | cuota  
         -----------+---------+---------------+--------
          61219235B | Juan    | Sierra Garcia | 300.00
@@ -278,7 +263,7 @@ menu = "main"
         prueba2=# create extension dblink;
         CREATE EXTENSION
 
-        prueba2=> SELECT * FROM dblink('dbname=prueba1 host=172.22.100.25 user=postgres1 password='postgres1', 'select * from Propietarios') AS Propietarios (NIF varchar, Nombre varchar, Apellidos varchar, Cuota numeric);
+        prueba2=> SELECT * FROM dblink('dbname=prueba1 host=192.168.121.99 user=postgres1 password='postgres1', 'select * from Propietarios') AS Propietarios (NIF varchar, Nombre varchar, Apellidos varchar, Cuota numeric);
             nif    |  nombre   |      apellidos      | cuota  
         -----------+-----------+---------------------+--------
          61219065B | Mario     | Gutiérrez Valencia  | 300.00
