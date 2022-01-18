@@ -1,5 +1,5 @@
 +++
-title = "PLSQL"
+title = "PLSQL apuntes"
 description = ""
 tags = [
     "Apuntes"
