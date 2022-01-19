@@ -10,7 +10,7 @@ menu = "main"
 
 ### Ejercicio 1: Envío local, entre usuarios del mismo servidor
 
-* Tenemos distintos parametros configurables, como por ejemplo en el fichero `/etc/postfix/main.cf` podemos configurar el parametro `myorigin` que es el dominio donde se va a enviar nuestro correo y `mydestination` se refiere a los dominios que considera que son suyos, si llegara algun correo a a cualquiera de los dominios que añadamos el servidor recibirá estos correos. Y otro que usaremos más adelante es el relayhost, aquí podremos añadir un servidor de correo 
+* Tenemos distintos parametros configurables, como por ejemplo en el fichero `/etc/postfix/main.cf` podemos configurar el parametro `myorigin` que es el dominio donde se va a enviar nuestro correo y `mydestination` se refiere a los dominios que considera que son suyos, si llegara algun correo a a cualquiera de los dominios que añadamos el servidor recibirá estos correos. Y otro que usaremos más adelante es el relayhost, aquí podremos añadir un servidor de correo que redirija nuestros envios.
 
 * Primero instalaremos el paquete postfix, durante la instalación nos pedira que tipo de servidor de correo queremos, elegiremos `Internet site`
 
@@ -19,6 +19,38 @@ menu = "main"
 * Otra cosa que nos pedirá en la instalación es que añadamos el dominio en el que estará nuestro servidor de correo
 
 ![dominio](/ejercicio_correo/2.png)
+
+* Vamos a enviar un correo a nuestro dominio
+
+~~~
+debian@apolo:~$ mail usuario2@alegv.gonzalonazareno.org
+Subject: prueba potente
+helo.
+Cc:
+~~~
+
+* Vamos a comprobar que hemos recibido el correo mirando los logs.
+
+~~~
+agrant@bullseye:~$ sudo cat /var/mail/usuario2 
+From debian@alegv.gonzalonazareno.org  Fri Jan 14 12:55:42 2022
+Return-Path: <debian@alegv.gonzalonazareno.org>
+X-Original-To: usuario2@alegv.gonzalonazareno.org
+Delivered-To: usuario2@alegv.gonzalonazareno.org
+Received: by apolo (Postfix, from userid 1000)
+	id 7BB611000B7; Fri, 14 Jan 2022 12:55:42 +0000 (UTC)
+To: usuario2@alegv.gonzalonazareno.org
+Subject: prueba potente
+MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Message-Id: <20220114125542.7BB611000B7@apolo>
+Date: Fri, 14 Jan 2022 12:55:42 +0000 (UTC)
+From: debian@alegv.gonzalonazareno.org
+helo
+~~~
+
+### Ejercicio 2: Envío de correo desde usuarios del servidor a correos de internet
 
 * Necesitaremos que el servidor de papion, servidor de correo del instituto, mande nuestros correos por nosotros, pues si lo intentamos nosotros el cortafuegos nos lo echará para atras. añadiremos este servidor al relay del fichero `main.cf`.
 
@@ -51,5 +83,5 @@ Jan 19 09:10:27 apolo postfix/smtp[4299]: 48534611AD: to=<tojandro@gmail.com>, r
 
 * Veamos una prueba de que nos ha llegado.
 
-![correo_enviado](/ejercicio_correo/3.png)
+![prueba](/ejercicio_correo/3.png)
 
