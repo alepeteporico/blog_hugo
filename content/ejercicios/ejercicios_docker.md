@@ -64,3 +64,43 @@ CONTAINER ID   IMAGE     COMMAND   CREATED   STATUS    PORTS     NAMES
 * Pantallazo que desde el navegador muestre el fichero index.php
 
 ![html](/ejercicios_docker/3.png)
+
+* ver el tamaño del contenedor web después de crear los dos ficheros.
+
+~~~
+alejandrogv@AlejandroGV:~$ docker ps --size
+CONTAINER ID   IMAGE            COMMAND                  CREATED          STATUS          PORTS                  NAMES     SIZE
+742fced008c7   php:7.4-apache   "docker-php-entrypoi…"   12 minutes ago   Up 12 minutes   0.0.0.0:8000->80/tcp   web       67B (virtual 469MB)
+~~~
+
+* Observar que hemos podido conectarnos al servidor de base de datos con el usuario creado y que se ha creado la base de datos prueba (show databases). El acceso se debe realizar desde el ordenador que tenéis instalado docker, no hay que acceder desde dentro del contenedor, es decir, no usar docker exec.
+
+~~~
+alejandrogv@AlejandroGV:~$ sudo mysql -u invitado -p -h 127.0.0.1 -P 3336
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 4
+Server version: 10.5.10-MariaDB-1:10.5.10+maria~focal mariadb.org binary distribution
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]> show databases;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| prueba             |
++--------------------+
+2 rows in set (0.090 sec)
+~~~
+
+* Comprobación que no se puede borrar la imagen mariadb mientras el contenedor bbdd está creado.
+
+~~~
+alejandrogv@AlejandroGV:~$ docker rmi mariadb
+Error response from daemon: conflict: unable to remove repository reference "mariadb" (must force) - container 802bb2b97b91 is using its referenced image eff629089685
+~~~
+
+### Almacenamiento
