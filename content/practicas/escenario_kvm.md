@@ -90,5 +90,3 @@ iface ens5 inet static
 ~~~
 
 * Ahora instalariamos las demás máquinas y configurariamos sus interfaces tal y como hemos hecho aquí.
-
-* 

@@ -284,7 +284,3 @@ PING host2 (172.20.0.2): 56 data bytes
 1 packets transmitted, 1 packets received, 0% packet loss
 round-trip min/avg/max/stddev = 0.316/0.316/0.316/0.000 ms
 ~~~
-
-----------------------------------------------------
-
-* 

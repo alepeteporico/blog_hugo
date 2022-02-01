@@ -11,77 +11,85 @@ menu = "main"
 
 ### Servidor DNS
 
-**El servidor DNS estará instalado en freston, por ello instalaremos bind en esta máquina**
+*El servidor DNS estará instalado en freston, por ello instalaremos bind en esta máquina
 
-        root@freston:~# apt install bind9
+        root@apolo:~# apt install bind9
 
-**Configuramos el fichero "/etc/bind/named.conf.options" y añadimos las siguientes líneas:**
+*Configuramos el fichero "/etc/bind/named.conf.options" y añadimos las siguientes líneas:
 
-    listen-on { any };
-	allow-transfer { none };
-	recursion yes;
+~~~
+        listen-on { any; };
+        allow-transfer { none; };
+        recursion yes;
+        allow-recursion { any; };
+~~~
+
+*Configuramos el DNS local, la DMZ y externa en el fichero de configuración /etc/bind/named.conf.local:
+
+~~~
+view interna {
+	match-clients { 10.0.1.0/24; 127.0.0.1; };
 	allow-recursion { any; };
 
-**Configuramos el DNS local, la DMZ y externa en el fichero de configuración /etc/bind/named.conf.local:**
+	zone "alegv.gonzalonazareno.org" {
+		type master;
+		file "db.alegv.interna";
+	};
 
-        view interna {
-                match-clients { 10.0.1.0/24; localhost; };
-
-                zone "alegv.gonzalonazareno.org" {
-                        type master;
-                        file "db.alegv.interna";
-                };
-
-                zone "1.0.10.in-addr.arpa" {
-                        type master;
-                        file "db.1.0.10";
-                };
-
-                zone "2.0.10.in-addr.arpa" {
-                        type master;
-                        file "db.2.0.10";
-                };
-
-                include "/etc/bind/zones.rfc1918";
-                include "/etc/bind/named.conf.default-zones";
-        };
-        view dmz {
-                match-clients { 10.0.2.0/24; };
-
-                zone "alegv.gonzalonazareno.org" {
-                        type master;
-                        file "db.alegv.dmz";
-                };
-
-                zone "1.0.10.in-addr.arpa" {
-                        type master;
-                        file "db.1.0.10";
-                };
-
-                zone "2.0.10.in-addr.arpa" {
-                        type master;
-                        file "db.2.0.10";
-                };
-
-                include "/etc/bind/zones.rfc1918";
-                include "/etc/bind/named.conf.default-zones";
+        zone "1.0.10.in-addr-arpa" { 
+                type master;
+                file "db.1.0.10";
         };
 
-        view externa {
-                match-clients { 172.22.0.0/15; 192.168.202.2; };
-
-                zone "alegv.gonzalonazareno.org" {
-                        type master;
-                        file "db.alegv.externa";
-                };
-
-                include "/etc/bind/zones.rfc1918";
-                include "/etc/bind/named.conf.default-zones";
+        zone "16.172.in-addr.arpa" { 
+                type master;
+                file "db.16.172";
         };
 
-**Y en el fichero "/etc/bind/named.conf" debemos comentar esta línea:**
+	include "/etc/bind/zones.rfc1918";
+	include "/etc/bind/named.conf.default-zones";
+};
 
-        //include "/etc/bind/named.conf.default-zones";
+view dmz {
+        match-clients { 172.16.0.0/16; };
+
+        zone "alegv.gonzalonazareno.org" {
+                type master;
+                file "db.alegv.dmz";
+        };
+
+        zone "1.0.10.in-addr-arpa" {
+                type master;
+                file "db.1.0.10";
+        };
+
+        zone "16.172.in-addr.arpa" {
+                type master;
+                file "db.16.172";
+        };
+
+        include "/etc/bind/zones.rfc1918";
+        include "/etc/bind/named.conf.default-zones";
+};
+
+view externa {
+	match-clients { 172.22.0.0/16; 192.168.202.2/32; };
+	
+	zone "alegv.gonzalonazareno.org" {
+		type master;
+		file "db.alegv.externa";
+	};
+
+        include "/etc/bind/zones.rfc1918";
+        include "/etc/bind/named.conf.default-zones";
+};
+~~~
+
+* Y en el fichero "/etc/bind/named.conf" debemos comentar esta línea:
+
+~~~
+//include "/etc/bind/named.conf.default-zones";
+~~~
 
 **Crearemos los archivos db, lo hacemos en la carpeta "/var/cache/bind/"**
 
@@ -89,250 +97,156 @@ menu = "main"
 
 ~~~
 $TTL    86400
-@       IN      SOA     freston.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. (
+@       IN      SOA     apolo.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. (
                               1         ; Serial
                          604800         ; Refresh
                           86400         ; Retry
                         2419200         ; Expire
                           86400 )       ; Negative Cache TTL
 ;
-@       IN      NS      freston.alegv.gonzalonazareno.org.
+@       IN      NS      apolo.alegv.gonzalonazareno.org.
 
 $ORIGIN alegv.gonzalonazareno.org.
 
-dulcinea        IN      A       10.0.1.8
-sancho  IN      A       10.0.1.6
-quijote IN      A       10.0.2.5
-freston IN      A       10.0.1.9
-www     IN      CNAME   quijote
-bd      IN      CNAME   sancho
+zeus	IN      A       10.0.1.1
+ares	IN      A       10.0.1.101
+apolo	IN      A       10.0.1.102
+hera	IN      A       172.16.0.200
+www     IN      CNAME   hera
+bd      IN      CNAME   ares
 ~~~
 
 ### db.alegv.dmz
 
-        $TTL    86400
-        @       IN      SOA     freston.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. (
-                                      1         ; Serial
-                                 604800         ; Refresh
-                                  86400         ; Retry
-                                2419200         ; Expire
-                                  86400 )       ; Negative Cache TTL
-        ;
-        @       IN      NS      freston.alegv.gonzalonazareno.org.
-        
-        $ORIGIN alegv.gonzalonazareno.org.
-        
-        dulcinea        IN      A       10.0.2.10
-        sancho  IN      A       10.0.1.6
-        quijote IN      A       10.0.2.5
-        freston IN      A       10.0.1.9
-        www     IN      CNAME   quijote
-        bd      IN      CNAME   sancho
+~~~
+$TTL	86400
+@       IN      SOA     apolo.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. (
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                          86400 )       ; Negative Cache TTL
+;
+@       IN      NS      apolo.alegv.gonzalonazareno.org.
+
+$ORIGIN alegv.gonzalonazareno.org.
+
+zeus    IN      A       172.16.0.1
+ares    IN      A       10.0.1.101
+apolo   IN      A       10.0.1.102
+hera    IN      A       172.16.0.200
+www     IN      CNAME   hera   
+bd      IN      CNAME   ares
+~~~
 
 ### db.alegv.externa
 
-        $TTL    86400
-        @       IN      SOA     dulcinea.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. (
-                                      1         ; Serial
-                                 604800         ; Refresh
-                                  86400         ; Retry
-                                2419200         ; Expire
-                                  86400 )       ; Negative Cache TTL
-        ;
-        @       IN      NS      dulcinea.alegv.gonzalonazareno.org.
+~~~
+$TTL    86400
+@       IN      SOA     zeus.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. (
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                          86400 )       ; Negative Cache TTL
+;
+@       IN      NS      zeus.alegv.gonzalonazareno.org.
+@	IN	MX 10	zeus.alegv.gonzalonazareno.org.
 
-        $ORIGIN alegv.gonzalonazareno.org.
+$ORIGIN alegv.gonzalonazareno.org.
 
-        dulcinea        IN      A       172.22.200.87
-        www     IN      CNAME   dulcinea
-        test    IN      CNAME   dulcinea
+zeus	IN	A	172.22.3.191
+www     IN      CNAME   zeus   
+bd      IN      CNAME   zeus
+~~~
 
 **Ahora crearemos los archivos de las resoluciones inversas en la misma ruta**
 
 ### db.1.0.10
 
-        $TTL    86400
-        @       IN      SOA     freston.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. (
-                                      1         ; Serial
-                                 604800         ; Refresh
-                                  86400         ; Retry
-                                2419200         ; Expire
-                                  86400 )       ; Negative Cache TTL
-        ;
-        @       IN      NS      freston.alegv.gonzalonazareno.org.
+~~~
+$TTL    86400
+@       IN      SOA     apolo.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. (
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                          86400 )       ; Negative Cache TTL
+;
+@       IN      NS      apolo.alegv.gonzalonazareno.org.
 
+$ORIGIN 1.0.10.in-addr.arpa.
 
-        $ORIGIN 1.0.10.in-addr.arpa.
+1	IN	PTR	zeus.alegv.gonzalonazareno.org.
+101	IN	PTR	ares.alegv.gonzalonazareno.org.
+102	IN	PTR	apolo.alegv.gonzalonazareno.org.
+~~~
 
-        8       IN      PTR     dulcinea.alegv.gonzalonazareno.org.
-        6       IN      PTR     sancho.alegv.gonzalonazareno.org.
-        9       IN      PTR     freston.alegv.gonzalonazareno.org.
+### db.16.172
 
-### db.2.0.10
+~~~
+$TTL    86400
+@       IN      SOA     apolo.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. (
+                              1         ; Serial
+                         604800         ; Refresh
+                          86400         ; Retry
+                        2419200         ; Expire
+                          86400 )       ; Negative Cache TTL
+;
+@       IN      NS      apolo.alegv.gonzalonazareno.org.
 
-        $TTL    86400
-        @       IN      SOA     freston.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. (
-                                       1         ; Serial
-                                 604800         ; Refresh
-                                  86400         ; Retry
-                                2419200         ; Expire
-                                  86400 )       ; Negative Cache TTL
-        ;
-        @       IN      NS      freston.alegv.gonzalonazareno.org.
-        
-        
-        $ORIGIN 2.0.10.in-addr.arpa.
-        
-        10      IN      PTR     dulcinea.alegv.gonzalonazareno.org.
-        5       IN      PTR     quijote.alegv.gonzalonazareno.org.
+$ORIGIN 16.172.in-addr.arpa.
 
-**Si quisieramos asegurarnos de que no tenemos ningún error de sintáxis podemos usar esto:**
+0.200	IN	PTR	hera.alegv.gonzalonazareno.org.
+0.1	IN	PTR	zeus.alegv.gonzalonazareno.org.
+~~~
 
-        root@freston:/var/cache/bind# named-checkconf
+* Si quisieramos asegurarnos de que no tenemos ningún error de sintáxis podemos usar esto:
 
-**IPV6 da conflictos, así que podemos deshabilitarlo en el fichero "/etc/default/bind9"**
+~~~
+root@freston:/var/cache/bind# named-checkconf
+~~~
 
-        # run resolvconf?
-        RESOLVCONF=yes
+* IPV6 da conflictos, así que podemos deshabilitarlo en el fichero "/etc/default/bind9"
 
-        # startup options for the server
-        OPTIONS="-4 -u bind"
+~~~
+# run resolvconf?
+RESOLVCONF=yes
 
-**Reiniciamos el servicio de DNS**
+# startup options for the server
+OPTIONS="-4 -u bind"
+~~~
 
-        root@freston:/var/cache/bind# systemctl restart bind9
+* Reiniciamos el servicio de DNS
 
-        debian@freston:~$ sudo systemctl status bind9
-        ● bind9.service - BIND Domain Name Server
-           Loaded: loaded (/lib/systemd/system/bind9.service; enabled; vendor preset: enabled)
-           Active: active (running) since Fri 2021-02-19 11:38:00 UTC; 1min 37s ago
-             Docs: man:named(8)
-          Process: 14513 ExecStart=/usr/sbin/named $OPTIONS (code=exited, status=0/SUCCESS)
-         Main PID: 14514 (named)
-            Tasks: 4 (limit: 562)
-           Memory: 18.3M
-           CGroup: /system.slice/bind9.service
-                   └─14514 /usr/sbin/named -4 -u bind
+~~~
+debian@apolo:~$ sudo systemctl restart bind9
 
-        Feb 19 11:38:00 freston named[14514]: zone localhost/IN/externa: loaded serial 2
-        Feb 19 11:38:00 freston named[14514]: all zones loaded
-        Feb 19 11:38:00 freston systemd[1]: Started BIND Domain Name Server.
-        Feb 19 11:38:00 freston named[14514]: running
-        Feb 19 11:38:01 freston named[14514]: managed-keys-zone/interna: Key 20326 for zone . acceptance timer co
-        Feb 19 11:38:01 freston named[14514]: resolver priming query complete
-        Feb 19 11:38:01 freston named[14514]: managed-keys-zone/externa: Key 20326 for zone . acceptance timer co
-        Feb 19 11:38:01 freston named[14514]: resolver priming query complete
-        Feb 19 11:38:01 freston named[14514]: managed-keys-zone/dmz: Key 20326 for zone . acceptance timer comple
-        Feb 19 11:38:01 freston named[14514]: resolver priming query complete
+debian@apolo:~$ sudo systemctl status bind9
+* named.service - BIND Domain Name Server
+     Loaded: loaded (/lib/systemd/system/named.service; enabled; vendor preset: enabled)
+     Active: active (running) since Mon 2022-01-31 13:14:39 CET; 10s ago
+       Docs: man:named(8)
+   Main PID: 1688 (named)
+      Tasks: 4 (limit: 529)
+     Memory: 18.6M
+        CPU: 302ms
+     CGroup: /system.slice/named.service
+             `-1688 /usr/sbin/named -f -u bind
 
-**Vamos a añadir las reglas en Dulcinea, lo haremos para el DNS (puerto 53) y como lo usaremos mas adelante, también para http (puerto 80) y https (puerto 443)**
+Jan 31 13:14:40 apolo named[1688]: network unreachable resolving './DNSKEY/IN': 2001:7fe::53#53
+Jan 31 13:14:40 apolo named[1688]: network unreachable resolving './DNSKEY/IN': 2001:503:c27::2:30#53
+Jan 31 13:14:40 apolo named[1688]: network unreachable resolving './DNSKEY/IN': 2001:503:ba3e::2:30#53
+Jan 31 13:14:40 apolo named[1688]: network unreachable resolving './DNSKEY/IN': 2001:500:12::d0d#53
+Jan 31 13:14:40 apolo named[1688]: managed-keys-zone/interna: Key 20326 for zone . is now trusted (accep>
+Jan 31 13:14:40 apolo named[1688]: managed-keys-zone/dmz: Key 20326 for zone . is now trusted (acceptanc>
+Jan 31 13:14:40 apolo named[1688]: resolver priming query complete
+Jan 31 13:14:40 apolo named[1688]: resolver priming query complete
+Jan 31 13:14:40 apolo named[1688]: managed-keys-zone/externa: Key 20326 for zone . is now trusted (accep>
+Jan 31 13:14:40 apolo named[1688]: resolver priming query complete
+~~~
 
-        debian@dulcinea:~$ sudo nft add chain nat prerouting { type nat hook prerouting priority 0 \; }
-        debian@dulcinea:~$ sudo nft add rule ip nat prerouting iifname "eth0" udp dport 53 counter dnat to 10.0.1.9
-        debian@dulcinea:~$ sudo nft add rule ip nat prerouting iifname "eth0" tcp dport 80 counter dnat to 10.0.2.2
-        debian@dulcinea:~$ sudo nft add rule ip nat prerouting iifname "eth0" tcp dport 443 counter dnat to 10.0.2.2
-
-**Y guardamos los cambios**
-
-        root@dulcinea:~# nft list ruleset > /etc/nftables.conf
-
-**Vamos a cambiar el nombre de dominio local en los /etc/hosts de todas las máquinas**
-
-### Dulciena
-
-        127.0.1.1 dulcinea.alegv.gonzalonazareno.org dulcinea.novalocal dulcinea
-        127.0.0.1 localhost
-
-### Sancho
-
-        127.0.0.1 sancho.alegv.gonzalonzareno.org
-        127.0.0.1 localhost
-
-### Feston
-
-        127.0.1.1 freston.alegv.gonzalonzareno.org freston.novalocal freston
-        127.0.0.1 localhost
-
-### Quijote
-
-        127.0.1.1 quijote.alegv.gonzalonazareno.org quijote
-
-**Cambiamos los ficheros de resolv de todas las instanacias:**
-
-### Dulcinea
-
-        root@dulcinea:~# cat /etc/resolvconf/resolv.conf.d/head 
-        nameserver 10.0.1.9
-
-        root@dulcinea:~# cat /etc/resolvconf/resolv.conf.d/base 
-        nameserver 192.168.202.2
-        search alegv.gonzalonazareno.org
-
-        root@dulcinea:~# cat /etc/resolv.conf 
-        nameserver 10.0.1.9
-        nameserver 192.168.200.2
-        nameserver 192.168.202.2
-        search alegv.gonzalonazareno.org
-
-### Sancho
-
-        ubuntu@sancho:~$ cat /etc/netplan/50-cloud-init.yaml
-        network:
-            version: 2
-            ethernets:
-                ens4:
-                    dhcp4: false
-                    match:
-                        macaddress: fa:16:3e:8b:3f:fb
-                    mtu: 8950
-                    set-name: ens4
-                    addresses: [10.0.1.6/24]
-                    gateway4: 10.0.1.8
-                    nameservers:
-                        addresses: [192.168.202.2, 192.168.200.2, 1.0.1.9]
-                        search: ["alegv.gonzalonazareno.org"]
-
-        ubuntu@sancho:~$ cat /etc/resolv.conf 
-                nameserver 127.0.0.53
-                options edns0 trust-ad
-                search alegv.gonzalonazareno.org
-
-### Quijote
-
-        [centos@quijote ~]$ cat /etc/resolv.conf 
-        # Generated by NetworkManager
-        search openstacklocal alegv.gonzalonazareno.org
-        nameserver 10.0.1.9
-        nameserver 192.168.202.2
-        nameserver 192.168.200.2
-
-### Freston
-
-        debian@freston:~$ cat /etc/resolv.conf 
-        nameserver 10.0.1.9
-        nameserver 192.168.200.2
-        nameserver 192.168.202.2
-        search openstacklocal alegv.gonzalonazareno.org
-
-        debian@freston:~$ cat /etc/resolvconf/resolv.conf.d/base
-        nameserver 192.168.202.2
-        search alegv.gonzalonazareno.org
-
-        debian@freston:~$ cat /etc/resolvconf/resolv.conf.d/head 
-        nameserver 10.0.1.9
-
-**Nuestro siguiente paso será deshabilitar la seguirdad de los puertos y las máquinas:**
-
-        (openstackclient) alejandrogv@AlejandroGV:~$ openstack server remove security group Quijote default
-        (openstackclient) alejandrogv@AlejandroGV:~$ openstack port set --disable-port-security 3fd1ff15-8a86-4374-ab6b-5e946e9721c0
-
-        (openstackclient) alejandrogv@AlejandroGV:~$ openstack server remove security group Freston default
-        (openstackclient) alejandrogv@AlejandroGV:~$ openstack port set --disable-port-security bb44ccb2-b79e-497c-b271-4d9a8f3dadaa
-
-        (openstackclient) alejandrogv@AlejandroGV:~$ openstack server remove security group Sancho default
-        (openstackclient) alejandrogv@AlejandroGV:~$ openstack port set --disable-port-security a7c4213b-d224-4d2f-8cf1-1f8770ef7823
-
-**Vamos a hacer las comprobaciones necesarias en cada máquina:**
+* Vamos a hacer las comprobaciones necesarias en cada máquina:
 
 ### Dulcinea
 
@@ -377,30 +291,36 @@ bd      IN      CNAME   sancho
 
 ### Desde fuera:
 
-        alejandrogv@AlejandroGV:~$ dig dulcinea.alegv.gonzalonazareno.org
+~~~
+alejandrogv@AlejandroGV:~$ dig alegv.gonzalonazareno.org
 
-        ; <<>> DiG 9.11.5-P4-5.1+deb10u3-Debian <<>> dulcinea.alegv.gonzalonazareno.org
-        ;; global options: +cmd
-        ;; Got answer:
-        ;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 18016
-        ;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 1, ADDITIONAL: 1
+; <<>> DiG 9.16.22-Debian <<>> alegv.gonzalonazareno.org
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 12856
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
 
-        ;; OPT PSEUDOSECTION:
-        ; EDNS: version: 0, flags:; udp: 4096
-        ; COOKIE: 0c19b93390596f9a67cc7a1960b76f3f5eee202006b6b4e9 (good)
-        ;; QUESTION SECTION:
-        ;dulcinea.alegv.gonzalonazareno.org. IN	A
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+; COOKIE: d14809270130ee359e88c61961f8ef40775f5cc6025b334e (good)
+;; QUESTION SECTION:
+;alegv.gonzalonazareno.org.	IN	A
 
-        ;; ANSWER SECTION:
-        dulcinea.alegv.gonzalonazareno.org. 86400 IN A	172.22.200.87
+;; AUTHORITY SECTION:
+alegv.gonzalonazareno.org. 10748 IN	SOA	zeus.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. 1 604800 86400 2419200 86400
 
-        ;; AUTHORITY SECTION:
-        alegv.gonzalonazareno.org. 86400 IN	NS	dulcinea.alegv.gonzalonazareno.org.
+;; Query time: 0 msec
+;; SERVER: 192.168.202.2#53(192.168.202.2)
+;; WHEN: Tue Feb 01 09:28:48 CET 2022
+;; MSG SIZE  rcvd: 129
 
-        ;; Query time: 3 msec
-        ;; SERVER: 192.168.202.2#53(192.168.202.2)
-        ;; WHEN: mié jun 02 13:45:03 CEST 2021
-        ;; MSG SIZE  rcvd: 121
+alejandrogv@AlejandroGV:~$ dig +short zeus.alegv.gonzalonazareno.org
+172.22.3.191
+
+alejandrogv@AlejandroGV:~$ dig +short www.alegv.gonzalonazareno.org
+zeus.alegv.gonzalonazareno.org.
+172.22.3.191
+~~~
 
 ### Servidor web
 

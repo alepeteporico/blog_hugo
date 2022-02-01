@@ -24,11 +24,15 @@ menu = "main"
 
 * Vamos a proceder a realizar nuestro certificado, para ello primero instalamos certbot
 
-        root@sputnik:~# apt install certbot
+~~~
+debian@mrrobot:~$ sudo apt install certbot
+~~~
 
 * Tenemos que parar el servicio de nginx para dejar el puerto 80 libre.
 
-        root@sputnik:~# systemctl stop nginx
+~~~
+debian@mrrobot:~$ sudo systemctl stop nginx.service
+~~~
 
 * Ahora si, vamos a generar el certificado y rellenar la información, lo primero que nos pedirá será el correo electrónico.
 

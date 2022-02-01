@@ -102,6 +102,73 @@ Superuser created successfully.
 
 ![polls](/despliegue_python/6.png)
 
+### Modificación de la aplicación.
+
+* Primero realizaremos estos cambios en el entorno de desarrollo, el primero de ellos será que nuestro nombre aparezca en la pagina de admin. Para ello modificaremos el fichero `django_tutorial/polls/templates/polls/index.html`.
+
+        {% load static %}
+
+        <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}">
+
+        <h1>Alejandro Gutiérrez Valencia<h1>
+
+        {% if latest_question_list %}
+            <ul>
+            {% for question in latest_question_list %}
+            <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+            {% endfor %}
+            </ul>
+        {% else %}
+            <p>No polls are available.</p>
+        {% endif %}
+
+![nombre](/despliegue_python/8.png)
+
+* Vamos a modificar la imagen que se ve de fondo en la aplicación, para ello modificamos el archivo `django/lib/python3.7/site-packages/django/contrib/admin/static/admin/css/base.css` y podemos por ejemplo cambiar el color de fondo
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+            font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
+            color: #333;
+            background: #ebe10d;
+        }
+
+![fondo](/despliegue_python/10.png)
+
+* Añadiremos una nueva tabla en la base de datos, para ello añadimos el siguiente modelo a `polls/models.py`
+
+          class Categoria(models.Model):
+          	Abr = models.CharField(max_length=4)
+          	Nombre = models.CharField(max_length=50)
+
+          	def __str__(self):
+          		return self.Abr+" - "+self.Nombre 
+
+* El siguiente paso es crear una nueva migración:
+
+        (django) alejandrogv@AlejandroGV:~/django_tutorial$ python3 manage.py makemigrations
+        Migrations for 'polls':
+          polls/migrations/0002_categoria.py
+            - Create model Categoria
+
+* Ahora en `polls/admin.py` debemos añadir el nuevo modelo.
+
+        from .models import Choice, Question, Categoria
+
+        admin.site.register(Categoria)
+
+* Y migramos por supuesto.
+
+        (django) alejandrogv@AlejandroGV:~/django_tutorial$ python3 manage.py migrate
+        Operations to perform:
+          Apply all migrations: admin, auth, contenttypes, polls, sessions
+        Running migrations:
+          Applying polls.0002_categoria... OK
+
+![fondo](/despliegue_python/11.png)
+
 ### ENTORNO DE PRODUCCIÓN.
 
 * Copiaremos nuestro repositorio con la aplicación y la guardaremos en el que se convertirá en nuestro DocumentRoot.
@@ -310,70 +377,3 @@ root@mrrobot:/var/www/django_tutorial# cp -r polls/static/polls/* static/polls/
 * Para evitar que se pueda mostrar información sensible configuramos el fichero settings.py y quitamos el debug.
 
         DEBUG = False
-
-### Modificación de la aplicación.
-
-* Primero realizaremos estos cambios en el entorno de desarrollo, el primero de ellos será que nuestro nombre aparezca en la pagina de admin. Para ello modificaremos el fichero `django_tutorial/polls/templates/polls/index.html`.
-
-        {% load static %}
-
-        <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}">
-
-        <h1>Alejandro Gutiérrez Valencia<h1>
-
-        {% if latest_question_list %}
-            <ul>
-            {% for question in latest_question_list %}
-            <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>No polls are available.</p>
-        {% endif %}
-
-![nombre](/despliegue_python/8.png)
-
-* Vamos a modificar la imagen que se ve de fondo en la aplicación, para ello modificamos el archivo `django/lib/python3.7/site-packages/django/contrib/admin/static/admin/css/base.css` y podemos por ejemplo cambiar el color de fondo
-
-        body {
-            margin: 0;
-            padding: 0;
-            font-size: 14px;
-            font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
-            color: #333;
-            background: #ebe10d;
-        }
-
-![fondo](/despliegue_python/10.png)
-
-* Añadiremos una nueva tabla en la base de datos, para ello añadimos el siguiente modelo a `polls/models.py`
-
-          class Categoria(models.Model):
-          	Abr = models.CharField(max_length=4)
-          	Nombre = models.CharField(max_length=50)
-
-          	def __str__(self):
-          		return self.Abr+" - "+self.Nombre 
-
-* El siguiente paso es crear una nueva migración:
-
-        (django) alejandrogv@AlejandroGV:~/django_tutorial$ python3 manage.py makemigrations
-        Migrations for 'polls':
-          polls/migrations/0002_categoria.py
-            - Create model Categoria
-
-* Ahora en `polls/admin.py` debemos añadir el nuevo modelo.
-
-        from .models import Choice, Question, Categoria
-
-        admin.site.register(Categoria)
-
-* Y migramos por supuesto.
-
-        (django) alejandrogv@AlejandroGV:~/django_tutorial$ python3 manage.py migrate
-        Operations to perform:
-          Apply all migrations: admin, auth, contenttypes, polls, sessions
-        Running migrations:
-          Applying polls.0002_categoria... OK
-
-![fondo](/despliegue_python/11.png)
