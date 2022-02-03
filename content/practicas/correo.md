@@ -1,5 +1,5 @@
 +++
-title = "Ejercicio correo"
+title = "Correo en la VPS"
 description = ""
 tags = [
     "SRI"
