@@ -25,3 +25,5 @@ Feb  2 07:39:59 mrrobot postfix/smtp[916027]: connect to gmail-smtp-in.l.google.
 Feb  2 07:39:59 mrrobot postfix/smtp[916027]: E42DCA0AB9: to=<tojandro@gmail.com>, relay=gmail-smtp-in.l.google.com[66.102.1.26]:25, delay=0.69, delays=0.02/0.03/0.32/0.32, dsn=2.0.0, status=sent (250 2.0.0 OK  1643787599 q14si3769684wme.70 - gsmtp)
 Feb  2 07:39:59 mrrobot postfix/qmgr[915260]: E42DCA0AB9: removed
 ~~~
+
+![spf](/correo/1.png)
