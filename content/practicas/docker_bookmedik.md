@@ -16,6 +16,8 @@ menu = "main"
 
 ~~~
 alejandrogv@AlejandroGV:~/docker/docker_php$ docker image ls
-REPOSITORY          TAG          IMAGE ID       CREATED         SIZE
-usuario/bookmedik   v1           04c149347bc6   3 minutes ago   257MB
+REPOSITORY            TAG          IMAGE ID       CREATED        SIZE
+alejandro/bookmedik   v1           04c149347bc6   2 days ago     257MB
 ~~~
+
+* 
