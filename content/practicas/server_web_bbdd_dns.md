@@ -363,7 +363,8 @@ zeus.alegv.gonzalonazareno.org.
 debian@zeus:~$ dig +short -x 10.0.1.101
 ares.alegv.gonzalonazareno.org.
 
-
+debian@zeus:~$ dig +short -x 172.16.0.200
+hera.alegv.gonzalonazareno.org.
 ~~~
 
 ### Dulcinea

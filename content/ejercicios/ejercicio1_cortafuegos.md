@@ -11,7 +11,7 @@ menu = "main"
 * Añadiremos las siguientes reglas.
 
 ~~~
- Limpiamos las tablas
+# Limpiamos las tablas
 iptables -F
 iptables -t nat -F
 iptables -Z
@@ -52,10 +52,7 @@ vagrant@bullseye:~$ sudo iptables -A OUTPUT -d 192.168.121.0/24 -p tcp --sport 2
 * Deniega el acceso a tu servidor web desde una ip concreta.
 
 ~~~
-iptables -A OUTPUT -p tcp -d 172.22.0.59 --dport 80 -j DROP
-
-root@bullseye:~# iptables -s 172.22.0.159 -A INPUT -p tcp --dport 80 -m state --state ESTABLISHED -j DROP
-root@bullseye:~# iptables -s 172.22.0.159 -A OUTPUT -p tcp --sport 80 -m state --state ESTABLISHED -j DROP
+root@bullseye:~# iptables -s 172.22.0.159 -A INPUT -p tcp --dport 80 -j DROP
 ~~~
 
 ~~~
@@ -65,7 +62,93 @@ curl: (28) Failed to connect to 192.168.121.154 port 80: Expiró el tiempo de co
 
 * Permite hacer consultas DNS sólo al servidor 192.168.202.2. Comprueba que no puedes hacer un dig @1.1.1.1.
 
+* Ya tenemos una regla que permite la conexión a cualquier dirección al puerto udp así que lo más eficiente sería quitar la regla udp y hacer que solo permita la conexión a esta dirección, es exactamente lo que hemos hecho.
+
 ~~~
-iptables -s 172.22.0.159 -A INPUT -p tcp --dport 80 -m state --state ESTABLISHED -j DROP
+iptables -A INPUT -s 192.168.202.2 -p udp -m udp --sport 53 -j ACCEPT
+iptables -A OUTPUT -d 192.168.202.2 -p udp -m udp --dport 53 -j ACCEPT
 ~~~
 
+~~~
+root@bullseye:~# dig @192.168.202.2 www.google.es
+
+; <<>> DiG 9.16.22-Debian <<>> @192.168.202.2 www.google.es
+; (1 server found)
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 13491
+;; flags: qr rd ra; QUERY: 1, ANSWER: 1, AUTHORITY: 4, ADDITIONAL: 9
+
+;; OPT PSEUDOSECTION:
+; EDNS: version: 0, flags:; udp: 4096
+; COOKIE: 87fa099632a61629d49631bc620a0c47ffb243a5b6209bd8 (good)
+;; QUESTION SECTION:
+;www.google.es.			IN	A
+
+;; ANSWER SECTION:
+www.google.es.		16	IN	A	216.58.215.131
+
+;; AUTHORITY SECTION:
+google.es.		84005	IN	NS	ns3.google.com.
+google.es.		84005	IN	NS	ns2.google.com.
+google.es.		84005	IN	NS	ns4.google.com.
+google.es.		84005	IN	NS	ns1.google.com.
+
+;; ADDITIONAL SECTION:
+ns1.google.com.		90004	IN	A	216.239.32.10
+ns2.google.com.		90004	IN	A	216.239.34.10
+ns3.google.com.		90004	IN	A	216.239.36.10
+ns4.google.com.		90004	IN	A	216.239.38.10
+ns1.google.com.		90004	IN	AAAA	2001:4860:4802:32::a
+ns2.google.com.		90004	IN	AAAA	2001:4860:4802:34::a
+ns3.google.com.		90004	IN	AAAA	2001:4860:4802:36::a
+ns4.google.com.		90004	IN	AAAA	2001:4860:4802:38::a
+
+;; Query time: 0 msec
+;; SERVER: 192.168.202.2#53(192.168.202.2)
+;; WHEN: Mon Feb 14 08:01:11 UTC 2022
+;; MSG SIZE  rcvd: 344
+~~~
+
+~~~
+root@bullseye:~# dig @1.1.1.1 www.google.es
+
+; <<>> DiG 9.16.22-Debian <<>> @1.1.1.1 www.google.es
+; (1 server found)
+;; global options: +cmd
+;; connection timed out; no servers could be reached
+~~~
+
+* No permitir el acceso al servidor web de www.josedomingo.org (Tienes que utilizar la ip).
+
+~~~
+root@bullseye:~# curl www.josedomingo.org
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>301 Moved Permanently</title>
+</head><body>
+<h1>Moved Permanently</h1>
+<p>The document has moved <a href="https://www.josedomingo.org/">here</a>.</p>
+<hr>
+<address>Apache/2.4.38 (Debian) Server at www.josedomingo.org Port 80</address>
+</body></html>
+~~~
+
+* ¿Puedes acceder a fp.josedomingo.org? Tampoco podríamos, pues hemos bloqueado la IP donde se alojan estos dos sitios.
+
+~~~
+root@bullseye:~# curl fp.josedomingo.org
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
+<html><head>
+<title>301 Moved Permanently</title>
+</head><body>
+<h1>Moved Permanently</h1>
+<p>The document has moved <a href="https://fp.josedomingo.org/">here</a>.</p>
+<hr>
+<address>Apache/2.4.38 (Debian) Server at fp.josedomingo.org Port 80</address>
+</body></html>
+~~~
+
+* Permite mandar un correo usando nuestro servidor de correo: babuino-smtp
+
+* Instala un servidor mariadb, y permite los accesos desde la ip de tu cliente.

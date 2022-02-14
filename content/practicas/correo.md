@@ -27,3 +27,4 @@ Feb  2 07:39:59 mrrobot postfix/qmgr[915260]: E42DCA0AB9: removed
 ~~~
 
 ![spf](/correo/1.png)
+

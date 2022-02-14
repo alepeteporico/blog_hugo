@@ -16,7 +16,7 @@ menu = "main"
 
 ## Conexión entre ORACLE
 
-* Usaremos dos máquina vagrant con centos 8 e instalaremos oracle 19c en cada una.
+* Usaremos dos máquina con centos 7 e instalaremos oracle 19c en cada una.
 
 * Para comprobar que tenemos conexión por el puerto 1521 que usa oracle para el listener podemos usar el comando tnsping.
 

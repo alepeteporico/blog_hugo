@@ -74,39 +74,41 @@ menu = "main"
 
 * Una vez cliquemos ahí nos aparecerá un fichero llamado `main.yml` que editaremos de la siguiente forma:
 
-        # This is a basic workflow to help you get started with Actions
+~~~
+# This is a basic workflow to help you get started with Actions
 
-        name: CI
+name: CI
 
-        # Controls when the action will run. 
-        on:
-          # Triggers the workflow on push or pull request events but only for the master branch
-          push:
-            branches: [ master ]
-          pull_request:
-            branches: [ master ]
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
 
-        jobs:
-          build:
+  jobs:
+    build:
 
-            runs-on: ubuntu-latest
-            strategy:
-              matrix:
-                python-version: [3.9]
+      runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          python-version: [3.9]
 
-            steps:
-            - uses: actions/checkout@v2
-            - name: Set up Python ${{ matrix.python-version }}
-              uses: actions/setup-python@v2
-              with:
-                python-version: ${{ matrix.python-version }}
-            - name: Requerimientos
-              run: |
-                pip install --upgrade pip
-                pip install -r requirements.txt
+      steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Requerimientos
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt
 
-            - name: Prueba python3
-              run: python3 manage.py test
+      - name: Prueba python3
+        run: python3 manage.py test
+~~~
 
 * Vamos a comprobar un commit con todo correcto.
 
