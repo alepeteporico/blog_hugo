@@ -152,3 +152,10 @@ root@bullseye:~# curl fp.josedomingo.org
 * Permite mandar un correo usando nuestro servidor de correo: babuino-smtp
 
 * Instala un servidor mariadb, y permite los accesos desde la ip de tu cliente.
+
+~~~
+root@bullseye:~# iptables -A INPUT -s 172.22.0.159 -p tcp --dport 3306 -j ACCEPT
+~~~
+
+iptables -A INPUT -s 172.22.0.159 -p tcp --dport 3306 -j ACCEPT
+iptables -A OUTPUT -d 172.22.0.159 -p tcp --sport 3306 -j ACCEPT
