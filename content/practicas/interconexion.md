@@ -311,32 +311,74 @@ postgres=#
 
 * Nuestro primer paso será instalar la paquetería necesaria para realizar esta conexión, ya tenemos los dos servidores operativos, así que realizemos este paso, empezemos con Oracle.
 
-        [vagrant@oracle ~]$ sudo dnf install unixODBC postgresql-odbc
+~~~
+[root@db ~]# dnf install unixODBC postgresql-odbc
+~~~
 
-* En el fichero `/etc/odbcinst.ini` se encuentra la información de todos los drivers que ofrece ODBC para interconectar bases de datos, comentaremos todo menos lo que este relacionado con postgres.
+* En el fichero `/etc/odbcinst.ini` se encuentra la información de todos los drivers que ofrece ODBC para interconectar bases de datos, comentaremos los necesarios.
 
-        [PostgreSQL]
-        Description     = ODBC for PostgreSQL
-        Driver          = /usr/lib/psqlodbcw.so
-        Setup           = /usr/lib/libodbcpsqlS.so
-        Driver64        = /usr/lib64/psqlodbcw.so
-        Setup64         = /usr/lib64/libodbcpsqlS.so
-        FileUsage	= 1
+~~~
+[PostgreSQL]
+Description     = ODBC for PostgreSQL
+Driver          = /usr/lib/psqlodbcw.so
+Setup           = /usr/lib/libodbcpsqlS.so
+Driver64        = /usr/lib64/psqlodbcw.so
+Setup64         = /usr/lib64/libodbcpsqlS.so
+FileUsage	= 1
+~~~
 
 * En el fichero `/etc/odbc.ini` introduciremos información de nuestro servidor postgres como puede ser la dirección IP donde se aloja o el nombre de usuario y contraseña para acceder entre otros.
 
-        [PSQLU]
-        Debug           = 0
-        CommLog         = 0
-        ReadOnly        = 0
-        Driver          = PostgreSQL
-        Servername	= 172.22.100.25
-        Username        = remoto1
-        Password        = remoto1
-        Port            = 5432
-        Database        = prueba
-        Trace           = 0
-        TraceFile	= /tmp/sql.log
+~~~
+[PSQLU]
+Debug           = 0
+CommLog         = 0
+ReadOnly        = 0
+Driver          = PostgreSQL
+Servername	= 192.168.121.125
+Username        = alegv1
+Password        = alegv1
+Port            = 5432
+Database        = prueba 
+Trace           = 0
+TraceFile	= /tmp/sql.log
+~~~
+
+* Modificamos el fichero `initPSQLU.ora` donde añadiremos algunas variables de entornos necesarias para conectarnos a la base de datos de postgres.
+
+~~~
+HS_FDS_CONNECT_INFO = PSQLU
+HS_FDS_TRACE_LEVEL = DEBUG
+HS_FDS_SHAREABLE_NAME = /usr/lib64/psqlodbcw.so
+HS_LANGUAGE = AMERICAN_AMERICA.WE8ISO8859P1
+set ODBCINI=/etc/odbc.ini
+~~~
+
+* Y seguidamente iremos con el `listener.ora`.
+
+~~~
+SID_LIST_LISTENER=
+  (SID_LIST=
+      (SID_DESC=
+         (SID_NAME=PSQLU)
+         (ORACLE_HOME=/opt/oracle/product/19c/dbhome_1)
+         (PROGRAM=dg4odbc)
+      )
+  )
+~~~
+
+* Necesitamos añadir las siguietes líneas en el fichero `tnsnames.ora`.
+
+~~~
+PSQLU  =
+  (DESCRIPTION=
+    (ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=1521))
+    (CONNECT_DATA=(SID=PSQLU))
+    (HS=OK)
+  )
+~~~
+
+
 
 * Vamos a comprobar la conexión.
 

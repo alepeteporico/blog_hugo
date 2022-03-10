@@ -10,11 +10,21 @@ menu = "main"
 
 * Vamos a instalar todos los paquetes necesarios.
 
-        debian@mrrobot:~$ sudo apt install nginx mariadb-client mariadb-server php php-mysql php-fpm
+~~~
+debian@mrrobot:~$ sudo apt install nginx mariadb-client mariadb-server php php-mysql php-fpm
+~~~
+
+* También debemos instalar el servidor de aplicaciones php-fpm.
+
+~~~
+debian@mrrobot:~$ sudo apt install php7.4-fpm php7.4
+~~~
 
 * Crearemos el directorio sobre el que trabajaremos en nuestro virtual host.
 
-        root@:~# mkdir /var/www/iesgn06
+~~~
+root@:~# mkdir /var/www/alejandrogv
+~~~
 
 * Crearemos un virtual host en `sites-available`
 
@@ -23,11 +33,11 @@ server {
         listen 80;
         listen [::]:80;
 
-        root /var/www/iesgn06;
+        root /var/www/web;
 
         index index.html index.htm index.nginx-debian.html;
 
-        server_name www.iesgn06.es;
+        server_name www.alejandrogv.site;
 
         location / {
                 try_files $uri $uri/ =404;
@@ -35,9 +45,17 @@ server {
 }
 ~~~
 
+* Para que nuestro virtualhost por defecto sea este, debemos añadir la siguiente línea el el fichero default de el directorio sites-available, dentro del bloque server.
+
+~~~
+rewrite ^/$ http://www.alejandrogv.site permanent;
+~~~
+
 * Y creamos el enlace simbólico en sites-enabled.
 
-        root@sputnik:/etc/nginx/sites-available# ln -s /etc/nginx/sites-available/iesgn06 /etc/nginx/sites-enabled/
+~~~
+debian@mrrobot:~$ sudo ln -s /etc/nginx/sites-available/web.conf /etc/nginx/sites-enabled/
+~~~
 
 * Después de añadir la ruta a nuestro `etc/hosts` comprobaremos que podemos acceder desde el navegador.
 

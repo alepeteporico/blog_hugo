@@ -42,35 +42,34 @@ iptables -A INPUT -i eth0 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j 
 iptables -A OUTPUT -o eth0 -p tcp --sport 80 -m state --state ESTABLISHED -j ACCEPT
 ~~~
 
-* Permite poder hacer conexiones ssh al exterior. (Esta regla ya se contempla anteriormente)
+* Permite poder hacer conexiones ssh al exterior.
 
 ~~~
-vagrant@bullseye:~$ sudo iptables -A INPUT -s 192.168.121.0/24 -p tcp --dport 22 -m state --state NEW,ESTABLISHED -j ACCEPT
-vagrant@bullseye:~$ sudo iptables -A OUTPUT -d 192.168.121.0/24 -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
+iptables -A INPUT -i eth0 -p tcp --sport 22 -m state --state ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -o eth0 -p tcp --dport 22 -m state --state NEW,ESTABLISHED -j ACCEPT
 ~~~
 
 * Deniega el acceso a tu servidor web desde una ip concreta.
 
 ~~~
-root@bullseye:~# iptables -s 172.22.0.159 -A INPUT -p tcp --dport 80 -j DROP
+iptables -A INPUT ! -s 192.168.121.187/24 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT ! -d 192.168.121.187/24 -p tcp --sport 80 -m state --state ESTABLISHED -j ACCEPT
 ~~~
 
 ~~~
-alejandrogv@AlejandroGV:~$ curl http://192.168.121.154:80
-curl: (28) Failed to connect to 192.168.121.154 port 80: Expiró el tiempo de conexión
+vagrant@pruebas:~$ curl http://192.168.121.131:80
+curl: (28) Failed to connect to 192.168.121.131 port 80: Expiró el tiempo de conexión
 ~~~
 
 * Permite hacer consultas DNS sólo al servidor 192.168.202.2. Comprueba que no puedes hacer un dig @1.1.1.1.
 
-* Ya tenemos una regla que permite la conexión a cualquier dirección al puerto udp así que lo más eficiente sería quitar la regla udp y hacer que solo permita la conexión a esta dirección, es exactamente lo que hemos hecho.
-
 ~~~
-iptables -A INPUT -s 192.168.202.2 -p udp -m udp --sport 53 -j ACCEPT
-iptables -A OUTPUT -d 192.168.202.2 -p udp -m udp --dport 53 -j ACCEPT
+iptables -A INPUT -s 192.168.202.2/32 -p udp --sport 53 -m state --state ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -d 192.168.202.2/32 -p udp --dport 53 -m state --state NEW,ESTABLISHED -j ACCEPT
 ~~~
 
 ~~~
-root@bullseye:~# dig @192.168.202.2 www.google.es
+root@servidor:~# dig @192.168.202.2 www.google.es
 
 ; <<>> DiG 9.16.22-Debian <<>> @192.168.202.2 www.google.es
 ; (1 server found)
@@ -122,6 +121,11 @@ root@bullseye:~# dig @1.1.1.1 www.google.es
 * No permitir el acceso al servidor web de www.josedomingo.org (Tienes que utilizar la ip).
 
 ~~~
+iptables -A OUTPUT -d 37.187.119.60/32 -p tcp --dport 80 -m state --state NEW,ESTABLISHED -j DROP
+iptables -A INPUT -s 37.187.119.60/32 -p tcp --sport 80 -m state --state ESTABLISHED -j DROP
+~~~
+
+~~~
 root@bullseye:~# curl www.josedomingo.org
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html><head>
@@ -151,11 +155,34 @@ root@bullseye:~# curl fp.josedomingo.org
 
 * Permite mandar un correo usando nuestro servidor de correo: babuino-smtp
 
+~~~
+iptables -A OUTPUT -d 192.168.203.3/32 -p tcp --dport 25 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -s 192.168.203.3/32 -p tcp --sport 25 -m state --state ESTABLISHED -j ACCEPT
+~~~
+
 * Instala un servidor mariadb, y permite los accesos desde la ip de tu cliente.
 
 ~~~
-root@bullseye:~# iptables -A INPUT -s 172.22.0.159 -p tcp --dport 3306 -j ACCEPT
+iptables -A INPUT -s 192.168.121.187/24 -p tcp --dport 3306 -m state --state NEW,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -d 192.168.121.187/24 -p tcp --sport 3306 -m state --state ESTABLISHED -j ACCEPT
 ~~~
 
-iptables -A INPUT -s 172.22.0.159 -p tcp --dport 3306 -j ACCEPT
-iptables -A OUTPUT -d 172.22.0.159 -p tcp --sport 3306 -j ACCEPT
+~~~
+vagrant@pruebas:~$ mysql -h 192.168.121.131 -u remoto1 -p
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 30
+Server version: 10.5.12-MariaDB-0+deb11u1 Debian 11
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]>
+~~~
+
+~~~
+alejandrogv@AlejandroGV:~/vagrant/seguridad/cortafuegos$ mysql -h 192.168.121.131 -u remoto1 -p
+Enter password: 
+
+~~~
