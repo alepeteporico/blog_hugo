@@ -49,6 +49,24 @@ iptables -A INPUT -i eth0 -p tcp --sport 22 -m state --state ESTABLISHED -j ACCE
 iptables -A OUTPUT -o eth0 -p tcp --dport 22 -m state --state NEW,ESTABLISHED -j ACCEPT
 ~~~
 
+~~~
+root@servidor:~# ssh debian@192.168.1.139
+The authenticity of host '192.168.1.139 (192.168.1.139)' can't be established.
+ECDSA key fingerprint is SHA256:l8TgJ0HFoxGaU0vs9JPTeePVkPecz32d/vMFW77BMmg.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '192.168.1.139' (ECDSA) to the list of known hosts.
+debian@192.168.1.139's password: 
+Linux zeus 5.10.0-11-amd64 #1 SMP Debian 5.10.92-1 (2022-01-18) x86_64
+
+The programs included with the Debian GNU/Linux system are free software;
+the exact distribution terms for each program are described in the
+individual files in /usr/share/doc/*/copyright.
+
+Debian GNU/Linux comes with ABSOLUTELY NO WARRANTY, to the extent
+permitted by applicable law.
+Last login: Thu Feb 3 13:03:43 2022
+~~~
+
 * Deniega el acceso a tu servidor web desde una ip concreta.
 
 ~~~
@@ -110,7 +128,7 @@ ns4.google.com.		90004	IN	AAAA	2001:4860:4802:38::a
 ~~~
 
 ~~~
-root@bullseye:~# dig @1.1.1.1 www.google.es
+root@servidor:~# dig @1.1.1.1 www.google.es
 
 ; <<>> DiG 9.16.22-Debian <<>> @1.1.1.1 www.google.es
 ; (1 server found)
@@ -126,7 +144,7 @@ iptables -A INPUT -s 37.187.119.60/32 -p tcp --sport 80 -m state --state ESTABLI
 ~~~
 
 ~~~
-root@bullseye:~# curl www.josedomingo.org
+root@servidor:~# curl www.josedomingo.org
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html><head>
 <title>301 Moved Permanently</title>
@@ -141,7 +159,7 @@ root@bullseye:~# curl www.josedomingo.org
 * ¿Puedes acceder a fp.josedomingo.org? Tampoco podríamos, pues hemos bloqueado la IP donde se alojan estos dos sitios.
 
 ~~~
-root@bullseye:~# curl fp.josedomingo.org
+root@servidor:~# curl fp.josedomingo.org
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html><head>
 <title>301 Moved Permanently</title>
@@ -158,6 +176,17 @@ root@bullseye:~# curl fp.josedomingo.org
 ~~~
 iptables -A OUTPUT -d 192.168.203.3/32 -p tcp --dport 25 -m state --state NEW,ESTABLISHED -j ACCEPT
 iptables -A INPUT -s 192.168.203.3/32 -p tcp --sport 25 -m state --state ESTABLISHED -j ACCEPT
+~~~
+
+~~~
+root@servidor:~# telnet babuino-smtp.gonzalonazareno.org 25
+Trying 192.168.203.3...
+Connected to babuino-smtp.gonzalonazareno.org.
+Escape character is '^]'.
+220 babuino-smtp.gonzalonazareno.org ESMTP Postfix (Debian/GNU)
+HELO babuino-smtp.gonzalonazareno.org
+250 babuino-smtp.gonzalonazareno.org
+
 ~~~
 
 * Instala un servidor mariadb, y permite los accesos desde la ip de tu cliente.
