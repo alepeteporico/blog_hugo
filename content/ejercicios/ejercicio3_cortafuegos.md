@@ -351,3 +351,20 @@ iptables -A FORWARD -i ens3 -o ens8 -p tcp --sport 80 -m state --state ESTABLISH
 iptables -A FORWARD -i ens8 -o ens3 -p tcp --dport 443 -m state --state NEW,ESTABLISHED -j ACCEPT
 iptables -A FORWARD -i ens3 -o ens8 -p tcp --sport 443 -m state --state ESTABLISHED -j ACCEPT
 ~~~
+
+~~~
+[hera@hera ~]$ curl https://alepeteporico.github.io
+<!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<title> Alepetepórico Blog </title>
+
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="generator" content="Hugo 0.80.0" />
+
+
+
+
+<script src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>
+~~~
