@@ -912,11 +912,11 @@ AllowedIPs = 10.99.99.3/32
 
 * Descargamos la aplicación de wireguard en playstore.
 
-![descargar](/vpn/6.png)
+![descargar](/vpn/6.jpg)
 
 * Ahora tenemos varias opciones de configuración vamos a usar la que parece más sencilla, mediante el codigo qr.
 
-![qr](/vpn/7.png)
+![qr](/vpn/7.jpg)
 
 * Para hacerlo primero creamos un par de claves en el servidor para nuestro cliente.
 
@@ -983,11 +983,11 @@ vagrant@servervpn:~$ qrencode -t ansiutf8 < cliente_android.conf
 
 * Escaneamos el codigo y le ponemos nombre a la interfaz.
 
-[qr](/vpn/8.png)
+[qr](/vpn/8.jpg)
 
 * Y vemos la interfaz activada.
 
-[qr](/vpn/9.png)
+[qr](/vpn/9.jpg)
 
 * Creamos el nuevo peer en el servidor
 
