@@ -983,11 +983,11 @@ vagrant@servervpn:~$ qrencode -t ansiutf8 < cliente_android.conf
 
 * Escaneamos el codigo y le ponemos nombre a la interfaz.
 
-[qr](/vpn/8.jpg)
+![qr](/vpn/8.jpg)
 
 * Y vemos la interfaz activada.
 
-[qr](/vpn/9.jpg)
+![qr](/vpn/9.jpg)
 
 * Creamos el nuevo peer en el servidor
 
@@ -997,4 +997,154 @@ Publickey = I1gwDiuESB9FGjZ0Q/B6aJdiyyiY+arekkjt0ZK8FQI=
 AllowedIPs = 10.99.99.4/32
 ~~~
 
-* 
+## VPN sitio a sitio con WireGuard.
+
+* Tendremos el mismo escenario que usamos para hacer la VPN sitio a sitio con OpenVPN.
+
+### Servidor 1.
+
+* Generamos el par de claves con wireguard.
+
+~~~
+vagrant@servidor1:~$ wg genkey | sudo tee /etc/wireguard/servidor1-privada.key | wg pubkey | sudo tee /etc/wireguard/servidor1-publica.key
+Fsz5MIL2DGfbAZj+bDgUSFMltex7bhPLkQ+mYiq7mXI=
+~~~
+
+* Creamos la interfaz como hemos hecho anteriormente, aunque ahora tendremos que añadir unas reglas iptables para hacer forwarding, por supuesto tendremos que activar el bit de forwarding anteriormente.
+
+~~~
+[Interface]
+Address = 10.99.99.1
+PrivateKey = 8HT6kBnwZFn/XoG6GLhLMxtJwbxaBJE1ev4WJ6byFHw=
+ListenPort = 51820
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D POSTROUTING -o eth0 -j MASQUERADE
+~~~
+
+* Levantamos la interfaz.
+
+~~~
+vagrant@servidor1:~$ wg-quick up wg0
+[#] ip link add wg0 type wireguard
+[#] wg setconf wg0 /dev/fd/63
+[#] ip -4 address add 10.99.99.1 dev wg0
+[#] ip link set mtu 1420 up dev wg0
+[#] iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
+~~~
+
+### Cliente 1.
+
+* En el cliente solo debemos cambiar la ruta por defecto y apuntar a la ip interna del servidor 1.
+
+~~~
+vagrant@cliente1:~$ sudo ip r del default
+vagrant@cliente1:~$ sudo ip r add default via 172.30.0.10
+~~~
+
+### Servidor 2.
+
+* Crearemos el par de claves para este servidor.
+
+~~~
+vagrant@servidor2:~$ wg genkey | sudo tee /etc/wireguard/servidor2-privada.key | wg pubkey | sudo tee /etc/wireguard/servidor2-publica.key
+rq8H+vq7gIz1qosbDT4v50h/bTXVo7YVoPi564U3byc=
+~~~
+
+* Configuramos la interfaz añadiendo un peer con la ip publica de esta maquina y la clave publica del servidor 1.
+
+~~~
+[Interface]
+Address = 10.99.99.2
+PrivateKey = 2Bo+GwOmLyKzYpCmsXjY7sSRswEB478Y+0HXfDmhU1k=
+ListenPort = 51820
+
+[Peer]
+PublicKey = Fsz5MIL2DGfbAZj+bDgUSFMltex7bhPLkQ+mYiq7mXI=
+AllowedIPs = 10.99.99.0/24, 172.30.0.0/24
+Endpoint = 192.168.121.8:51820
+~~~
+
+* Antes de levantar la interfaz volvemos al servidor 1, donde añadiremos un peer en la interfaz con la clave publica de nuestro servidor 2 y la red privada del mismo.
+
+~~~
+[Interface]
+Address = 10.99.99.1
+PrivateKey = 8HT6kBnwZFn/XoG6GLhLMxtJwbxaBJE1ev4WJ6byFHw=
+ListenPort = 51820
+PostUp = iptables -A FORWARD -i %i -j ACCEPT; iptables -A FORWARD -o %i -j ACCEPT; iptables -t nat -A PO>
+PostDown = iptables -D FORWARD -i %i -j ACCEPT; iptables -D FORWARD -o %i -j ACCEPT; iptables -t nat -D >
+
+[Peer]
+Publickey = rq8H+vq7gIz1qosbDT4v50h/bTXVo7YVoPi564U3byc=
+AllowedIPs = 10.99.99.0/24, 172.20.0.0/24
+PersistentKeepAlive = 25
+~~~
+
+* Una vez hecho esto y reiniciada la interfaz del servidor 1 podemos levantar la del servidor 2.
+
+~~~
+vagrant@servidor2:~$ wg-quick up wg0
+[#] ip link add wg0 type wireguard
+[#] wg setconf wg0 /dev/fd/63
+[#] ip -4 address add 10.99.99.2 dev wg0
+[#] ip link set mtu 65456 up dev wg0
+[#] ip -4 route add 172.30.0.0/24 dev wg0
+[#] ip -4 route add 10.99.99.0/24 dev wg0
+~~~
+
+### Cliente 2.
+
+* Cambiamos la interfaz por defecto de este cliente tal como hicimos con el primero.
+
+~~~
+vagrant@cliente2:~$ sudo ip r del default
+vagrant@cliente2:~$ sudo ip r add default via 172.20.0.10
+~~~
+
+### Comprobaciones.
+
+* Vemos las rutas del servidor 2.
+
+~~~
+vagrant@servidor2:~$ ip r
+default via 192.168.121.1 dev eth0 
+10.99.99.0/24 dev wg0 scope link 
+172.20.0.0/24 dev eth1 proto kernel scope link src 172.20.0.10 
+172.30.0.0/24 dev wg0 scope link 
+192.168.121.0/24 dev eth0 proto kernel scope link src 192.168.121.8 
+~~~
+
+* Ahora las del servidor 1.
+
+~~~
+vagrant@servidor1:~$ ip r
+default via 192.168.121.1 dev eth0 
+10.99.99.0/24 dev wg0 scope link 
+172.20.0.0/24 dev wg0 scope link 
+172.30.0.0/24 dev eth1 proto kernel scope link src 172.30.0.10 
+192.168.121.0/24 dev eth0 proto kernel scope link src 192.168.121.86
+~~~
+
+* Ping desde el cliente 2 al cliente 1
+
+~~~
+vagrant@cliente2:~$ ping 172.30.0.15
+PING 172.30.0.15 (172.30.0.15) 56(84) bytes of data.
+64 bytes from 172.30.0.15: icmp_seq=1 ttl=64 time=2.017 ms
+^C
+--- 172.30.0.15 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 2.017/2.017/2.017/0.030 ms
+~~~
+
+* Ping desde el cliente 1 al cliente 2.
+
+~~~
+vagrant@cliente1:~$ ping 172.20.0.15
+PING 172.20.0.15 (172.20.0.15) 56(84) bytes of data.
+64 bytes from 172.20.0.15: icmp_seq=1 ttl=64 time=2.531 ms
+^C
+--- 172.20.0.15 ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 2.531/2.531/2.531/0.031 ms
+~~~
