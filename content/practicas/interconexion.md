@@ -382,73 +382,72 @@ PSQLU  =
 
 * Vamos a comprobar la conexión.
 
-        [vagrant@oracle ~]$ sudo isql PSQLU
-        +---------------------------------------+
-        | Connected!                            |
-        |                                       |
-        | sql-statement                         |
-        | help \[tablename]                      |
-        | quit                                  |
-        |                                       |
-        +---------------------------------------+
+~~~
+[oracle@localhost ~]$ isql PSQLU
++---------------------------------------+
+| Connected!                            |
+|                                       |
+| sql-statement                         |
+| help \[tablename]                     |
+| quit                                  |
+|                                       |
++---------------------------------------+
+~~~
 
 * Vamos a configurar un fichero que debemos generar en `/opt/oracle/product/19c/dbhome_1/hs/admin/initPSQLU.ora` donde debemos añadir las siguientes líneas.
 
-        HS_FDS_CONNECT_INFO = PSQLU
-        HS_FDS_TRACE_LEVEL = DEBUG
-        HS_FDS_SHAREABLE_NAME = /usr/lib64/psqlodbcw.so
-        HS_LANGUAGE = AMERICAN_AMERICA.WE8ISO8859P1
-        set ODBCINI=/etc/odbc.ini
+~~~
+HS_FDS_CONNECT_INFO = PSQLU
+HS_FDS_TRACE_LEVEL = DEBUG
+HS_FDS_SHAREABLE_NAME = /usr/lib64/psqlodbcw.so
+HS_LANGUAGE = AMERICAN_AMERICA.WE8ISO8859P1
+set ODBCINI=/etc/odbc.ini
+~~~
 
 * Ahora configuramos nuestro fichero listener, donde deberemos añadir la escucha al driver de ODBC y especificando nuestro DNS.
 
-        LISTENER =
-          (DESCRIPTION_LIST =
-            (DESCRIPTION =
-              (ADDRESS = (PROTOCOL = TCP)(HOST = oracle.alegv.bd)(PORT = 1521))
-              (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
-            )
-          )
+~~~
+LISTENER =
+  (DESCRIPTION_LIST =
+    (DESCRIPTION =
+      (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521))
+      (ADDRESS = (PROTOCOL = IPC)(KEY = EXTPROC1521))
+    )
+  )
 
-        SID_LIST_LISTENER=
-          (SID_LIST=
-              (SID_DESC=
-                 (SID_NAME=PSQLU)
-                 (ORACLE_HOME=/opt/oracle/product/19c/dbhome_1)
-                 (PROGRAM=dg4odbc)
-              )
-          )
+SID_LIST_LISTENER=
+  (SID_LIST=
+      (SID_DESC=
+         (SID_NAME=PSQLU)
+         (ORACLE_HOME=/opt/oracle/product/19c/dbhome_1)
+         (PROGRAM=dg4odbc)
+      )
+  )
+~~~
 
 * También vamos a configurar el fichero tnsnames.ora donde definiremos la nueva conexión que realmente será a nuestra propia máquina.
 
-        ORCLCDB =
-          (DESCRIPTION =
-            (ADDRESS = (PROTOCOL = TCP)(HOST = myhost)(PORT = 1521))
-            (CONNECT_DATA =
-              (SERVER = DEDICATED)
-              (SERVICE_NAME = ORCLCDB)
-            )
-          )
-
-        LISTENER_ORCLCDB =
-          (ADDRESS = (PROTOCOL = TCP)(HOST = myhost)(PORT = 1521))
+~~~
+ORCLCDB =
+  (DESCRIPTION =
+    (ADDRESS = (PROTOCOL = TCP)(HOST = myhost)(PORT = 1521))
+    (CONNECT_DATA =
+      (SERVER = DEDICATED)
+      (SERVICE_NAME = ORCLCDB)
+    )
+  )
 
 
-        ORACLE2 =
-          (DESCRIPTION =
-            (ADDRESS = (PROTOCOL = TCP)(HOST = 172.22.100.20)(PORT = 1521))
-            (CONNECT_DATA =
-              (SERVER = DEDICATED)
-              (SERVICE_NAME = ORCLCDB)
-            )
-          )
+LISTENER_ORCLCDB =
+  (ADDRESS = (PROTOCOL = TCP)(HOST = myhost)(PORT = 1521))
 
-        PSQLU  =
-          (DESCRIPTION=
-            (ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=1521))
-            (CONNECT_DATA=(SID=PSQLU))
-            (HS=OK)
-          )
+PSQLU  =
+  (DESCRIPTION=
+    (ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=1521))
+    (CONNECT_DATA=(SID=PSQLU))
+    (HS=OK)
+  )
+~~~
 
 * Tras esto reiniciamos el servicio, accedemos a nuestra base de datos y comprobamos que funciona el enlace.
 

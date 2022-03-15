@@ -4,7 +4,7 @@ description = ""
 tags = [
     "SRI"
 ]
-date = "2021-03-16"
+date = "2021-12-10"
 menu = "main"
 +++
 
@@ -367,7 +367,7 @@ debian@zeus:~$ dig +short -x 172.16.0.200
 hera.alegv.gonzalonazareno.org.
 ~~~
 
-### Servidor web
+## Servidor web
 
 * Para que podamos acceder debemos habilitar en el firewall los puertos 443, 80 y 53
 
