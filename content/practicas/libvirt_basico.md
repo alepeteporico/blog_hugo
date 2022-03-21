@@ -19,7 +19,7 @@ menu = "main"
 ~~~
 <network>
   <name>red_interna</name>
-  <bridge name="virbr10"/>
+  <bridge name="virbr20"/>
   <forward mode="nat"/>
   <ip address="10.0.1.0" netmask="255.255.255.0">
     <dhcp>
@@ -68,8 +68,8 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABA.....
 
 ~~~
 alejandrogv@AlejandroGV:~/libvirt$ sudo cat volumen/etc/hosts
-127.0.0.1	localhost
-127.0.1.1	maquina_alejandro
+127.0.0.1	maquina1_alejandro
+127.0.1.1	localhost
 
 # The following lines are desirable for IPv6 capable hosts
 ::1     localhost ip6-localhost ip6-loopback
@@ -148,4 +148,18 @@ alejandrogv@AlejandroGV:~/libvirt$ virsh -c qemu:///system vol-upload ejercicio1
     <graphics type='vnc' port='-1' autoport='yes' listen='0.0.0.0' />
   </devices>
 </domain>
+~~~
+
+* Definimos el dominio.
+
+~~~
+alejandrogv@AlejandroGV:~/libvirt$ virsh -c qemu:///system define dominio1.xml 
+Domain 'dominio1' defined from dominio1.xml
+~~~
+
+* iniciamos el dominio.
+
+~~~
+alejandrogv@AlejandroGV:~/libvirt$ virsh -c qemu:///system start dominio1
+Domain 'dominio1' started
 ~~~

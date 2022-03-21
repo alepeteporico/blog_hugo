@@ -11,11 +11,7 @@ menu = "main"
 
 ### Servidor DNS
 
-*El servidor DNS estará instalado en freston, por ello instalaremos bind en esta máquina
-
-        root@apolo:~# apt install bind9
-
-*Configuramos el fichero "/etc/bind/named.conf.options" y añadimos las siguientes líneas:
+* Configuramos el fichero "/etc/bind/named.conf.options" y añadimos las siguientes líneas:
 
 ~~~
         listen-on { any; };
@@ -284,22 +280,19 @@ alejandrogv@AlejandroGV:~$ dig alegv.gonzalonazareno.org
 ; <<>> DiG 9.16.22-Debian <<>> alegv.gonzalonazareno.org
 ;; global options: +cmd
 ;; Got answer:
-;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 12856
-;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 1, ADDITIONAL: 1
+;; ->>HEADER<<- opcode: QUERY, status: SERVFAIL, id: 42290
+;; flags: qr rd ra; QUERY: 1, ANSWER: 0, AUTHORITY: 0, ADDITIONAL: 1
 
 ;; OPT PSEUDOSECTION:
 ; EDNS: version: 0, flags:; udp: 4096
-; COOKIE: d14809270130ee359e88c61961f8ef40775f5cc6025b334e (good)
+; COOKIE: 28348d43b60be7e7a084f7c06231d997b8300d17dbf74b16 (good)
 ;; QUESTION SECTION:
 ;alegv.gonzalonazareno.org.	IN	A
 
-;; AUTHORITY SECTION:
-alegv.gonzalonazareno.org. 10748 IN	SOA	zeus.alegv.gonzalonazareno.org. admin.alegv.gonzalonazareno.org. 1 604800 86400 2419200 86400
-
 ;; Query time: 0 msec
 ;; SERVER: 192.168.202.2#53(192.168.202.2)
-;; WHEN: Tue Feb 01 09:28:48 CET 2022
-;; MSG SIZE  rcvd: 129
+;; WHEN: Wed Mar 16 13:35:35 CET 2022
+;; MSG SIZE  rcvd: 82
 ~~~
 
 2. La dirección IP de zeus.
@@ -318,7 +311,7 @@ debian@apolo:~$ dig +short zeus.alegv.gonzalonazareno.org
 
 ~~~
 alejandrogv@AlejandroGV:~$ dig +short zeus.alegv.gonzalonazareno.org
-172.22.3.191
+172.22.0.27
 ~~~
 
 3. Una resolución de www.
