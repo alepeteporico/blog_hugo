@@ -55,7 +55,7 @@ end
 
 **Y por últimos realizaremos la instalación de php**
 
-    vagrant@cmsalegv:~$ sudo apt install php7.4 libapache2-mod-php7.4 php7.4-mysql php-common php7.4-cli php7.4-common php7.4-json php7.4-opcache php7.4-readline
+    vagrant@cmsalegv:~$ sudo apt install php7.4 libapache2-mod-php7.4 php7.4-mysql php-common php7.4-cli php7.4-common php7.4-json php7.4-opcache php7.4-readline php-dom php-gd php-xml
 
 **Tendremos que habilitar el mod de apache de PHP**
 

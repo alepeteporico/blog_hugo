@@ -18,23 +18,6 @@ Filesystem      Size  Used Avail Use% Mounted on
 /dev/md0        9.8G   24K  9.3G   1% /mnt/copias
 ~~~
 
-* Vamos a crear una serie de directorios dentro de este volumen que usaremos para guardar y organizar nuestras copias de seguirdad.
-
-~~~
-ebian@zeus:/mnt/copias$ tree
-.
-|-- completa
-|   |-- apolo
-|   |-- ares
-|   |-- hera
-|   `-- zeus
-|-- incremental
-|   |-- apolo
-|   |-- ares
-|   |-- hera
-|   `-- zeus
-~~~
-
 * Nuestro esquema para realizar las copias de seguridad será una copia completa a la semana y una incremental diaria.
 
 ## Componentes de bacula
@@ -545,6 +528,7 @@ debian@zeus:~$ sudo systemctl restart bacula-sd.service
 debian@zeus:~$ sudo systemctl enable bacula-sd.service
 Synchronizing state of bacula-sd.service with SysV service script with /lib/systemd/systemd-sysv-install.
 Executing: /lib/systemd/systemd-sysv-install enable bacula-sd
+
 debian@zeus:~$ sudo systemctl restart bacula-director.service
 debian@zeus:~$ sudo systemctl enable bacula-director.service
 Synchronizing state of bacula-director.service with SysV service script with /lib/systemd/systemd-sysv-install.
@@ -572,7 +556,7 @@ Director {
 }
 
 FileDaemon {
-  Name = ares-fd
+  Name = zeus-fd
   FDport = 9102
   WorkingDirectory = /var/lib/bacula
   Pid Directory = /run/bacula
@@ -676,3 +660,98 @@ Messages {
   director = zeus-dir = all, !skipped, !restored
 }
 ~~~
+
+* A parte, en hera tendremos que abrir los puertos en el firewall.
+
+~~~
+[usuario@hera ~]$ sudo firewall-cmd --permanent --add-port=9101/tcp
+success
+[usuario@hera ~]$ sudo firewall-cmd --permanent --add-port=9102/tcp
+success
+[usuario@hera ~]$ sudo firewall-cmd --permanent --add-port=9103/tcp
+success
+[usuario@hera ~]$ sudo firewall-cmd --reload
+success
+~~~
+
+## Comprobaciones
+
+* Vamos a conectarnos desde la consola de bacula en el servidor y ver el estado de algún cliente.
+
+~~~
+debian@zeus:~$ sudo bconsole 
+Connecting to Director localhost:9101
+1000 OK: 103 zeus-dir Version: 9.6.7 (10 December 2020)
+Enter a period to cancel a command.
+*status client
+The defined Client resources are:
+     1: zeus-fd
+     2: ares-fd
+     3: apolo-fd
+     4: hera-fd
+Select Client (File daemon) resource (1-4): 1
+Connecting to Client zeus-fd at 10.0.1.1:9102
+
+zeus-fd Version: 9.6.7 (10 December 2020)  x86_64-pc-linux-gnu debian bullseye/sid
+Daemon started 22-mar-22 12:42. Jobs: run=0 running=0.
+ Heap: heap=102,400 smbytes=24,371 max_bytes=24,388 bufs=88 max_bufs=88
+ Sizes: boffset_t=8 size_t=8 debug=0 trace=0 mode=0,0 bwlimit=0kB/s
+ Plugin: bpipe-fd.so 
+
+Running Jobs:
+Director connected at: 22-mar-22 12:43
+No Jobs running.
+====
+
+Terminated Jobs:
+====
+~~~
+
+## Volumenes
+
+* Debemos crear las etiquetas desde la consola de bacula donde se guardarán las copias, tanto la diaria, como la semanal.
+
+~~~
+debian@zeus:~$ sudo bconsole
+Connecting to Director localhost:9101
+1000 OK: 103 zeus-dir Version: 9.6.7 (10 December 2020)
+Enter a period to cancel a command.
+*label
+Automatically selected Catalog: MyCatalog
+Using Catalog "MyCatalog"
+Automatically selected Storage: volcopias
+Enter new Volume name: copia-diaria
+Defined Pools:
+     1: Backup-Restore
+     2: Daily
+     3: Default
+     4: File
+     5: Scratch
+     6: Weekly
+Select the Pool (1-6): 2
+Connecting to Storage daemon volcopias at 10.0.1.1:9103 ...
+Sending label command for Volume "copia-diaria" Slot 0 ...
+3000 OK label. VolBytes=216 VolABytes=0 VolType=1 Volume="copia-diaria" Device="FileStorage" (/mnt/copias/)
+Catalog record for Volume "copia-diaria", Slot 0  successfully created.
+Requesting to mount FileChgr1 ...
+3906 File device ""FileStorage" (/mnt/copias/)" is always mounted.
+*label
+Automatically selected Storage: volcopias
+Enter new Volume name: copia-semanal
+Defined Pools:
+     1: Backup-Restore
+     2: Daily
+     3: Default
+     4: File
+     5: Scratch
+     6: Weekly
+Select the Pool (1-6): 6
+Connecting to Storage daemon volcopias at 10.0.1.1:9103 ...
+Sending label command for Volume "copia-semanal" Slot 0 ...
+3000 OK label. VolBytes=218 VolABytes=0 VolType=1 Volume="copia-semanal" Device="FileStorage" (/mnt/copias/)
+Catalog record for Volume "copia-semanal", Slot 0  successfully created.
+Requesting to mount FileChgr1 ...
+3906 File device ""FileStorage" (/mnt/copias/)" is always mounted.
+~~~
+
+* Como acabamos de crearlo no tiene ninguna copia ni nada, daremos un tiempo a que se realizen algunos trabajos y podremos comprobar que se han realizado algunas copias.
