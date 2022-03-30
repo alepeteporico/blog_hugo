@@ -96,3 +96,10 @@ END;
 ### Diccionario de datos:
 
 * [Pagina de referencia](https://ss64.com/)
+
+**Mostrar mensaje por pantalla**
+
+~~~
+DBMS_OUTPUT.PUT_LINE('TEXTO QUE SE VERÁ');
+~~~
+

@@ -4,7 +4,7 @@ description = ""
 tags = [
     "SRI"
 ]
-date = "2021-06-01"
+date = "2022-30-03"
 menu = "main"
 +++
 
@@ -20,11 +20,7 @@ debian@mrrobot:~$ sudo apt install nginx mariadb-client mariadb-server php php-m
 debian@mrrobot:~$ sudo apt install php7.4-fpm php7.4
 ~~~
 
-* Crearemos el directorio sobre el que trabajaremos en nuestro virtual host.
-
-~~~
-root@:~# mkdir /var/www/alejandrogv
-~~~
+### Virtualhosting
 
 * Crearemos un virtual host en `sites-available`
 
@@ -57,50 +53,95 @@ rewrite ^/$ http://www.alejandrogv.site permanent;
 debian@mrrobot:~$ sudo ln -s /etc/nginx/sites-available/web.conf /etc/nginx/sites-enabled/
 ~~~
 
-* Después de añadir la ruta a nuestro `etc/hosts` comprobaremos que podemos acceder desde el navegador.
+* Comprobaremos que podemos acceder desde el navegador.
 
 ![nginx](/lemp/1.png)
 
+### Mapeo URL
+
 * Ahora crearemos una redirección, cuando se acceda a www.iesgn06.es se redireccionará a `/principal`, para ello añadiremos lo siguiente a nuestro fichero de configuración del virtual host.
 
-        location / {
-                try_files $uri $uri/ =404;
-                return 301 /principal/index.html;
-                location /principal {
-                        autoindex off;
-                }
+~~~
+location / {
+        try_files $uri $uri/ =404;
+        return 301 /principal/index.html;
+        location /principal {
+                autoindex off;
         }
-
-* Comprobamos su funcionamiento.
-
-![principal](/lemp/2.png)
+}
+~~~
 
 * Ahora vamos a instalar una plantilla, primero debemos descargarla.
 
-        root@sputnik:~# wget https://plantillashtmlgratis.com/wp-content/themes/helium-child/descargas/page267/brunch.zip
+~~~
+debian@mrrobot:~$ wget https://plantillashtmlgratis.com/wp-content/themes/helium-child/descargas/page267/brunch.zip
+~~~
 
 * Lo descomprimimos y movemos todo el contenido a principal.
 
-        root@sputnik:~# mv 2112_brunch/* /var/www/iesgn06/principal/
+~~~
+debian@mrrobot:~$ sudo mv 2112_brunch/* /var/www/web
+~~~
 
 * Reiniciamos el servicio y entramos a nuestra web para comprobar que la plantilla se ha instalado exitosamente.
 
 ![principal](/lemp/3.png)
 
+* Si entramos en /principal/documentos se deberán ver los documentos de /srv/doc para ello añadimos las siguiente líneas en en virtualhost.
+
+~~~
+location /principal/documentos {
+        alias /srv/doc;
+        autoindex on;
+        disable_symlinks off;
+}
+~~~
+
+* Vemos que funciona.
+
+![principal](/lemp/4.png)
+
+### Autentificación
+
+* Vamos a limitar el acceso en `www.alejandrogv.site/secreto`, para ello primero debemos crear un htaccess en nginx, lo haremos de la siguiente forma.
+
+~~~
+debian@mrrobot:~$ sudo sh -c "echo -n 'usuario:' >> /etc/nginx/.htpasswd"
+debian@mrrobot:~$ sudo sh -c "openssl passwd -apr1 >> /etc/nginx/.htpasswd"
+Password: 
+Verifying - Password:
+~~~
+
+* Añadimos la localicación correspondiente haciendo referencia a que es restringido y donde encontrar el usario y contraseña en el virtualhost.
+
+~~~
+location /secreto {
+        auth_basic           “Restringido”;
+        auth_basic_user_file /etc/nginx/.htpasswd;
+}
+~~~
+
+* Reiniciamos el servicio y comprobamos que nos pide usuario y contraseña al entrar en secreto.
+
+![principal](/lemp/5.png)
+
+![principal](/lemp/6.png)
+
+### PHP
+
 * Ahora configuraremos nuestrovirtual host para que pueda ejectuar php añadiendo de nuevo en nuestro fichero de configuración lo siguiente.
 
-        location ~ \.php$ {
-                include snippets/fastcgi-php.conf;
-                fastcgi_pass unix:/run/php/php7.3-fpm.sock;
-        }
-
-* Creamos un fichero info.php en principal.
-
-        root@sputnik:~# cat /var/www/iesgn06/principal/info.php
-        <?php
-        phpinfo();
-        ?>
+~~~
+location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/run/php/php7.3-fpm.sock;
+}
+~~~
 
 * Comprobamos que funciona.
 
-![principal](/lemp/4.png)
+![principal](/lemp/7.png)
+
+### Ansible
+
+* Aquí tenemos nuestro [repositorio]() ansible 
