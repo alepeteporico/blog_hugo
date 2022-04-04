@@ -59,7 +59,7 @@ debian@mrrobot:~$ sudo ln -s /etc/nginx/sites-available/web.conf /etc/nginx/site
 
 ### Mapeo URL
 
-* Ahora crearemos una redirección, cuando se acceda a www.iesgn06.es se redireccionará a `/principal`, para ello añadiremos lo siguiente a nuestro fichero de configuración del virtual host.
+* Ahora crearemos una redirección, cuando se acceda a www.alejandrogv.site se redireccionará a `/principal`, para ello añadiremos lo siguiente a nuestro fichero de configuración del virtual host.
 
 ~~~
 location / {
