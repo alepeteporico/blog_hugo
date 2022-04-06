@@ -16,6 +16,12 @@ menu = "main"
 root@cmsagv:~# mysqldump drupal > ./backup.sql
 ~~~
 
+* Migramos la aplicación
+
+~~~
+alejandrogv@AlejandroGV:~$ scp drupal/ debian@mrrobot.alejandrogv.site/home/debian/
+~~~
+
 * Seguidamente nos iremos a nuestra VPS donde instalaremos mariadb y crearemos una base de datos y un usuario con privilegios sobre ella.
 
 ~~~
@@ -103,13 +109,13 @@ $databases['default']['default'] = array (
 
 ### Nextcloud
 
-* Vamos a descargar el cms.
+* Migramos la aplicación
 
 ~~~
-debian@mrrobot:~$ curl -LO https://download.nextcloud.com/server/releases/nextcloud-23.0.0.zip
+alejandrogv@AlejandroGV:~$ scp nextcloud/ debian@mrrobot.alejandrogv.site/home/debian/
 ~~~
 
-* Después de descomprimirlo y alojarlo en nuestra carpeta de `/var/www/web` con el nombre de cloud vamos a realizar la migración de la base de datos que hemos creado previamente.
+* Lo alojamos en nuestra carpeta de `/var/www/web` con el nombre de cloud vamos a realizar la migración de la base de datos que hemos creado previamente.
 
 ~~~
 root@mrrobot:~# mysql nextcloud < /home/debian/nextcloud.sql
