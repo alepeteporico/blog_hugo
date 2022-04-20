@@ -261,65 +261,104 @@ DEBUG = False
 
 * Primero realizaremos estos cambios en el entorno de desarrollo, el primero de ellos será que nuestro nombre aparezca en la pagina de admin. Para ello modificaremos el fichero `django_tutorial/polls/templates/polls/index.html`.
 
-        {% load static %}
+~~~
+{% load static %}
 
-        <link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}">
-
-        <h1>Alejandro Gutiérrez Valencia<h1>
-
-        {% if latest_question_list %}
-            <ul>
-            {% for question in latest_question_list %}
-            <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
-            {% endfor %}
-            </ul>
-        {% else %}
-            <p>No polls are available.</p>
-        {% endif %}
+<link rel="stylesheet" type="text/css" href="{% static 'polls/style.css' %}">
+Alejandro Gutierrez Valencia
+{% if latest_question_list %}
+    <ul>
+    {% for question in latest_question_list %}
+    <li><a href="{% url 'polls:detail' question.id %}">{{ question.question_text }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No polls are available.</p>
+{% endif %}
+~~~
 
 ![nombre](/despliegue_python/8.png)
 
-* Vamos a modificar la imagen que se ve de fondo en la aplicación, para ello modificamos el archivo `django/lib/python3.7/site-packages/django/contrib/admin/static/admin/css/base.css` y podemos por ejemplo cambiar el color de fondo
+* En `django_tutorial/polls/templates/index.html` cambiaremos la imagen que aparece de fondo en la aplicación.
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-size: 14px;
-            font-family: "Roboto","Lucida Grande","DejaVu Sans","Bitstream Vera Sans",Verdana,Arial,sans-serif;
-            color: #333;
-            background: #ebe10d;
-        }
-
-![fondo](/despliegue_python/10.png)
+![imagen](/despliegue_python/9.png)
 
 * Añadiremos una nueva tabla en la base de datos, para ello añadimos el siguiente modelo a `polls/models.py`
 
-          class Categoria(models.Model):
-          	Abr = models.CharField(max_length=4)
-          	Nombre = models.CharField(max_length=50)
+~~~
+class Categoria(models.Model):
+        Abr = models.CharField(max_length=4)
+        Nombre = models.CharField(max_length=50)
 
-          	def __str__(self):
-          		return self.Abr+" - "+self.Nombre 
+        def __str__(self):
+                return self.Abr+" - "+self.Nombre
+~~~
 
 * El siguiente paso es crear una nueva migración:
 
-        (django) alejandrogv@AlejandroGV:~/django_tutorial$ python3 manage.py makemigrations
-        Migrations for 'polls':
-          polls/migrations/0002_categoria.py
-            - Create model Categoria
+~~~
+(django) alejandrogv@AlejandroGV:~/django_tutorial$ python3 manage.py makemigrations
+Migrations for 'polls':
+  polls/migrations/0002_categoria.py
+    - Create model Categoria
+~~~
+
+* Migramos.
+
+~~~
+(django) alejandrogv@AlejandroGV:~/django_tutorial$ python3 manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, polls, sessions
+Running migrations:
+  Applying polls.0002_categoria... OK
+~~~
 
 * Ahora en `polls/admin.py` debemos añadir el nuevo modelo.
 
-        from .models import Choice, Question, Categoria
+~~~
+from .models import Choice, Question, Categoria
 
-        admin.site.register(Categoria)
+admin.site.register(Categoria)
+~~~
 
-* Y migramos por supuesto.
+![categoria ](/despliegue_python/10.png)
 
-        (django) alejandrogv@AlejandroGV:~/django_tutorial$ python3 manage.py migrate
-        Operations to perform:
-          Apply all migrations: admin, auth, contenttypes, polls, sessions
-        Running migrations:
-          Applying polls.0002_categoria... OK
+* Después de hacer estos cambios, la forma de migrarlos en subir los cambios a github y hacer un pull en el entorno de desarrollo.
 
-![fondo](/despliegue_python/11.png)
+~~~
+debian@mrrobot:~/aplicaciones/django_tutorial$ git pull
+hint: Pulling without specifying how to reconcile divergent branches is
+hint: discouraged. You can squelch this message by running one of the following
+hint: commands sometime before your next pull:
+hint: 
+hint:   git config pull.rebase false  # merge (the default strategy)
+hint:   git config pull.rebase true   # rebase
+hint:   git config pull.ff only       # fast-forward only
+hint: 
+hint: You can replace "git config" with "git config --global" to set a default
+hint: preference for all repositories. You can also pass --rebase, --no-rebase,
+hint: or --ff-only on the command line to override the configured default per
+hint: invocation.
+remote: Enumerating objects: 17, done.
+remote: Counting objects: 100% (17/17), done.
+remote: Compressing objects: 100% (3/3), done.
+remote: Total 9 (delta 6), reused 9 (delta 6), pack-reused 0
+Unpacking objects: 100% (9/9), 990 bytes | 247.00 KiB/s, done.
+From https://github.com/alepeteporico/django_tutorial
+   2e1a38a..6b3b604  master     -> origin/master
+Updating 2e1a38a..6b3b604
+Fast-forward
+ polls/admin.py                   | 3 ++-
+ polls/models.py                  | 7 +++++++
+ polls/templates/index.html       | 4 ++--
+ polls/templates/polls/index.html | 4 ++--
+ 4 files changed, 13 insertions(+), 5 deletions(-)
+~~~
+
+* Comprobamos que se han migrado los cambios.
+
+![cambios](/despliegue_python/13.png)
+
+![cambios](/despliegue_python/14.png)
+
+![cambios](/despliegue_python/15.png)
