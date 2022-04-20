@@ -34,29 +34,79 @@ debian@mrrobot:~$ sudo apt install certbot
 debian@mrrobot:~$ sudo systemctl stop nginx.service
 ~~~
 
-* Ahora si, vamos a generar el certificado y rellenar la información, lo primero que nos pedirá será el correo electrónico.
+* Ahora si, vamos a generar los certificados.
 
-        root@sputnik:~# certbot certonly --standalone -d www.iesgn06.es
-        Saving debug log to /var/log/letsencrypt/letsencrypt.log
-        Plugins selected: Authenticator standalone, Installer None
-        Enter email address (used for urgent renewal and security notices) (Enter 'c' to
-        cancel): tojandro@gmail.com
+~~~
+root@mrrobot:~# certbot certonly --standalone -d www.alejandrogv.site
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Plugins selected: Authenticator standalone, Installer None
+Requesting a certificate for www.alejandrogv.site
+Performing the following challenges:
+http-01 challenge for www.alejandrogv.site
+Waiting for verification...
+Cleaning up challenges
 
-* Tenemos que aceptar los terminos.
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at:
+   /etc/letsencrypt/live/www.alejandrogv.site/fullchain.pem
+   Your key file has been saved at:
+   /etc/letsencrypt/live/www.alejandrogv.site/privkey.pem
+   Your certificate will expire on 2022-07-17. To obtain a new or
+   tweaked version of this certificate in the future, simply run
+   certbot again. To non-interactively renew *all* of your
+   certificates, run "certbot renew"
+ - If you like Certbot, please consider supporting our work by:
 
-        Please read the Terms of Service at
-        https://letsencrypt.org/documents/LE-SA-v1.2-November-15-2017.pdf. You must
-        agree in order to register with the ACME server at
-        https://acme-v02.api.letsencrypt.org/directory
-        - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        (A)gree/(C)ancel: A
+   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
+~~~
 
-* Por último no dejaremos que compartan nuestro correo e inforamción.
+~~~
+root@mrrobot:~# certbot certonly --standalone -d python.alejandrogv.site
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+Plugins selected: Authenticator standalone, Installer None
+Requesting a certificate for python.alejandrogv.site
+Performing the following challenges:
+http-01 challenge for python.alejandrogv.site
+Waiting for verification...
+Cleaning up challenges
 
-        Would you be willing to share your email address with the Electronic Frontier
-        Foundation, a founding partner of the Let's Encrypt project and the non-profit
-        organization that develops Certbot? We'd like to send you email about our work
-        encrypting the web, EFF news, campaigns, and ways to support digital freedom.
-        - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        (Y)es/(N)o: N
+IMPORTANT NOTES:
+ - Congratulations! Your certificate and chain have been saved at:
+   /etc/letsencrypt/live/python.alejandrogv.site/fullchain.pem
+   Your key file has been saved at:
+   /etc/letsencrypt/live/python.alejandrogv.site/privkey.pem
+   Your certificate will expire on 2022-07-17. To obtain a new or
+   tweaked version of this certificate in the future, simply run
+   certbot again. To non-interactively renew *all* of your
+   certificates, run "certbot renew"
+ - If you like Certbot, please consider supporting our work by:
 
+   Donating to ISRG / Let's Encrypt:   https://letsencrypt.org/donate
+   Donating to EFF:                    https://eff.org/donate-le
+~~~
+
+* Vamos a comprobar los certificados que tenemos.
+
+~~~
+root@mrrobot:~# certbot certificates
+Saving debug log to /var/log/letsencrypt/letsencrypt.log
+
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+Found the following certs:
+  Certificate Name: python.alejandrogv.site
+    Serial Number: 366a35d4554012842c0a6e15479a6bbff69
+    Key Type: RSA
+    Domains: python.alejandrogv.site
+    Expiry Date: 2022-07-17 09:08:03+00:00 (VALID: 89 days)
+    Certificate Path: /etc/letsencrypt/live/python.alejandrogv.site/fullchain.pem
+    Private Key Path: /etc/letsencrypt/live/python.alejandrogv.site/privkey.pem
+  Certificate Name: www.alejandrogv.site
+    Serial Number: 312daa9a75a50f34e8519be31472dbb8656
+    Key Type: RSA
+    Domains: www.alejandrogv.site
+    Expiry Date: 2022-07-17 09:05:58+00:00 (VALID: 89 days)
+    Certificate Path: /etc/letsencrypt/live/www.alejandrogv.site/fullchain.pem
+    Private Key Path: /etc/letsencrypt/live/www.alejandrogv.site/privkey.pem
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+~~~
