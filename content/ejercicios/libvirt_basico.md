@@ -163,3 +163,14 @@ Domain 'dominio1' defined from dominio1.xml
 alejandrogv@AlejandroGV:~/libvirt$ virsh -c qemu:///system start dominio1
 Domain 'dominio1' started
 ~~~
+
+* Para acceder a la máquina por ssh podemos listar las direcciones ip que ha direccionado la red que hemos creado, sin embargo, no se el motivo de que la red que he creado no reparte niguna dirección.
+
+~~~
+alejandrogv@AlejandroGV:~/libvirt$ sudo virsh net-dhcp-leases red_interna
+ Expiry Time   dirección MAC   Protocol   IP address   Hostname   Client ID or DUID
+-------------------------------------------------------------------------------------
+
+~~~
+
+* Una vez sepamos la dirección ip solo tendríamos que acceder normalmente por ssh
