@@ -202,4 +202,6 @@ mysql-username: guacamole_user
 mysql-password: guacamole_user
 ~~~
 
-* Ahora podremos acceder mediante el usuario y la contraseña predeterminados `guacadmin`
+* Ahora podremos acceder mediante el usuario y la contraseña predeterminados `guacadmin`.
+
+![guacamole](/guacamole/2.png)
