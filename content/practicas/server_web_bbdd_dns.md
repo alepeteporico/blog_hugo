@@ -193,8 +193,8 @@ $TTL    86400
 
 $ORIGIN 16.172.in-addr.arpa.
 
-0.200	IN	PTR	hera.alexgv.gonzalonazareno.org.
-0.1	IN	PTR	zeus.alexgv.gonzalonazareno.org.
+200.0	IN	PTR	hera.alexgv.gonzalonazareno.org.
+1.0	IN	PTR	zeus.alexgv.gonzalonazareno.org.
 ~~~
 
 * Si quisieramos asegurarnos de que no tenemos ningún error de sintáxis podemos usar esto:
@@ -398,17 +398,13 @@ IncludeOptional	sites-enabled/*.conf
     ServerName www.alexgv.gonzalonazareno.org
     DocumentRoot /var/www/alexgv
 
-    <Directory /var/www/alexgv/>
-        Options FollowSymLinks
-        AllowOverride All
-        Order deny,allow
-        Allow from all
+    <Proxy \"unix:/run/php-fpm/www.sock|fcgi://php-fpm\">
+        ProxySet disablereuse=off
+    </Proxy>
 
-        <FilesMatch "\.php">
-                SetHandler "proxy:unix:/run/php-fpm/www.sock|fcgi://localhost"
-        </FilesMatch>
-
-    </Directory>
+    <FilesMatch \.php$>
+        SetHandler proxy:fcgi://php-fpm
+    </FilesMatch>
 
     ErrorLog /var/www/alexgv/log/error.log
     CustomLog /var/www/alexgv/log/requests.log combined
@@ -441,7 +437,7 @@ Relabeled /var/www/alexgv/log from unconfined_u:object_r:httpd_sys_content_t:s0 
 **Usaremos el gestor mariadb**
 
 ~~~
-ubuntu@sancho:~$ sudo apt install mariadb-server
+usuario@ares:~$ sudo apt install mariadb-server
 ~~~
 
 **Y una vez instalado debemos configurarlo para permitir el uso de usuarios remoto accediendo al fichero `/etc/mysql/mariadb.conf.d/50-server.cnf` y modificando la línea `bind-address` tal como aparece a continuación**
@@ -450,9 +446,9 @@ ubuntu@sancho:~$ sudo apt install mariadb-server
 
 **Ahora vamos a entrar y crear un usuario que usaremos remotamente.**
 
-        ubuntu@sancho:~$ sudo mysql -u root -p
+        usuario@ares:~$ sudo mysql -u root -p
 
-        MariaDB [(none)]> CREATE USER 'ale'@'10.0.2.5' IDENTIFIED BY 'ale';
+        MariaDB [(none)]> CREATE USER 'ale'@'172.16.0.200' IDENTIFIED BY 'ale';
         Query OK, 0 rows affected (0.009 sec)
 
 **Crearemos una base de datos y daremos a nuestro usuario remoto privilegios sobre ella**
@@ -460,37 +456,41 @@ ubuntu@sancho:~$ sudo apt install mariadb-server
         MariaDB [(none)]> CREATE DATABASE prueba;
         Query OK, 1 row affected (0.010 sec)
 
-        MariaDB [(none)]> GRANT ALL PRIVILEGES ON *.* TO 'ale'@'10.0.2.5'
+        MariaDB [(none)]> GRANT ALL PRIVILEGES ON *.* TO 'ale'@'172.16.0.200'
             -> ;
         Query OK, 0 rows affected (0.001 sec)
 
 **Ahora vayamos a centos, y lo primero que haremos será instalar el cliente de mariadb**
 
-        [centos@quijote ~]$ sudo dnf install mariadb
+        [usuario@hera ~]$ sudo dnf install mariadb
 
 **Y procedemos a acceder al servidor mariadb con las credenciales que usamos anteriormente**
 
-        [root@quijote ~]# mysql -u ale -p -h bd.alexgv.gonzalonazareno.org
-        Enter password: 
-        Welcome to the MariaDB monitor.  Commands end with ; or \g.
-        Your MariaDB connection id is 37
-        Server version: 10.3.29-MariaDB-0ubuntu0.20.04.1 Ubuntu 20.04
-        
-        Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
-        
-        Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
-        
-        MariaDB [(none)]>
+~~~
+[usuario@hera ~]# mysql -u ale -p -h bd.alexgv.gonzalonazareno.org
+Enter password: 
+Welcome to the MariaDB monitor.  Commands end with ; or \g.
+Your MariaDB connection id is 37
+Server version: 10.3.29-MariaDB-0ubuntu0.20.04.1 Ubuntu 20.04
+
+Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+MariaDB [(none)]>
+~~~
 
 **Vamos a comprobar que funciona simplemente listando las bases de datos que tenemos**
 
-        MariaDB [(none)]> SHOW DATABASES;
-        +--------------------+
-        | Database           |
-        +--------------------+
-        | information_schema |
-        | mysql              |
-        | performance_schema |
-        | prueba             |
-        +--------------------+
-        4 rows in set (0.034 sec)
+~~~
+MariaDB [(none)]> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| prueba             |
++--------------------+
+4 rows in set (0.034 sec)
+~~~
