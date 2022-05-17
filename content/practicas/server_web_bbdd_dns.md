@@ -383,10 +383,9 @@ success
 [usuario@hera ~]$ sudo mkdir /etc/httpd/sites-enabled /etc/httpd/sites-available
 ~~~
 
-* Ahora entraremos al fichero de configuración "/etc/httpd/conf/httpd.conf" para añadir sites-avaiable como nueva ruta comentando la última línea y añadiendo otra
+* Ahora entraremos al fichero de configuración "/etc/httpd/conf/httpd.conf" para añadir sites-avaiable como nueva ruta añadiendo una nueva linea.
 
 ~~~
-#IncludeOptional conf.d/*.conf
 IncludeOptional	sites-enabled/*.conf
 ~~~
 
@@ -456,7 +455,7 @@ usuario@ares:~$ sudo apt install mariadb-server
         MariaDB [(none)]> CREATE DATABASE prueba;
         Query OK, 1 row affected (0.010 sec)
 
-        MariaDB [(none)]> GRANT ALL PRIVILEGES ON *.* TO 'ale'@'172.16.0.200'
+        MariaDB [(none)]> GRANT ALL PRIVILEGES ON prueba.* TO 'ale'@'172.16.0.200'
             -> ;
         Query OK, 0 rows affected (0.001 sec)
 
@@ -467,11 +466,11 @@ usuario@ares:~$ sudo apt install mariadb-server
 **Y procedemos a acceder al servidor mariadb con las credenciales que usamos anteriormente**
 
 ~~~
-[usuario@hera ~]# mysql -u ale -p -h bd.alexgv.gonzalonazareno.org
+[usuario@hera ~]$ mysql -u ale -p -h bd.alexgv.gonzalonazareno.org
 Enter password: 
 Welcome to the MariaDB monitor.  Commands end with ; or \g.
-Your MariaDB connection id is 37
-Server version: 10.3.29-MariaDB-0ubuntu0.20.04.1 Ubuntu 20.04
+Your MariaDB connection id is 43
+Server version: 10.3.34-MariaDB-0ubuntu0.20.04.1 Ubuntu 20.04
 
 Copyright (c) 2000, 2018, Oracle, MariaDB Corporation Ab and others.
 
@@ -488,9 +487,7 @@ MariaDB [(none)]> SHOW DATABASES;
 | Database           |
 +--------------------+
 | information_schema |
-| mysql              |
-| performance_schema |
 | prueba             |
 +--------------------+
-4 rows in set (0.034 sec)
+2 rows in set (0.006 sec)
 ~~~
