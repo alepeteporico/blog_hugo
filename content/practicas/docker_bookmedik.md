@@ -35,4 +35,4 @@ c0a74ef3523e   mariadb                  "docker-entrypoint.s…"   35 seconds ag
 c6e1d60dcec4   alejandro/bookmedik:v1   "script.sh"              35 seconds ago   Up 20 seconds   0.0.0.0:8081->80/tcp   bookmedik
 ~~~
 
-* 
+*   

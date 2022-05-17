@@ -1,10 +1,10 @@
 +++
-title = "Instalación de aplicación web python"
+title = "Instalación de un CMS python"
 description = ""
 tags = [
     "IWEB"
 ]
-date = "2021-06-02"
+date = "2022-06-02"
 menu = "main"
 +++
 
@@ -85,81 +85,96 @@ menu = "main"
 
         (despliegue) alejandrogv@AlejandroGV:~/proyecto/cms$ python3 manage.py dumpdata > backup.json
 
-* Nos dirigimos a freston, donde añadiremos un registro nuevo en el DNS para nuestro nuevo sitio.
+* Nos dirigimos a apolo, donde añadiremos un registro nuevo en el DNS para nuestro nuevo sitio.
 
 #### interna
 
-        dulcinea        IN      A       10.0.1.8
-        sancho  IN      A       10.0.1.6
-        quijote IN      A       10.0.2.5
-        freston IN      A       10.0.1.9
-        www     IN      CNAME   quijote
-        bd      IN      CNAME   sancho
-        python  IN      CNAME   quijote
+~~~
+zeus    IN      A       10.0.1.1
+ares    IN      A       10.0.1.101
+apolo   IN      A       10.0.1.102
+hera    IN      A       172.16.0.200
+www     IN      CNAME   hera
+bd      IN      CNAME   ares
+python  IN      CNAME   hera
+~~~
 
 #### externa
 
-        dulcinea        IN      A       172.22.200.87
-        www     IN      CNAME   dulcinea
-        python  IN      CNAME   dulcinea
+~~~
+zeus    IN      A       172.22.0.169
+www     IN      CNAME   zeus
+bd      IN      CNAME   zeus
+python  IN      CNAME   zeus
+~~~
 
 #### dmz
 
-        dulcinea        IN      A       10.0.2.10
-        sancho  IN      A       10.0.1.6
-        quijote IN      A       10.0.2.5
-        freston IN      A       10.0.1.9
-        www     IN      CNAME   quijote
-        bd      IN      CNAME   sancho
-        python  IN      CNAME   quijote
+~~~
+zeus    IN      A       172.16.0.1
+ares    IN      A       10.0.1.101
+apolo   IN      A       10.0.1.102
+hera    IN      A       172.16.0.200
+www     IN      CNAME   hera
+bd      IN      CNAME   ares
+python  IN      CNAME   hera
+~~~
 
 * Ahora en sancho vamos a crear una base de datos y un usuario remoto que la administrará.
 
         MariaDB [(none)]> CREATE DATABASE mezzanine;
         Query OK, 1 row affected (0.023 sec)
 
-        MariaDB [(none)]> GRANT USAGE ON *.* TO 'ale'@'10.0.2.5' IDENTIFIED BY 'ale';
+        MariaDB [(none)]> GRANT USAGE ON *.* TO 'ale'@'172.16.0.200' IDENTIFIED BY 'ale';
         Query OK, 0 rows affected (0.041 sec)
 
-        MariaDB [(none)]> GRANT ALL PRIVILEGES ON mezzanine.* to 'ale'@'10.0.2.5';
+        MariaDB [(none)]> GRANT ALL PRIVILEGES ON mezzanine.* to 'ale'@'172.16.0.200';
         Query OK, 0 rows affected (0.009 sec)
 
-* Vamos a instalar las dependencias necesarias en quijote.
+* Vamos a instalar las dependencias necesarias en apolo.
 
-        [centos@quijote ~]$ sudo dnf install virtualenv git python3-mod_wsgi gcc python3-devel mysql-devel
+~~~
+[usuario@hera ~]$ sudo dnf install virtualenv git python3-mod_wsgi gcc python3-devel mysql-devel
+~~~
 
 * Como hicimos anteriormente crearemos el entorno donde instalaremos las dependencias de la aplicación.
 
-        [centos@quijote virtualenv]$ python3 -m venv despliegue
-        [centos@quijote virtualenv]$ source despliegue/bin/activate
+~~~
+[usuario@hera ~]$ python3 -m venv despliegue
+[usuario@hera ~]$ source despliegue/bin/activate
+~~~
 
-* Una vez tengamos nuestra carpeta `cms` con todo el contenido incluido el backup en quijote instalamos las dependencias usando el fichero requirements.txt y algunos paquetes mas necesarios
+* Una vez tengamos nuestra carpeta `cms` con todo el contenido incluido el backup en apolo instalamos las dependencias usando el fichero requirements.txt y algunos paquetes mas necesarios
 
-        (despliegue) [centos@quijote cms]$ pip install -r requirements.txt
-        (despliegue) [centos@quijote cms]$ pip install mysql-connector-python uwsgi mysqlclient
+~~~
+(despliegue) [usuario@hera mezzanine]$ pip install -r requirements.txt
+(despliegue) [usuario@hera mezzanine]$ pip install mysql-connector-python uwsgi mysqlclient
+~~~
 
 * Cambiaremos el fichero settings.py para que use la base de datos de mysql.
 
-        DATABASES = {
-            "default": {
-                # Add "postgresql_psycopg2", "mysql", "sqlite3" or "oracle".
-                "ENGINE": "django.db.backends.mysql",
-                # DB name or path to database file if using sqlite3.
-                "NAME": "mezzanine",
-                # Not used with sqlite3.
-                "USER": "quijote",
-                # Not used with sqlite3.
-                "PASSWORD": "alegv",
-                # Set to empty string for localhost. Not used with sqlite3.
-                "HOST": "bd.alegv.gonzalonazareno.org",
-                # Set to empty string for default. Not used with sqlite3.
-                "PORT": "",
-            }
-        }
+~~~
+DATABASES = {
+    "default": {
+        # Add "postgresql_psycopg2", "mysql", "sqlite3" or "oracle".
+        "ENGINE": "django.db.backends.mysql",
+        # DB name or path to database file if using sqlite3.
+        "NAME": "mezzanine",
+        # Not used with sqlite3.
+        "USER": "ale",
+        # Not used with sqlite3.
+        "PASSWORD": "ale",
+        # Set to empty string for localhost. Not used with sqlite3.
+        "HOST": "bd.alexgv.gonzalonazareno.org",
+        # Set to empty string for default. Not used with sqlite3.
+        "PORT": "",
+    }
+}
+~~~
 
 * Migramos para que use la nueva base de datos.
 
-        (despliegue) [centos@quijote cms]$ python3 manage.py migrate
+        (despliegue) [centos@apolo cms]$ python3 manage.py migrate
         Operations to perform:
           Apply all migrations: admin, auth, blog, conf, contenttypes, core, django_comments, forms, galleries, generic, pages, redirects, sessions, sites, twitter
         Running migrations:
@@ -207,12 +222,12 @@ menu = "main"
 
 * Ahora vamos a importar los datos de la base de datos que teniamos en el entorno de desarrollo.
 
-        (despliegue) [centos@quijote cms]$ python3 manage.py loaddata backup.json
+        (despliegue) [centos@apolo cms]$ python3 manage.py loaddata backup.json
         Installed 128 object(s) from 1 fixture(s)
 
 * Ahora vamos a generar el contenido estático
 
-        (despliegue) [centos@quijote cms]$ python manage.py collectstatic
+        (despliegue) [centos@apolo cms]$ python manage.py collectstatic
 
 * Ahora moveremos la carpeta con todo el contenido a /var/www/ allí crearemos una carpeta de log dentro de la misma y un archivo llamado `uwsgi.ini` que hará que nuestra aplicación escuche por el puerto 8080.
 
@@ -246,17 +261,17 @@ menu = "main"
 
 * creamos el enlace simbólico y reiniciamos el servicio.
 
-        (despliegue) [root@quijote ~]# ln -s /etc/httpd/sites-available/mezzanine.conf /etc/httpd/sites-enabled/
-        (despliegue) [root@quijote ~]# systemctl restart httpd
+        (despliegue) [root@apolo ~]# ln -s /etc/httpd/sites-available/mezzanine.conf /etc/httpd/sites-enabled/
+        (despliegue) [root@apolo ~]# systemctl restart httpd
 
 * Vamos a ejecutarlo.
 
-        (despliegue) [root@quijote mezzanine]# uwsgi --ini uwsgi.ini
+        (despliegue) [root@apolo mezzanine]# uwsgi --ini uwsgi.ini
         [uWSGI] getting INI configuration from uwsgi.ini
         *** Starting uWSGI 2.0.19.1 (64bit) on [Wed Jun 16 09:33:45 2021] ***
         compiled with version: 8.3.1 20191121 (Red Hat 8.3.1-5) on 15 June 2021 14:37:47
         os: Linux-4.18.0-240.22.1.el8_3.x86_64 #1 SMP Thu Apr 8 19:01:30 UTC 2021
-        nodename: quijote.alegv.gonzalonazareno.org
+        nodename: apolo.alegv.gonzalonazareno.org
         machine: x86_64
         clock source: unix
         detected number of CPU cores: 1
