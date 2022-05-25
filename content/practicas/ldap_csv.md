@@ -10,6 +10,6 @@ menu = "main"
 
 * Crear entre todos los alumnos de la clase que vayan a hacer esta tarea un fichero CSV que incluya información personal de cada uno incluyendo los siguientes datos:
 
-*  Nombre
+  *  Nombre
 
-*  Apellidos
+  *  Apellidos
