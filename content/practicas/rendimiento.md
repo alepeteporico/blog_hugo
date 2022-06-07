@@ -229,7 +229,7 @@ Requests per second:    75.60 [#/sec] (mean)
 * Ahora vamos a apagar uno de los nodos usando `hatop`, paquete que debemos instalar.
 
 ~~~
-
+hatop -s /run/haproxy/admin.sock
 ~~~
 
 * Usando este comando nos aparecerá esta pantalla, si nos situamos encima de uno de los nodos y pulsamos `F10` se desactivará.
