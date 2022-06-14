@@ -754,4 +754,26 @@ Requesting to mount FileChgr1 ...
 3906 File device ""FileStorage" (/mnt/copias/)" is always mounted.
 ~~~
 
-* Como acabamos de crearlo no tiene ninguna copia ni nada, daremos un tiempo a que se realizen algunos trabajos y podremos comprobar que se han realizado algunas copias.
+* Como acabamos de crearlo no tiene ninguna copia ni nada, daremos un tiempo a que se realizen algunos trabajos y podremos comprobar que se han realizado algunas copias. para hacerlo usamos el comando en baculas:
+
+~~~
+listjobs
+~~~
+
+* Para restaurar una copia de seguirdad usariamos:
+
+~~~
+restore client=ares-fd all
+~~~
+
+* Nos aparecerá una serie de opciones, la que es más normal que usemos probablemente sea la de restaurar la última copia que se haya hecho.
+
+~~~
+5: Select the most recent backup for a client
+~~~
+
+* Una vez se haya restaurado la máquina en cuestión debemos usar el siguiente comando para que se instalen todos los paquetes que tenemos en el directorio `var`.
+
+~~~
+apt reinstall ~i
+~~~
