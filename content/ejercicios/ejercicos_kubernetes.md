@@ -135,7 +135,7 @@ Forwarding from 127.0.0.1:8282 -> 80
 Forwarding from [::1]:8282 -> 80
 ~~~
 
-[conexión](/ejercicios_kubernetes/1.png)
+![conexión](/ejercicios_kubernetes/1.png)
 
 * Muestra los logs del Pod y comprueba que se visualizan los logs de los accesos que hemos realizado en el punto anterior.
 
@@ -338,7 +338,7 @@ Forwarding from 127.0.0.1:8383 -> 80
 Forwarding from [::1]:8383 -> 80
 ~~~
 
-[conexión](/ejercicios_kubernetes/2.png)
+![conexión](/ejercicios_kubernetes/2.png)
 
 * Ver los logs del despliegue.
 
@@ -357,11 +357,11 @@ AH00558: httpd: Could not reliably determine the server's fully qualified domain
 
 * Pantallazo de la primera version de la aplicación.
 
-[conexión](/ejercicios_kubernetes/3.png)
+![conexión](/ejercicios_kubernetes/3.png)
 
 * Pantallazo de la segunda versión de la aplicación.
 
-[conexión](/ejercicios_kubernetes/4.png)
+![conexión](/ejercicios_kubernetes/4.png)
 
 * Visualizar el historial de actualización del despligue después de actualizar a la versión 2.
 
@@ -375,7 +375,7 @@ REVISION  CHANGE-CAUSE
 
 * Pantallazo de la tercera versión de la aplicación.
 
-[conexión](/ejercicios_kubernetes/5.png)
+![conexión](/ejercicios_kubernetes/5.png)
 
 * Historial despúes de hacer un rollback.
 
@@ -390,7 +390,7 @@ REVISION  CHANGE-CAUSE
 
 * Accediendo a la aplicación después de hacer el rollout.
 
-[conexión](/ejercicios_kubernetes/6.png)
+![conexión](/ejercicios_kubernetes/6.png)
 
 ### Ejercicio 6
 
@@ -418,21 +418,21 @@ replicaset.apps/redis-5d96fc576        1         1         0       4s
 
 * Acceso desde un navegador web a la aplicación usando el port-forward, y se vea el mensaje de error al no poder acceder a la base de datos.
 
-[conexión](/ejercicios_kubernetes/7.png)
+![conexión](/ejercicios_kubernetes/7.png)
 
 ### Ejercicio 7
 
 * Pantallazo donde se vea el acceso desde un navegador web a la aplicación cuando sólo tenemos el servicio para acceder a la aplicación.
 
-[conexión](/ejercicios_kubernetes/8.png)
+![conexión](/ejercicios_kubernetes/8.png)
 
 * Pantallazo donde se vea el acceso desde un navegador web a la aplicación usando la ip del nodo master y el puerto asignado al Service.
 
-[conexión](/ejercicios_kubernetes/9.png)
+![conexión](/ejercicios_kubernetes/9.png)
 
 * Pantallazo donde se vea el acceso desde un navegador web a la aplicación usando el nombre que hemos configurado en el recurso Ingress.
 
-[conexión](/ejercicios_kubernetes/11.png)
+![conexión](/ejercicios_kubernetes/11.png)
 
 ### Ejercicio 8
 
@@ -515,7 +515,7 @@ spec:
 
 * Pantallazo de acceso a la aplicación.
 
-[conexión](/ejercicios_kubernetes/12.png)
+![conexión](/ejercicios_kubernetes/12.png)
 
 ### Ejercicio 9
 
@@ -581,7 +581,7 @@ spec:
 
 * Pantallazo donde se vea el acceso a `info.php`
 
-[conexión](/ejercicios_kubernetes/13.png)
+![conexión](/ejercicios_kubernetes/13.png)
 
 * Pantallazo donde se vea que se ha eliminado y se ha vuelto a crear el despliegue y se sigue sirviendo el fichero `info.php`
 
@@ -605,7 +605,7 @@ NAME                                     DESIRED   CURRENT   READY   AGE
 replicaset.apps/servidorweb-745bc67f58   1         1         0       5s
 ~~~
 
-[conexión](/ejercicios_kubernetes/13.png)
+![conexión](/ejercicios_kubernetes/13.png)
 
 ### Ejercicio 10
 
@@ -676,7 +676,7 @@ spec:
 
 * Acceso a la aplicación con los mensajes escritos.
 
-[conexión](/ejercicios_kubernetes/14.png)
+![conexión](/ejercicios_kubernetes/14.png)
 
 * Pantallazo donde se vea que se ha eliminado y se ha vuelto a crear el despliegue de redis y que se sigue sirviendo la aplicación con los mensajes.
 
@@ -688,7 +688,7 @@ alejandrogv@AlejandroGV:~/kubernetes/ejercicios/10$ kubectl apply -f redis.yaml
 deployment.apps/redis created
 ~~~
 
-[conexión](/ejercicios_kubernetes/14.png)
+![conexión](/ejercicios_kubernetes/14.png)
 
 ### Ejercicio 11
 
@@ -764,4 +764,4 @@ statefulset.apps/serverweb-mariadb   1/1     6m35s
 
 * Pantallazo donde se vea el acceso al blog y se vea tu nombre como título del blog.
 
-[conexión](/ejercicios_kubernetes/15.png)
+![conexión](/ejercicios_kubernetes/15.png)

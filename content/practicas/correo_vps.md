@@ -255,6 +255,8 @@ non_smtpd_milters = $smtpd_milters
 
 ## Para luchar contra el SPAM
 
+### Tarea 6
+
 * Vamos a instalar una herramienta llamada `spamassasin` para filtrar el spam que llega a nuestro servidor
 
 ~~~
