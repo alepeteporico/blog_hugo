@@ -249,6 +249,10 @@ non_smtpd_milters = $smtpd_milters
 
 ![prueba](/correo/17.png)
 
+* Comprobemoslo enviando un correo y viendo su información.
+
+![prueba](/correo/8.png)
+
 ## Para luchar contra el SPAM
 
 * Vamos a instalar una herramienta llamada `spamassasin` para filtrar el spam que llega a nuestro servidor
