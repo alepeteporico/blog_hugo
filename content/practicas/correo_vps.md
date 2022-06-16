@@ -255,6 +255,24 @@ non_smtpd_milters = $smtpd_milters
 
 ## Para luchar contra el SPAM
 
+### Tarea 5
+
+* Debemos configurar postfix para que tenga en cuenta el registro SPF de los correos que recibe, para ello primero añadimos las siguientes líneas al fichero `/etc/postfix/master.cf`
+
+~~~
+policyd-spf  unix  -    n       n       -       0       spawn
+  user=policyd-spf argv=/usr/bin/policyd-spf
+~~~
+
+* Y en `main.cf`.
+
+~~~
+policyd-spf_time_limit = 3600
+smtpd_recipient_restrictions = check_policy_service unix:private/policyd-spf
+~~~
+
+* 
+
 ### Tarea 6
 
 * Vamos a instalar una herramienta llamada `spamassasin` para filtrar el spam que llega a nuestro servidor

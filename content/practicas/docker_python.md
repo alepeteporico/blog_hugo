@@ -68,15 +68,16 @@ CSRF_TRUSTED_ORIGINS = ['http://*.alejandrogv.site','http://*.127.0.0.1','https:
 FROM python:3
 WORKDIR /usr/src/app
 MAINTAINER Alejandro Gutierrez Valencia "tojandro@gmail.com"
-RUN pip install django mysqlclient && git clone https://github.com/alepeteporico/django_tutorial.git /usr/src/app && mkdir static
+RUN pip install django mysqlclient && mkdir static
 ENV ALLOWED_HOSTS=*
 ENV HOST=mariadb
 ENV USER=django
 ENV PASSW=django
-ENV BD=django
+ENV DB=django
 ENV DJANGO_SUPERUSER_PASSWORD=admin
 ENV DJANGO_SUPERUSER_USERNAME=admin
 ENV DJANGO_SUPERUSER_EMAIL=admin@example.org
+ADD django_tutorial/ /usr/src/app
 ADD django.sh /usr/src/app/
 RUN chmod +x /usr/src/app/django.sh
 CMD ["/usr/src/app/django.sh"]
@@ -87,9 +88,10 @@ CMD ["/usr/src/app/django.sh"]
 ~~~
 ! /bin/sh
 
+sleep 30
 python3 manage.py makemigrations
 python3 manage.py migrate
-python3 manage.py createsuperuser --noinput
+python3 manage.py createsuperuser --noinput --username DJANGO_SUPERUSER_USERNAME
 python3 manage.py collectstatic --no-input
 python3 manage.py runserver 0.0.0.0:8006
 ~~~
@@ -153,3 +155,101 @@ Removing intermediate container 577dee5aa02c
 Successfully built c471330cec62
 Successfully tagged alejandrogv/django:latest
 ~~~
+
+* Creamos el docker-compose.
+
+~~~
+version: '3.1'
+services:
+  django-tutorial:
+    container_name: django_tutorial
+    image: alejandrogv/django
+    restart: always
+    environment:
+      ALLOWED_HOSTS: "*"
+      HOST: bd_mariadb_django
+      USER: django
+      PASSW: django
+      BD: django
+      DJANGO_SUPERUSER_PASSWORD: admin
+      DJANGO_SUPERUSER_USERNAME: admin
+      DJANGO_SUPERUSER_EMAIL: admin@example.org
+    ports:
+      - 8096:8006
+    depends_on:
+      - db_django
+  db_django:
+    container_name: bd_mariadb_django
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: django
+      MARIADB_USER: django
+      MARIADB_PASSWORD: django
+    volumes:
+      - mariadb_data_django:/var/lib/mysql
+volumes:
+    mariadb_data_django:
+~~~
+
+* Iniciamos los contenedores.
+
+~~~
+alejandrogv@AlejandroGV:~/Escritorio/ASIR/IWEB/docker_python$ docker-compose up -d
+~~~
+
+* Comprobamos que podemos acceder a la aplicación y a la zona de administración.
+
+![admin](/docker_python/1.png)
+
+![admin](/docker_python/2.png)
+
+* Una vez funcionando en nuestro entorno de desarrollo nos dirigimos a producción donde clonaremos este repositorio, crearemos un nuevo registro cname y crearemos un certificado para nuestro nuevo sitio.
+
+~~~
+debian@mrrobot:~/docker_python$ sudo certbot certonly --standalone -d djangotutorial.alejandrogv.site
+~~~
+
+* Creamos la imagen y los contenedores.
+
+~~~
+debian@mrrobot:~/docker_python$ docker build -t alejandrogv/django .
+
+debian@mrrobot:~/docker_python$ docker-compose up -d
+~~~
+
+* Ahora crearemos nuestro virtualhost en nginx que actuara de proxy inverso
+
+~~~
+server {
+        listen 80;
+        listen [::]:80;
+
+        server_name djangotutorial.alejandrogv.site;
+
+        return 301 https://$host$request_uri;
+}
+
+server {
+        listen 443 ssl http2;
+        listen [::]:443 ssl http2;
+
+        ssl    on;
+        ssl_certificate /etc/letsencrypt/live/djangotutorial.alejandrogv.site/fullchain.pem;
+        ssl_certificate_key     /etc/letsencrypt/live/djangotutorial.alejandrogv.site/privkey.pem;
+
+        index index.html index.php index.htm index.nginx-debian.html;
+
+        server_name djangotutorial.alejandrogv.site;
+
+        location / {
+                proxy_pass http://localhost:8096;
+                include proxy_params;
+        }
+}
+~~~
+
+* Comprobamos que podemos acceder.
+
+![admin](/docker_python/3.png)
