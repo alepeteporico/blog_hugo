@@ -445,4 +445,8 @@ service lmtp {
 
 ![autentificacion](/correo/16.png)
 
-### 
+### Tarea 13
+
+* Comprobació de la seguiridad de nuestro servidor.
+
+![seguirdad](/correo/18.png)
