@@ -1,10 +1,10 @@
 +++
-title = "Interconexión de servidores de bases de datos 2023"
+title = "Interconexion 2023"
 description = ""
 tags = [
-    "ABD"
+    "GBD"
 ]
-date = "2022-11-20"
+date = "2022-11-15"
 menu = "main"
 +++
 
