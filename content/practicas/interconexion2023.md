@@ -12,7 +12,7 @@ menu = "main"
 
 * Debemos configurar el fichero tnsnames.ora y añadir la segunda base de datos que está en otra máquina, para ello añadiremos el siguiete contenido al fichero.
 
-~~~
+```
 ORACLE2 =
   (DESCRIPTION =
     (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.121.41)(PORT = 1521))
@@ -21,7 +21,7 @@ ORACLE2 =
       (SERVICE_NAME = ORCLCDB)
     )
   )
-~~~
+```
 
 * Comprobamos que tenemos conexión a la segunda base de datos.
 
