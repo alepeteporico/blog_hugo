@@ -1,5 +1,5 @@
 +++
-title = "Interconexion 2023"
+title = "practica grupal plsql"
 description = ""
 tags = [
     "GBD"
@@ -112,3 +112,44 @@ WHERE Fecha=(
     )
 )
 AND abonado!=0;
+
+
+
+~~~
+CREATE OR REPLACE PROCEDURE PrecioDeRegimen (v_codregimen Tarfias.CodigoRegimen%type, v_añadido OUT NUMBER)
+IS
+    v_PrecioBaseAD    NUMBER(6,2);
+    v_PrecioBaseMP    NUMBER(6,2);
+    v_PrecioBasePC    NUMBER(6,2);
+    v_PrecioBaseTI    NUMBER(6,2);
+
+BEGIN
+    v_PrecioBaseAD:=30;
+    v_PrecioBaseMP:=45;
+    v_PrecioBasePC:=65;
+    v_PrecioBaseTI:=80;
+
+    IF v_codregimen='AD'
+    THEN
+        v_añadido:=v_PrecioBaseAD;
+    ELSE IF v_codregimen='MP'
+    THEN
+        v_añadido:=v_PrecioBaseMP;
+    ELSE IF v_codregimen='PC'
+    THEN
+        v_añadido:=v_PrecioBasePC;
+    ELSE IF v_codregimen='TI'
+    THEN
+        v_añadido:=v_PrecioBaseTI;
+    END IF;
+END;
+/
+~~~
+
+~~~
+CREATE OR REPLACE TRIGGER PrecioDeHabitacion
+DECLARE
+
+BEGIN
+    
+~~~
