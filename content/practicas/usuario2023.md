@@ -105,19 +105,25 @@ db.grantRolesToUser('prueba1',
 
 2. Averigua si en MongoDB existe el concepto de privilegio del sistema y muestra las diferencias más importantes con ORACLE.
 
-* Se podría decir que si podemos asignar roles de sistema a nuestro usuarios en mongodb, si creamos un usuario le podemos asignar distintos roles como hicimos anteriormente pero de sistema, veremos algunos ejemplos a continuación.
+* Se podría decir que si podemos asignar privilegios de sistema a nuestro usuarios en mongodb, si creamos un usuario le podemos asignar distintos roles como hicimos anteriormente para dar permisos de escritura o lectura sobre una colección, pero esta vez son roles de sistema, veremos ejemplos en el siguiente apartado que trata sobre este asunto.
 
-+ Vamos a ver tres roles que tienen que ver con la administración de la base de datos:
+
+* **Diferencias con oracle:**
+  * Aunque tambien podemos dar solo roles especificos usando la funcion "grantRole", tenemos tres roles que agrupan una gran cantidad de ellos en funcion de para que necesitemos el usuario. Mientras que en oracle debemos asignar roles concretos como la creación de usuarios (GRANT CREATE USER) o la inserción de datos (GRANT INSERT), podemos asignarlos a la vez, sin embargo, no tenemos un rol que agrupe varios de ellos como si tenemos en mongo. Como ya hemos dicho, en el siguiente apartado se especificarán estos roles generales, para que sirven y que roles más pequeños los componen.
+
+3. Explica los roles por defecto que incorpora MongoDB y como se asignan a los usuarios.
+
++ Vamos a ver tres roles que tienen que ver con la administración de la base de datos y como asignarselos a un usuario que creemos, aunque también se especificará que usar para añadir estos roles a usuarios ya creados:
   
-  + **dbAdmin** Permite gestionar datos pero no usuarios.
++ **dbAdmin** Permite gestionar datos pero no usuarios.
 
 ~~~
 db.createUser({user: "administrador1", pwd: "administrador1", roles: [{role: "dbAdmin", db: "admin"}]})
 ~~~
 
 ~~~
-> db.premios.remove({"id": "976"});
-WriteResult({ "nRemoved" : 1 })
+> db.premios.listIndexes
+nobel.premios.listIndexes
 
 > db.createUser({user: "administrador2", pwd: "administrador2", roles: [{role: "userAdmin", db: "admin"}]})
 uncaught exception: Error: couldn't add user: not authorized on admin to execute command { createUser: "administrador2", pwd: "xxx", roles: [ { role: "userAdmin", db: "admin" } ], digestPassword: true, writeConcern: { w: "majority", wtimeout: 600000.0 }, lsid: { id: UUID("61ff1096-b904-479a-885d-2b33395a3326") }, $db: "admin" } :
@@ -126,10 +132,61 @@ DB.prototype.createUser@src/mongo/shell/db.js:1367:11
 @(shell):1:1
 ~~~
 
-  + Tenemos el caso completamente opuesto, un rol que puede gestionar usuarios pero no datos.
+* Las funciones que puede usar son:
+  *  collStats 
+  *  dbHash 
+  *  dbStats 
+  *  killCursors 
+  *  listIndexes 
+  *  listCollections 
+  *  bypassDocumentValidation 
+  *  collMod 
+  *  compact 
+  *  convertToCapped
 
 
++ **userAdmin** Tenemos el caso completamente opuesto, un rol que puede gestionar usuarios pero no datos.
 
-  + geg
+~~~
+db.createUser({user: "administrador2", pwd: "administrador2", roles: [{role: "userAdmin", db: "admin"}]})
+~~~
 
+~~~
+db.createUser({user: "administrador3", pwd: "administrador3", roles: [{role: "read", db: "nobel"}]})
+Successfully added user: {
+	"user" : "administrador3",
+	"roles" : [
+		{
+			"role" : "read",
+			"db" : "nobel"
+		}
+	]
+}
 
+> db.grantRolesToUser("administrador1", [ "readWrite", {role: "read", db: "nobel"} ])
+~~~
+
+* Las funciones que puede usar son:
+  *  changeCustomData 
+  *  changePassword 
+  *  createRole 
+  *  createUser 
+  *  dropRole 
+  *  dropUser 
+  *  grantRole 
+  *  revokeRole 
+  *  setAuthenticationRestriction 
+  *  viewRole 
+  *  viewUser
+
++ **dbOwner** Puede realizar cualquier función de administración en la base de datos, por lo tanto es a la vez **userAdmin** como **dbAdmin**.
+
+* *Podemos usar tambien "dbAdminAnyDatabase" o "userAdminAnyDatabase" para que puedan realizar las acciones sobre cualquier base de datos, o como hemos hecho decir que su base de datos es "admin"*
+
+* Hemos visto como añadirlos a usuarios que creamos nuevos, sin embargo tambiént tenemos la opción de añadir roles especificos a usuarios ya creados tambien podemos dar solo roles especificos usando la funcion "grantRole" como hemos podido ver en el ejemplo de funcionamiento del rol **userAdmin** que dejaré aquí nuevamente.
+
+~~~
+> db.grantRolesToUser("administrador1", [ "readWrite", {role: "read", db: "nobel"} ])
+~~~
+
+4. 
