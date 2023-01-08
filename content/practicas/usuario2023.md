@@ -189,4 +189,177 @@ Successfully added user: {
 > db.grantRolesToUser("administrador1", [ "readWrite", {role: "read", db: "nobel"} ])
 ~~~
 
-4. 
+* También podemos crear nuevos roles, vamos a ver un ejemplo que he encontrado en la página oficial de mongo de un rol que permite eliminar cualquier colección de cualquier base de datos que especifiquemos. Y nuevamente, podríamos asignar este rol a cualquier usuario que queramos.
+
+~~~
+db.createRole(
+   {
+     role: "dropSystemViewsAnyDatabase", 
+     privileges: [
+       {
+         actions: [ "dropCollection" ],
+         resource: { db: "", collection: "system.views" }
+       }
+     ],
+     roles: []
+   }
+)
+~~~
+
+4. Explica como puede consultarse el diccionario de datos de MongoDB para saber que roles han sido concedidos a un usuario y qué privilegios incluyen.
+
+* Ver los roles de un usuario es una tarea bastante sencilla, solo debemos usar la funcion "getUser"
+
+~~~
+> db.getUser("administrador1")
+{
+	"_id" : "admin.administrador1",
+	"userId" : UUID("2ec38b76-6ddf-457c-bab2-c4bb8ba34452"),
+	"user" : "administrador1",
+	"db" : "admin",
+	"roles" : [
+		{
+			"role" : "read",
+			"db" : "nobel"
+		},
+		{
+			"role" : "readWrite",
+			"db" : "admin"
+		},
+		{
+			"role" : "dbAdmin",
+			"db" : "admin"
+		}
+	],
+	"mechanisms" : [
+		"SCRAM-SHA-1",
+		"SCRAM-SHA-256"
+	]
+}
+~~~
+
+* Una vez tenemos todos los roles de este usuario podemos visualizar los privilegios que incluyen ese rol, en este caso con la función "getRoles" y dentro de esta función especificando que nos muestro los privilegios como veremos a continuación.
+
+~~~
+> db.getRole ( "dbAdmin", { showPrivileges: true } )
+{
+	"db" : "test",
+	"role" : "dbAdmin",
+	"roles" : [ ],
+	"privileges" : [
+		{
+			"resource" : {
+				"db" : "test",
+				"collection" : ""
+			},
+			"actions" : [
+				"bypassDocumentValidation",
+				"collMod",
+				"collStats",
+				"compact",
+				"convertToCapped",
+				"createCollection",
+				"createIndex",
+				"dbStats",
+				"dropCollection",
+				"dropDatabase",
+				"dropIndex",
+				"enableProfiler",
+				"listCollections",
+				"listIndexes",
+				"planCacheIndexFilter",
+				"planCacheRead",
+				"planCacheWrite",
+				"reIndex",
+				"renameCollectionSameDB",
+				"storageDetails",
+				"validate"
+			]
+		},
+		{
+			"resource" : {
+				"db" : "test",
+				"collection" : "system.profile"
+			},
+			"actions" : [
+				"changeStream",
+				"collStats",
+				"convertToCapped",
+				"createCollection",
+				"dbHash",
+				"dbStats",
+				"dropCollection",
+				"find",
+				"killCursors",
+				"listCollections",
+				"listIndexes",
+				"planCacheRead"
+			]
+		}
+	],
+	"inheritedRoles" : [ ],
+	"inheritedPrivileges" : [
+		{
+			"resource" : {
+				"db" : "test",
+				"collection" : ""
+			},
+			"actions" : [
+				"bypassDocumentValidation",
+				"collMod",
+				"collStats",
+				"compact",
+				"convertToCapped",
+				"createCollection",
+				"createIndex",
+				"dbStats",
+				"dropCollection",
+				"dropDatabase",
+				"dropIndex",
+				"enableProfiler",
+				"listCollections",
+				"listIndexes",
+				"planCacheIndexFilter",
+				"planCacheRead",
+				"planCacheWrite",
+				"reIndex",
+				"renameCollectionSameDB",
+				"storageDetails",
+				"validate"
+			]
+		},
+		{
+			"resource" : {
+				"db" : "test",
+				"collection" : "system.profile"
+			},
+			"actions" : [
+				"changeStream",
+				"collStats",
+				"convertToCapped",
+				"createCollection",
+				"dbHash",
+				"dbStats",
+				"dropCollection",
+				"find",
+				"killCursors",
+				"listCollections",
+				"listIndexes",
+				"planCacheRead"
+			]
+		}
+	],
+	"isBuiltin" : true
+}
+~~~
+
+* Nos muestra esta extensa lista de los privilegios que tiene el rol "dbAdmin", esto podemos hacerlo con cualquier rol.
+
+
+### Oracle
+
+1. Realiza un procedimiento llamado MostrarObjetosAccesibles que reciba un nombre de usuario y muestre todos los objetos a los que tiene acceso.
+
+~~~
+CREATE OR REPLACE PROCEDURE
+~~~
