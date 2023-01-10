@@ -363,3 +363,240 @@ db.createRole(
 ~~~
 CREATE OR REPLACE PROCEDURE
 ~~~
+
+select *
+from SYS.dba_objects
+order by OBJECT_TYPE 
+
+
+select *
+  from dba_objects
+  where owner = 'PRACTICA';
+
+## Parte grupal
+
+### CASO PRÁCTICO 1:
+
+1. Crea un usuario llamado Becario y, sin usar los roles de ORACLE, dale los siguientes privilegios:
+   * Conectarse a la base de datos.	
+   * Modificar el número de errores en la introducción de la contraseña de cualquier usuario.	
+   * Modificar índices en cualquier esquema (este privilegio podrá pasarlo a quien quiera)	
+   * Insertar filas en scott.emp (este privilegio podrá pasarlo a quien quiera)	
+   * Crear objetos en cualquier tablespace.	
+   * Gestión completa de usuarios, privilegios y roles.
+
+**ORACLE**
+
+* Creación de usuario:
+
+~~~
+SQL> CREATE USER Becario IDENTIFIED BY Becario;
+
+User created.
+~~~
+
+* Conexión a la base de datos.
+
+~~~
+SQL> GRANT CREATE SESSION TO Becario;
+
+Grant succeeded.
+
+SQL> connect Becario/Becario
+Connected.
+~~~
+
+* Modificar el número de errores en la introducción de la contraseña de cualquier usuario.
+
+~~~
+SQL> GRANT CREATE PROFILE TO Becario;
+
+SQL> GRANT ALTER USER TO Becario;
+
+SQL> connect Becario/Becario
+Connected.
+
+SQL> CREATE PROFILE numintentos2 LIMIT
+  2  FAILED_LOGIN_ATTEMPTS 5;
+
+Profile created.
+
+SQL> ALTER USER Prueba profile numintentos;
+~~~
+
+~~~
+SQL> connect Prueba
+Enter password: 
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+SQL> connect Prueba
+Enter password: 
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+SQL> connect Prueba
+Enter password: 
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+SQL> connect Prueba
+Enter password: 
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+SQL> connect Prueba
+Enter password: 
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+SQL> connect Prueba
+Enter password: 
+ERROR:
+ORA-01017: invalid username/password; logon denied
+
+
+Warning: You are no longer connected to ORACLE.
+~~~
+
+* Modificar índices en cualquier esquema (este privilegio podrá pasarlo a quien quiera)
+
+~~~
+SQL> CREATE INDEX index_prueba on emp(ename,sal);
+
+Index created.
+
+SQL> GRANT CONTROL ON index_prueba1 TO USER Becario;
+
+SQL> connect Becario/Becario
+Connected.
+
+SQL> ALTER INDEX SCOTT.index_prueba RENAME TO index_prueba1;
+
+Index altered.
+~~~
+
+* Insertar filas en scott.emp (este privilegio podrá pasarlo a quien quiera)
+
+~~~
+SQL> GRANT INSERT ON SCOTT.EMP TO Becario WITH GRANT OPTION;
+
+SQL> connect Becario/Becario
+Connected.
+
+SQL> INSERT INTO SCOTT.EMP VALUES
+(7489, 'JUAN', 'ANALYST', 7822,
+TO_DATE('18-DEC-1999', 'DD-MON-YYYY'), 900, NULL, 20);
+
+1 row created.
+~~~
+
+* Crear objetos en cualquier tablespace.
+
+~~~
+SQL> GRANT UNLIMITED TABLESPACE TO Becario;
+
+Grant succeeded.
+
+SQL> GRANT CREATE TYPE TO Becario;
+
+SQL> create type temp_col as table of number 
+  2  /
+
+Type created.
+~~~
+
+* Gestión completa de usuarios, privilegios y roles.
+
++ Usuarios:
+
+~~~
+SQL> GRANT CREATE USER TO Becario;
+
+Grant succeeded.
+
+SQL> GRANT ALTER USER TO Becario;
+
+Grant succeeded.
+
+SQL> GRANT DROP USER TO Becario;
+
+Grant succeeded.
+~~~
+
+~~~
+SQL> connect Becario/Becario
+Connected.
+
+SQL> CREATE USER prueba2 IDENTIFIED BY prueba2;
+
+User created.
+
+SQL> ALTER USER Prueba2 profile numintentos;
+
+User altered.
+
+SQL> DROP USER Prueba2;
+
+User dropped.
+~~~
+
++ Privilegios:
+
+~~~
+SQL> GRANT GRANT ANY PRIVILEGE TO Becario;
+
+Grant succeeded.
+~~~
+
+~~~
+SQL> connect Becario/Becario
+Connected.
+
+SQL> GRANT ALTER TABLESPACE TO prueba;
+
+Grant succeeded.
+~~~
+
++ Roles:
+
+~~~
+SQL> GRANT CREATE ROLE TO BECARIO;
+
+Grant succeeded.
+
+SQL> GRANT DROP ANY ROLE TO BECARIO;
+
+Grant succeeded.
+
+SQL> GRANT ALTER ANY ROLE TO BECARIO;
+
+Grant succeeded.
+
+SQL> GRANT GRANT ANY ROLE TO BECARIO;
+
+Grant succeeded.
+~~~
+
+~~~
+SQL> connect Becario/Becario
+Connected.
+
+SQL> CREATE ROLE rol_prueba;
+
+Role created.
+
+SQL> ALTER ROLE rol_prueba NOT IDENTIFIED;
+
+Role altered.
+
+SQL> GRANT rol_prueba, CONNECT TO prueba;
+
+Grant succeeded.
+
+SQL> DROP ROLE rol_prueba;
+
+Role dropped.
+~~~
+
+**Postgres**
