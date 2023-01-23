@@ -1004,3 +1004,151 @@ ALTER USER "ORDSYS" DEFAULT TABLESPACE TS2;
 ALTER USER "RAUL" DEFAULT TABLESPACE TS2;
 ALTER USER "PRUEBA" DEFAULT TABLESPACE TS2;
 ~~~
+
+### CASO PRÁCTICO 2:
+
+3. Realiza un procedimiento que reciba dos nombres de usuario y genere un script que asigne al primero los privilegios de inserción y modificación sobre todas las tablas del segundo, así como el de ejecución de cualquier procedimiento que tenga el segundo usuario.
+
+#### ORACLE
+
+~~~
+CREATE OR REPLACE PROCEDURE HeredarPrivilegios(v_usuario1 VARCHAR2, v_usuario2 VARCHAR2)
+IS
+	CURSOR c_tablas IS
+	SELECT table_name, grantable
+	FROM ALL_TABLES
+	WHERE owner=v_usuario2;
+BEGIN
+	FOR v_tabla IN c_tablas
+	LOOP
+		IF v_tabla.gratable='YES' THEN
+			dbms_output.put_line
+~~~
+
+4. Realiza un procedimiento que genere un script que cree un rol conteniendo todos los permisos que tenga el usuario cuyo nombre reciba como parámetro, le hayan sido asignados a aquél directamente o a traves de roles. El nuevo rol deberá llamarse BackupPrivsNombreUsuario.
+
+~~~
+CREATE OR REPLACE PROCEDURE ContraseñaUsuario(v_usuario VARCHAR2, contraseña OUT VARCHAR2)
+IS
+BEGIN
+	SELECT password INTO contraseña
+	FROM dba_users
+	WHERE username=v_usuario;
+END;
+/
+~~~
+
+~~~
+CREATE OR REPLACE PROCEDURE AsignarPrivilegiosSistema(v_usuario1 VARCHAR2, v_usuario2 VARCHAR2)
+IS
+	CURSOR c_privilegios IS
+	SELECT privilege, admin_option
+	FROM dba_sys_privs
+	WHERE grantee=v_usuario1;
+BEGIN
+	FOR v_privilegio IN c_privilegios
+	LOOP
+		IF v_privilegio.admin_option='YES' THEN
+			dbms_output.put_line('GRANT '||v_privilegio.privilege||' TO '||v_usuario2||' WITH ADMIN OPTION;');
+		ELSE
+			dbms_output.put_line('GRANT '||v_privilegio.privilege||' TO '||v_usuario2||';');
+		END IF;
+	END LOOP;
+END;
+/
+~~~
+
+~~~
+CREATE OR REPLACE PROCEDURE AsignarPrivilegiosObjetos(v_usuario1 VARCHAR2, v_usuario2 VARCHAR2)
+IS
+	CURSOR c_privilegios IS
+	SELECT privilege, grantable, table_name
+	FROM dba_tab_privs
+	WHERE grantee=v_usuario1
+	OR OWNER=v_usuario1;
+BEGIN
+	FOR v_privilegio IN c_privilegios
+	LOOP
+		IF v_privilegio.grantable='YES' THEN
+			dbms_output.put_line('GRANT '||v_privilegio.privilege||' ON '||v_usuario1||'.'||v_privilegio.table_name||' TO '||v_usuario2||' WITH GRANT OPTION;');
+		ELSE
+			dbms_output.put_line('GRANT '||v_privilegio.privilege||' ON '||v_usuario1||'.'||v_privilegio.table_name||' TO '||v_usuario2||';');
+		END IF;
+	END LOOP;
+END;
+/
+~~~
+
+~~~
+CREATE OR REPLACE PROCEDURE BackupPrivsNombreUsuario(v_usuario VARCHAR2)
+IS
+	usuario_backup	VARCHAR2(20);
+BEGIN
+	usuario_backup:=CONCAT(v_usuario,'_Backup');
+
+	dbms_output.put_line('CREATE USER '||usuario_backup||';');
+	AsignarPrivilegiosSistema(v_usuario, usuario_backup);
+	AsignarPrivilegiosObjetos(v_usuario, usuario_backup);
+END;
+/
+~~~
+
+* Comprobación de funcionamiento:
+
+~~~
+SQL> exec BackupPrivsNombreUsuario('SCOTT');
+CREATE USER SCOTT_Backup IDENTIFIED BY ;
+GRANT CREATE PROCEDURE TO SCOTT_Backup;
+GRANT CREATE SESSION TO SCOTT_Backup;
+GRANT CREATE TABLE TO SCOTT_Backup;
+GRANT INSERT ON SCOTT.EMP TO SCOTT_Backup WITH GRANT OPTION;
+
+PL/SQL procedure successfully completed.
+~~~
+
+### CASO PRÁCTICO 3:
+
+1. Privilegios de sistema:
+
+* Estos permiten realizar una operación o ejecutar un comando concreto. Hay casi 100:
+
+* Para los objetos:
+~~~
+CREATE, ALTER Y DROP
+~~~
+
+~~~
+CREATE ANY, ALTER ANY Y DROP ANY
+~~~
+
+* Para las tablas:
+~~~
+SELECT, INSERT, UPDATE, DELETE
+~~~
+
+* SINTAXIS PARA CONCEDER ESTOS PERMISOS:
+
+~~~
+GRANT CREATE USER TO Becario;
+~~~
+
+~~~
+GRANT CREATE ALTER ANY USER TO Becario;
+~~~
+
+~~~
+GRANT SELECT GRANT INSERT ANY TABLE TO Becario;
+~~~
+
+* Opción extra:
+~~~
+WITH GRANT OPTION
+~~~
+
+* SINTAXIS PARA REVOCAR ESTOS PERMISOS:
+
+~~~
+ROVOKE CREATE USER TO Becario;
+~~~
+
+* 
