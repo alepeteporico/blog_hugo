@@ -2,7 +2,7 @@
 title = "Almacenamiento en BBDD"
 description = ""
 tags = [
-    "AGB"
+    "GBD"
 ]
 date = "2023-01-25"
 menu = "main"
