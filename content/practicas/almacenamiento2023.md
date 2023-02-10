@@ -12,7 +12,7 @@ menu = "main"
 
 
 1. Establece que los objetos que se creen en el TS1 (creado por Alumno 1) tengan un tamaño inicial de 200K, y que cada extensión sea del doble del tamaño que la anterior. El número máximo de extensiones debe ser de 3.
-  
+
 * Primero apagamos este tablespace para poder modificarlo.
 
 ~~~
@@ -21,12 +21,39 @@ SQL> ALTER TABLESPACE TS1 OFFLINE;
 Tablespace altered.
 ~~~
 
-* 
+* Alteramos el tablespace tal y como se nos pide.
 
+~~~
+ALTER TABLESPACE TS1
+    DEFAULT STORAGE (
+       INITIAL 200K
+       MAXEXTENTS 3
+       PCTINCREASE 200);
+~~~
 
-2. Crea dos tablas en el tablespace recién creado e inserta un registro en cada una de ellas. Comprueba el espacio libre existente en el tablespace. Borra una de las tablas y comprueba si ha aumentado el espacio disponible en el tablespace. Explica la razón.
+* Sin embargo, esto nos da un error `ORA-25143: default storage clause is not compatible with allocation policy` creía que el problema estaba en que la segmentación se crea de forma automatica, y trate de cambiarla a manual sin ningún resultado, por ello he eliminiado el tablespace y lo he creado de 0 con estos nuevos parametros.
 
-2. Crea un espacio de tablas TS2 con dos ficheros en rutas diferentes de 1M cada uno no autoextensibles. Crea en el citado tablespace una tabla con la clausula de almacenamiento que quieras. Inserta registros hasta que se llene el tablespace. ¿Qué ocurre?
+~~~
+CREATE TABLESPACE TS1 
+DATAFILE 'ts1_001.dbf' 
+SIZE 2M
+    DEFAULT STORAGE (
+      INITIAL 200K
+      MAXEXTENTS 3
+      PCTINCREASE 200);
+~~~
+
+1. Crea dos tablas en el tablespace recién creado e inserta un registro en cada una de ellas. Comprueba el espacio libre existente en el tablespace. Borra una de las tablas y comprueba si ha aumentado el espacio disponible en el tablespace. Explica la razón.
+
+2. Convierte a TS1 en un tablespace de sólo lectura. Intenta insertar registros en la tabla existente. ¿Qué ocurre?. Intenta ahora borrar la tabla. ¿Qué ocurre? ¿Porqué crees que pasa eso?
+
+* Lo hacemos de solo lectura.
+
+~~~
+ALTER TABLESPACE TS1 READ ONLY;
+~~~
+
+4. Crea un espacio de tablas TS2 con dos ficheros en rutas diferentes de 1M cada uno no autoextensibles. Crea en el citado tablespace una tabla con la clausula de almacenamiento que quieras. Inserta registros hasta que se llene el tablespace. ¿Qué ocurre?
 
 ~~~
 CREATE TABLESPACE TS2
@@ -59,28 +86,6 @@ BEGIN
 END;
 /
 ~~~
-    EXECUTE IMMEDIATE (insertar);
-
-~~~
-INSERT INTO ALUMNOS VALUES
-('12344345','Alcalde Anta, Elena', 'C/Las Matas, 24','Madrid','917766545');
-
-INSERT INTO ALUMNOS VALUES
-('4448242','Cerrato Vela, Luis', 'C/Mina 28 - 3A', 'Madrid','916566545');
-
-INSERT INTO ALUMNOS VALUES
-('56882942','Diaz Perez, Maria', 'C/Luis Vives 25', 'Mostoles','915577545');
-
-INSERT INTO ALUMNOS VALUES
-('56882934','Diaz Perez, Jose', 'C/Luis Vives 25', 'Mostoles','915577546');
-~~~
-
-
-SELECT tablespace_name,
-ROUND(sum(bytes)/1024/1024,0)
-FROM dba_free_space
-WHERE tablespace_name NOT LIKE 'TEMP%'
-GROUP BY tablespace_name;
 
 
 
