@@ -321,6 +321,12 @@ Propietario: SYS
 
 7. Averigua si existe el concepto de segmento y el de extensión en Postgres, en qué consiste y las diferencias con los conceptos correspondientes de ORACLE.
 
+* Los segmentos en Oracle son el espacio que ocupa en un tablespace los objetos. En postgres el concepto es totalmente distinto, cuando se crea un segmento, se crea un archivo dentro del directorio que tiene asignado el tablespace en cuestión. Esto tiene inconvenientes, pues no puedes especificar lo que debe ocupar cada objeto (segmento). También tiene sus ventajas que podemos usar, como que cada tabla tendrá su propio segmento o carpeta que no compartira con otra. Cuando el objeto en cuestión supere 1GB de capacidad se creará una carpeta nueva.
+
+### MySQL:
+
+8. Averigua si existe el concepto de espacio de tablas en MySQL y las diferencias con los tablespaces de ORACLE.
+
 
 
 ## PARTE GRUPAL:
