@@ -283,6 +283,46 @@ Total de usuarios en el tablespace TS1: 0
 PL/SQL procedure successfully completed.
 ~~~
 
+6. Realiza un procedimiento llamado MostrarDetallesIndices que reciba el nombre de una tabla y muestre los detalles sobre los índices que hay definidos sobre las columnas de la misma.
+
+~~~
+CREATE OR REPLACE PROCEDURE MostrarDetallesIndices(v_tabla  VARCHAR2)
+IS
+  CURSOR c_indices IS
+    SELECT index_name, tablespace_name, owner
+    FROM dba_indexes
+    WHERE table_name=v_tabla;
+BEGIN
+  dbms_output.put_line('TABLA '||v_tabla);
+  FOR v_indice IN c_indices
+  LOOP
+    dbms_output.put_line('Nombre del indice: '||v_indice.index_name);
+    dbms_output.put_line('Nombre del tablespace: '||v_indice.tablespace_name);
+    dbms_output.put_line('Propietario: '||v_indice.owner);
+  END LOOP;
+END;
+/
+~~~
+
+* Ejecución del procedimiento.
+
+~~~
+SQL> EXEC MostrarDetallesIndices('JOCKEYS');
+TABLA JOCKEYS
+Nombre del indice: PK_JOCKEYS
+Nombre del tablespace: TS1
+Propietario: SYS
+Nombre del indice: INDEX_JOCKEYS
+Nombre del tablespace: SYSTEM
+Propietario: SYS
+~~~
+
+### POSTGRES:
+
+7. Averigua si existe el concepto de segmento y el de extensión en Postgres, en qué consiste y las diferencias con los conceptos correspondientes de ORACLE.
+
+
+
 ## PARTE GRUPAL:
 
 1. Cread un índice para la tabla EMP de SCOTT que agilice las consultas por nombre de empleado en un tablespace creado específicamente para índices. ¿Dónde deberiáis ubicar el fichero de datos asociado? ¿Cómo se os ocurre que podriáis probar si el índice resulta de utilidad?
