@@ -327,7 +327,43 @@ Propietario: SYS
 
 8. Averigua si existe el concepto de espacio de tablas en MySQL y las diferencias con los tablespaces de ORACLE.
 
+* Si, existe y se usa como en oracle con su propio motor de almacenamiento "InnoDB" y "NDB". Aunque tienen algunas restriscciones en comparación y para usar todas las funcionalidades necesitariamos un cluster MySQL NDB. Veamos la sintaxis de uso.
 
+* Crear un tablespace con InnoDB.
+
+~~~
+CREATE TABLESPACE ts1
+ADD DATAFILE 'ts1.idb'
+ENGINE = InnoDB;
+~~~
+
+* Incrementar tamaño de un tablespace InnoDB.
+
+~~~
+innodb_data_file_path=ts1.idb:12M;ts1_2.idb:50M:autoextend
+~~~
+
+* Crear un tablespace con NDB para lo que primero debemos crear un fichero de login.
+
+~~~
+CREATE LOGFILE GROUP logfile_group;
+~~~
+
+~~~
+
+~~~
+
+* Vistas importantes para manejar ambos motores de gestión de tablespaces.
+
+~~~
+SYS_DATAFILES
+SYS_FOREIGN
+SYS_FOREIGN_COLS
+SYS_TABLESPACES
+SYS_VIRTUAL
+SYS_ZIP_DICT
+SYS_ZIP_DICT_COLS
+~~~
 
 ## PARTE GRUPAL:
 
