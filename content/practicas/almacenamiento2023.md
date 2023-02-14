@@ -350,7 +350,14 @@ CREATE LOGFILE GROUP logfile_group;
 ~~~
 
 ~~~
-
+CREATE TABLESPACE TS2 
+ADD DATAFILE 'ts2.idb'
+USE LOGFILE GROUP logfile_group 
+EXTENT_SIZE = 1M 
+INITIAL_SIZE = 500K
+AUTOEXTEND_SIZE = 200K 
+MAX_SIZE = 1M
+ENGINE = NDB;
 ~~~
 
 * Vistas importantes para manejar ambos motores de gestión de tablespaces.
@@ -364,6 +371,12 @@ SYS_VIRTUAL
 SYS_ZIP_DICT
 SYS_ZIP_DICT_COLS
 ~~~
+
+### MongoDB
+
+9. Averigua si existe la posibilidad en MongoDB de decidir en qué archivo se almacena una colección.
+
+* **No parecer haber ninguna documentación al respecto. Las bases de datos no relacionales y en este caso mongo usan, entre otros metodos, documentos BJSON (JSON binario) para guardar la información. Pero la creación y gestión de estos archivos parece totalmente gestionada por el gestor MongoDB sin posibilidad aparente de que el usuario administrador pueda ejercer control sobre esto.**
 
 ## PARTE GRUPAL:
 
