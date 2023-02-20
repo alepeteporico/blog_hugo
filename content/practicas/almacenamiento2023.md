@@ -376,7 +376,7 @@ SYS_ZIP_DICT_COLS
 
 9. Averigua si existe la posibilidad en MongoDB de decidir en qué archivo se almacena una colección.
 
-* **No parecer haber ninguna documentación al respecto. Las bases de datos no relacionales y en este caso mongo usan, entre otros metodos, documentos BJSON (JSON binario) para guardar la información. Pero la creación y gestión de estos archivos parece totalmente gestionada por el gestor MongoDB sin posibilidad aparente de que el usuario administrador pueda ejercer control sobre esto.**
+* **No parece haber ninguna documentación al respecto. Las bases de datos no relacionales y en este caso mongo usan, entre otros metodos, documentos BJSON (JSON binario) para guardar la información. Pero la creación y gestión de estos archivos parece totalmente gestionada por el gestor MongoDB sin posibilidad aparente de que el usuario administrador pueda ejercer control sobre esto.**
 
 ## PARTE GRUPAL:
 
