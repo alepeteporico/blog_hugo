@@ -474,7 +474,7 @@ MariaDB [(none)]> SET GLOBAL server_audit_logging=ON;
 MariaDB [(none)]> SET GLOBAL server_audit_events = 'QUERY_DDL';
 ~~~
 
-1. Averigua las posibilidades que ofrece MongoDB para auditar los cambios que va sufriendo un documento. Demuestra su funcionamiento.
+9. Averigua las posibilidades que ofrece MongoDB para auditar los cambios que va sufriendo un documento. Demuestra su funcionamiento.
 
 * Si existe esa posibilidad, para auditorar los cambios que se hacen debemo usar la siguiente herramienta que informará de todas las modificaciones, inserciones y borrados de los documentos
 
