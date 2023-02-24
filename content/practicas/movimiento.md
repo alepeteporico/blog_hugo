@@ -305,6 +305,4 @@ QUERY='dept:"WHERE (SELECT d.deptno FROM emp e, dept d WHERE )"' ESTIMATE_ONLY=Y
 expdp SYSTEM DUMPFILE=myexp.dmp FULL=y LOG=myexp.log 
 ~~~
 
-SELECT deptno
-FROM dept
-WHERE deptno
+SELECT deptno FROM dept WHERE deptno IN (SELECT deptno FROM EMP GROUP BY deptno HAVING COUNT(*)<3);
