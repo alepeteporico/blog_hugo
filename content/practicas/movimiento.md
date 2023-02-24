@@ -266,9 +266,35 @@ TRACE
 Set trace/debug flags for the current job.
 ~~~
 
+* Primero le damos permisos para crear directorios a SCOTT, que será el usuario que usemos para realizar la exportación.
+
 ~~~
-expdp SCOTT/TIGER DUMPFILE=scott.dmp LOG=exportacionscott.log DIRECTORY=dmpdir SCHEMAS=SCOTT EXCLUDE=TABLE:"='BONUS'" QUERY='dept:"WHERE (SELECT d.deptno FROM emp e, dept d WHERE )"' ESTIMATE_ONLY=YES
+SQL> GRANT CREATE ANY DIRECTORY TO SCOTT;
+
+Grant succeeded.
 ~~~
+
+* Seguidamente nos conectamos a SCOTT y creamos el directorio donde haremos la exportación.
+
+~~~
+SQL> connect SCOTT/TIGER
+Connected.
+SQL> CREATE DIRECTORY DATA_PUMP_EXPORT AS '/opt/oracle/admin/ORCLCDB/dpdump/';
+
+Directory created.
+~~~
+
+* Para cumplir con el apartado que nos pide que la acción sea realiada dentro de dos minutos usaremos el comando `at` de linux que nos permitirá programar la tarea.
+
+~~~
+at now + 2 minutes
+~~~
+
+~~~
+expdp SCOTT/TIGER DUMPFILE=scott.dmp LOG=exportacionscott.log DIRECTORY=DATA_PUMP_EXPORT SCHEMAS=SCOTT EXCLUDE=TABLE:\"=\'BONUS\'\"
+~~~
+
+QUERY='dept:"WHERE (SELECT d.deptno FROM emp e, dept d WHERE )"' ESTIMATE_ONLY=YES
 
 2. Importa el fichero obtenido anteriormente usando Oracle Data Pump pero en un usuario distinto de la misma base de datos.
 
