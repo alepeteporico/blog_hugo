@@ -572,3 +572,54 @@ Job "SYSTEM"."SYS_EXPORT_FULL_01" successfully completed at Sat Feb 25 20:00:26 
 
 4. Intenta realizar operaciones similares de importación y exportación con las herramientas proporcionadas con MySQL desde línea de comandos, documentando el proceso.
 
+### EXPORTACIÓN
+
+* Una exportación de la base de datos de scott, excluyendo la tabla bonus y añadiendo un fichero de log por si hay errores.
+
+~~~
+root@alepeteporico:~# mysqldump -u root -p empresa --ignore-table=empresa.BONUS --log-error=/home/alejandrogv/Escritorio/ASIR/logfile.log > /home/alejandrogv/Escritorio/ASIR/exportacion.sql
+~~~
+
+* Una exportación de todas las bases de datos.
+
+~~~
+root@alepeteporico:~# mysqldump -u root --all-databases --log-error=/home/alejandrogv/Escritorio/ASIR/logfile.log > /home/alejandrogv/Escritorio/ASIR/exportaciontotal.sql
+~~~
+
+### IMPORTACIÓN
+
+* Creamos una base de datos nueva donde importaremos el esquema de scott.
+
+~~~
+MariaDB [(none)]> create database empresa2
+    -> ;
+Query OK, 1 row affected (0,001 sec)
+~~~
+
+* Importaremos la base de datos.
+
+~~~
+root@alepeteporico:~# mysql -u root empresa2 < /home/alejandrogv/Escritorio/ASIR/exportacion.sql
+~~~
+
+* Comprobamos que se ha realizado la importación.
+
+~~~
+MariaDB [(none)]> use empresa2
+Reading table information for completion of table and column names
+You can turn off this feature to get a quicker startup with -A
+
+Database changed
+MariaDB [empresa2]> show tables;
++--------------------+
+| Tables_in_empresa2 |
++--------------------+
+| dept               |
+| dummy              |
+| emp                |
+| salgrade           |
++--------------------+
+4 rows in set (0,001 sec)
+~~~
+
+5. Intenta realizar operaciones similares de importación y exportación con las herramientas proporcionadas con Postgres desde línea de comandos, documentando el proceso.
