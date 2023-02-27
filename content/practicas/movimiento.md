@@ -344,7 +344,7 @@ Dump file set for SCOTT.SYS_EXPORT_SCHEMA_01 is:
 Job "SCOTT"."SYS_EXPORT_SCHEMA_01" successfully completed at Sat Feb 25 18:46:34 2023 elapsed 0 00:00:31
 ~~~
 
-1. Importa el fichero obtenido anteriormente usando Oracle Data Pump pero en un usuario distinto de la misma base de datos.
+2. Importa el fichero obtenido anteriormente usando Oracle Data Pump pero en un usuario distinto de la misma base de datos.
 
 * Le damos permisos sobre el directorio al usuario en el que importaremos el esquema.
 
