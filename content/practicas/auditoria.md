@@ -492,19 +492,46 @@ alejandrogv@alepeteporico:~$ sudo cat /var/lib/mysql/server_audit.log
 
 9. Averigua las posibilidades que ofrece MongoDB para auditar los cambios que va sufriendo un documento. Demuestra su funcionamiento.
 
-* Si existe esa posibilidad, para auditorar los cambios que se hacen debemo usar la siguiente herramienta que informará de todas las modificaciones, inserciones y borrados de los documentos
+* Para usar las auditorias necesitamos mongo enterprise. Vamos a realizar la instalación.
 
 ~~~
-mongod --dbpath data/db --auth --setParameter auditAuthorizationSuccess=true --auditDestination file --auditFilter '{ atype: "authCheck", "param.command": { $in: [ "find", "insert", "delete", "update", "findandmodify" ] } }' --auditFormat BSON --auditPath data/db/auditLog.bson
+vagrant@buster:~$ sudo apt install gnupg
+
+vagrant@buster:~$ wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
+OK
+
+vagrant@buster:~$ echo "deb http://repo.mongodb.com/apt/debian buster/mongodb-enterprise/6.0 main" | sudo tee /etc/apt/sources.list.d/mongodb-enterprise.list
+deb http://repo.mongodb.com/apt/debian buster/mongodb-enterprise/6.0 main
+
+vagrant@buster:~$ sudo apt update
+
+vagrant@buster:~$ sudo apt-get install -y mongodb-enterprise
+~~~
+
+* Una vez instalado debemos activar las auditorias y el repositorio donde se guardarán. Para ello añadimos lo siguiente el fichero de configuración `/etc/mongod.conf`
+
+~~~
+storage:
+  dbPath: data/db
+auditLog:
+  destination: file   
+  format: JSON
+  path: data/db/auditLog.json
+~~~
+
+* Para auditorar los cambios que se hacen debemo usar la siguiente herramienta que informará de todas las modificaciones, inserciones y borrados de los documentos
+
+~~~
+mongod --dbpath data/db --auth --setParameter auditAuthorizationSuccess=true --auditDestination file --auditFilter '{ atype: "authCheck", "param.command": { $in: [ "find", "insert", "delete", "update", "findandmodify" ] } }' --auditFormat JSON --auditPath data/db/auditLog.json
 ~~~
 
 * Si tambień queremos auditar la creación y borrado de las colecciones podemos usar la siguiente variante.
 
 ~~~
-mongod --dbpath data/db --auditDestination file --auditFilter '{ atype: { $in: [ "createCollection", "dropCollection" ] } }' --auditFormat BSON --auditPath data/db/auditLog.bson
+mongod --dbpath data/db --auditDestination file --auditFilter '{ atype: { $in: [ "createCollection", "dropCollection" ] } }' --auditFormat JSON --auditPath data/db/auditLog.json
 ~~~
 
-10.  Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.
+1.   Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.
 
 * Si que tenemos esa posibilidad.
 
