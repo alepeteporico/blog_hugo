@@ -519,6 +519,14 @@ auditLog:
   path: data/db/auditLog.json
 ~~~
 
+* Creamos la carpeta y el fichero de auditorias.
+
+~~~
+vagrant@buster:~$ mkdir data/db
+
+vagrant@buster:~$ cat > data/db/auditLog.json
+~~~
+
 * Para auditorar los cambios que se hacen debemo usar la siguiente herramienta que informará de todas las modificaciones, inserciones y borrados de los documentos
 
 ~~~
@@ -529,6 +537,12 @@ mongod --dbpath data/db --auth --setParameter auditAuthorizationSuccess=true --a
 
 ~~~
 mongod --dbpath data/db --auditDestination file --auditFilter '{ atype: { $in: [ "createCollection", "dropCollection" ] } }' --auditFormat JSON --auditPath data/db/auditLog.json
+~~~
+
+* Ya tenemos el fichero y las auditorias, como las tenemos en json podemos visualizarlas de una forma mas legible a como están habitualmente, para ello podemos intalar la herramienta `jq`
+
+~~~
+
 ~~~
 
 1.   Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.
