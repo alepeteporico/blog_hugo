@@ -630,3 +630,4 @@ MariaDB [empresa2]> show tables;
 pg_dump prueba --exclude-table=carreras_profesionales > exportacion.sql
 ~~~
 
+* Vamos a 
