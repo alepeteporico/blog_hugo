@@ -1247,3 +1247,182 @@ prueba2=# \dt
  public | propietarios | table | postgres
 (2 rows)
 ~~~
+
+6. Exporta los documentos de una colección de MongoDB que cumplan una determinada condición e impórtalos en otra base de datos.
+
+### EXPORTACIÓN
+
+* Realizamos la exportación de un documento especifico.
+
+~~~
+vagrant@mongoagv:~$ sudo mongoexport --db nobel -c premios --out exportacion.json
+~~~
+
+* Ahora podemos añadirle alguna condición podemos usar la opción -q, con la que diremos que solo exporte los libros cuyo año de lanzamiento sea 2019.
+
+~~~
+vagrant@mongoagv:~$ sudo mongoexport --db nobel -c premios -q "{\"year\": \"2019\"}" --out libros1819.json
+2023-03-02T17:15:12.386+0000	connected to: mongodb://localhost/
+2023-03-02T17:15:12.391+0000	exported 6 records
+~~~
+
+* Vamos a ver que se han exportado solo los libros que hemos especificado.
+
+~~~
+vagrant@mongoagv:~$ cat libros1819.json | jq
+{
+  "_id": {
+    "$oid": "6400d466a0f4120b9c5e8a3c"
+  },
+  "year": "2019",
+  "category": "Chemistry",
+  "laureates": [
+    {
+      "id": "976",
+      "firstname": "John",
+      "surname": "Goodenough",
+      "motivation": "\"for the development of lithium-ion batteries\"",
+      "share": "3"
+    },
+    {
+      "id": "977",
+      "firstname": "M. Stanley",
+      "surname": "Whittingham",
+      "motivation": "\"for the development of lithium-ion batteries\"",
+      "share": "3"
+    },
+    {
+      "id": "978",
+      "firstname": "Akira",
+      "surname": "Yoshino",
+      "motivation": "\"for the development of lithium-ion batteries\"",
+      "share": "3"
+    }
+  ]
+}
+{
+  "_id": {
+    "$oid": "6400d466a0f4120b9c5e8a3d"
+  },
+  "year": "2019",
+  "category": "Economics",
+  "laureates": [
+    {
+      "id": "982",
+      "firstname": "Abhijit",
+      "surname": "Banerjee",
+      "motivation": "\"for their experimental approach to alleviating global poverty\"",
+      "share": "3"
+    },
+    {
+      "id": "983",
+      "firstname": "Esther",
+      "surname": "Duflo",
+      "motivation": "\"for their experimental approach to alleviating global poverty\"",
+      "share": "3"
+    },
+    {
+      "id": "984",
+      "firstname": "Michael",
+      "surname": "Kremer",
+      "motivation": "\"for their experimental approach to alleviating global poverty\"",
+      "share": "3"
+    }
+  ]
+}
+{
+  "_id": {
+    "$oid": "6400d466a0f4120b9c5e8a3e"
+  },
+  "year": "2019",
+  "category": "Literature",
+  "laureates": [
+    {
+      "id": "980",
+      "firstname": "Peter",
+      "surname": "Handke",
+      "motivation": "\"for an influential work that with linguistic ingenuity has explored the periphery and the specificity of human experience\"",
+      "share": "1"
+    }
+  ]
+}
+{
+  "_id": {
+    "$oid": "6400d466a0f4120b9c5e8a3f"
+  },
+  "year": "2019",
+  "category": "Peace",
+  "laureates": [
+    {
+      "id": "981",
+      "firstname": "Abiy",
+      "surname": "Ahmed Ali",
+      "motivation": "\"for his efforts to achieve Peace and international cooperation, and in particular for his decisive initiative to resolve the border conflict with neighbouring Eritrea\"",
+      "share": "1"
+    }
+  ]
+}
+{
+  "_id": {
+    "$oid": "6400d466a0f4120b9c5e8a40"
+  },
+  "year": "2019",
+  "category": "Physics",
+  "overallMotivation": "\"for contributions to our understanding of the evolution of the universe and Earth’s place in the cosmos\"",
+  "laureates": [
+    {
+      "id": "973",
+      "firstname": "James",
+      "surname": "Peebles",
+      "motivation": "\"for theoretical discoveries in physical cosmology\"",
+      "share": "2"
+    },
+    {
+      "id": "974",
+      "firstname": "Michel",
+      "surname": "Mayor",
+      "motivation": "\"for the discovery of an exoplanet orbiting a solar-type star\"",
+      "share": "4"
+    },
+    {
+      "id": "975",
+      "firstname": "Didier",
+      "surname": "Queloz",
+      "motivation": "\"for the discovery of an exoplanet orbiting a solar-type star\"",
+      "share": "4"
+    }
+  ]
+}
+{
+  "_id": {
+    "$oid": "6400d466a0f4120b9c5e8a41"
+  },
+  "year": "2019",
+  "category": "Medicine",
+  "laureates": [
+    {
+      "id": "970",
+      "firstname": "William",
+      "surname": "Kaelin",
+      "motivation": "\"for their discoveries of how cells sense and adapt to oxygen availability\"",
+      "share": "3"
+    },
+    {
+      "id": "971",
+      "firstname": "Peter",
+      "surname": "Ratcliffe",
+      "motivation": "\"for their discoveries of how cells sense and adapt to oxygen availability\"",
+      "share": "3"
+    },
+    {
+      "id": "972",
+      "firstname": "Gregg",
+      "surname": "Semenza",
+      "motivation": "\"for their discoveries of how cells sense and adapt to oxygen availability\"",
+      "share": "3"
+    }
+  ]
+}
+~~~
+
+### IMPORTACIÓN
