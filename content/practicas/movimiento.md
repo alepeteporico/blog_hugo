@@ -1261,7 +1261,7 @@ vagrant@mongoagv:~$ sudo mongoexport --db nobel -c premios --out exportacion.jso
 * Ahora podemos añadirle alguna condición podemos usar la opción -q, con la que diremos que solo exporte los libros cuyo año de lanzamiento sea 2019.
 
 ~~~
-vagrant@mongoagv:~$ sudo mongoexport --db nobel -c premios -q "{\"year\": \"2019\"}" --out libros1819.json
+vagrant@mongoagv:~$ sudo mongoexport --db nobel -c premios -q "{\"year\": \"2019\"}" --out libros19.json
 2023-03-02T17:15:12.386+0000	connected to: mongodb://localhost/
 2023-03-02T17:15:12.391+0000	exported 6 records
 ~~~
@@ -1426,3 +1426,74 @@ vagrant@mongoagv:~$ cat libros1819.json | jq
 ~~~
 
 ### IMPORTACIÓN
+
+* Vamos a realizar la importación la cual es bastante sencilla.
+
+~~~
+vagrant@mongoagv:~$ sudo mongoimport --db prueba --collection libros --file libros19.json
+2023-03-02T17:18:56.640+0000	connected to: mongodb://localhost/
+2023-03-02T17:18:56.694+0000	6 document(s) imported successfully. 0 document(s) failed to import.
+~~~
+
+* Entramos en la base de datos y comprobamos que la importación  se ha realizado correctamente.
+
+~~~
+Enterprise test> use prueba
+switched to db prueba
+Enterprise prueba> db.libros.find();
+[
+  {
+    _id: ObjectId("6400d466a0f4120b9c5e8a3c"),
+    year: '2019',
+    category: 'Chemistry',
+    laureates: [
+      {
+        id: '976',
+        firstname: 'John',
+        surname: 'Goodenough',
+        motivation: '"for the development of lithium-ion batteries"',
+        share: '3'
+      },
+      {
+        id: '977',
+        firstname: 'M. Stanley',
+        surname: 'Whittingham',
+        motivation: '"for the development of lithium-ion batteries"',
+        share: '3'
+      },
+      {
+        id: '978',
+        firstname: 'Akira',
+        surname: 'Yoshino',
+        motivation: '"for the development of lithium-ion batteries"',
+        share: '3'
+      }
+    ]
+  },
+  {
+    _id: ObjectId("6400d466a0f4120b9c5e8a3d"),
+    year: '2019',
+    category: 'Economics',
+    laureates: [
+      {
+        id: '982',
+        firstname: 'Abhijit',
+        surname: 'Banerjee',
+        motivation: '"for their experimental approach to alleviating global poverty"',
+        share: '3'
+      },
+....
+....
+....
+....
+~~~
+
+7. SQL-Loader es una herramienta que sirve para cargar grandes volúmenes de datos en una instancia de ORACLE. Exportad los datos de una base de datos completa desde Postgres a texto plano con delimitadores y emplead SQL-Loader para realizar el proceso de carga de dichos datos a una instancia ORACLE. Debéis documentar todo el proceso, explicando los distintos ficheros de configuración y de log que tiene SQL-Loader.
+
+* Como bien se nos indica el primer paso será exportar una base de datos de postgres a texto plano usando la herramienta de SQL Loader.
+
+~~~
+postgres@postgresagv:~$ pg_dump prueba > exportacion.sql
+~~~
+
+* 
