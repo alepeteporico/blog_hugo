@@ -1490,10 +1490,39 @@ Enterprise prueba> db.libros.find();
 
 7. SQL-Loader es una herramienta que sirve para cargar grandes volúmenes de datos en una instancia de ORACLE. Exportad los datos de una base de datos completa desde Postgres a texto plano con delimitadores y emplead SQL-Loader para realizar el proceso de carga de dichos datos a una instancia ORACLE. Debéis documentar todo el proceso, explicando los distintos ficheros de configuración y de log que tiene SQL-Loader.
 
-* Como bien se nos indica el primer paso será exportar una base de datos de postgres a texto plano usando la herramienta de SQL Loader.
+* Como bien se nos indica el primer paso será exportar una base de datos de postgres a texto plano, pero postgres no nos permite pasar toda una base de datos a csv, solo tenemos herramientas para pasar las tablas de una en una de la siguinte forma.
 
 ~~~
-postgres@postgresagv:~$ pg_dump prueba > exportacion.sql
+COPY jockeys TO '/var/lib/postgresql/jockeys.csv' DELIMITERS ',' CSV HEADER;
+
+COPY jockeys TO '/var/lib/postgresql/propietarios.csv' DELIMITERS ',' CSV HEADER;
 ~~~
 
-* 
+* Una vez pasadas las tablas pasamos los ficheros a nuestra máquina con oracle.
+
+~~~
+vagrant@oracleagv:~$ ls -l
+total 5098748
+-rw-r--r-- 1 vagrant vagrant        300 Mar  3 17:15  jockeys.csv
+-rw-r--r-- 1 vagrant vagrant        228 Mar  3 17:15  propietarios.csv
+~~~
+
+* Pero necesitamos primero varios ficheros, empecemos con los de control. Los ficheros de control constan de diferente información como:
+
+**Donde encontrar los datos**
+**Como se espera que esos datos estén formados**
+**Como se manejaran cosas como: la memoria, interrupciones, registros rechazados, etc...**
+**Como se manipularán los datos**
+
+* Vamos a ver como haremos los dos ficheros de control que necesitamos, uno para cada tabla.
+
+~~~
+OPTIONS (SKIP=1)
+LOAD DATA
+INFILE '/home/vagrant/propietarios.csv'
+APPEND
+INTO TABLE propietarios
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+()
+~~~
