@@ -1516,6 +1516,8 @@ total 5098748
 
 * Vamos a ver como haremos los dos ficheros de control que necesitamos, uno para cada tabla.
 
+#### Propietarios
+
 ~~~
 OPTIONS (SKIP=1)
 LOAD DATA
@@ -1524,5 +1526,169 @@ APPEND
 INTO TABLE propietarios
 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
 TRAILING NULLCOLS
-()
+(NIF,
+Nombre,	
+Apellidos,
+Cuota DECIMAL EXTERNAL(6))
+~~~
+
+#### Jockeys
+
+~~~
+OPTIONS (SKIP=1)
+LOAD DATA
+INFILE '/home/vagrant/jockeys.csv'
+APPEND
+INTO TABLE jockeys
+FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
+TRAILING NULLCOLS
+(DNI,
+Apellidos,
+Nombre,
+Peso	DECIMAL EXTERNAL(4),
+Altura	DECIMAL EXTERNAL(3),
+Telefono)
+~~~
+
+* Veamos que significa cada opción:
+
+`SKIP`: Para saltar una línea del fichero.
+
+`LOAD DATA`: Se especifica que se introducirán datos.
+
+`INFILE`: El fichero que contiene los datos.
+
+`APPEND`: Añade los datos al final de la tabla.
+
+`INTO TABLE`: Donde se indica la tabla donde se introducirán los datos.
+
+`FILEDS TERMINATED BY`: Donde indicamos los delimitadores del documento en cuestión.
+
+`TRAILING NULLCOLS`: Con esta opción si hay un dato vacío se rellenará con un NULL.
+
+* Ahora crearemos las tablas que llenaremos con los datos exportados.
+
+~~~
+SQL> CREATE TABLE Jockeys
+(
+DNI	VARCHAR(9),
+Apellidos	VARCHAR(20),
+Nombre	VARCHAR(15),
+Peso	NUMBER(4,2),
+Altura	NUMBER(3,2),
+Telefono	VARCHAR(10),
+CONSTRAINT pk_jockeys PRIMARY KEY(DNI),
+CONSTRAINT DNIJockey_ok CHECK(REGEXP_LIKE(DNI,'^[K,L,M,Z,Y,X][0-9]{7}[A-Z]{1}$') OR REGEXP_LIKE(DNI,'[0-9]{8}[A-Z]'))
+);
+
+Table created.
+
+SQL> CREATE TABLE Propietarios
+(
+NIF	VARCHAR(9),
+Nombre	VARCHAR(15),
+Apellidos	VARCHAR(20),
+Cuota	NUMBER(6,2),
+CONSTRAINT pk_propietarios PRIMARY KEY(NIF),
+CONSTRAINT NIFPropietario_ok CHECK(REGEXP_LIKE(NIF,'^[K,L,M,Z,Y,X][0-9]{7}[A-Z]{1}$') OR REGEXP_LIKE(NIF,'[0-9]{8}[A-Z]'))
+); 
+
+Table created.
+~~~
+
+* Cargamos los datos y creamos un fichero de log.
+
+#### Propietarios
+
+~~~
+vagrant@oracleagv:~$ sqlldr datos/datos control=/home/vagrant/propietarios.ctl log=/home/vagrant/propietarios.log
+
+SQL*Loader: Release 19.0.0.0.0 - Production on Sun Mar 5 22:27:24 2023
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+Path used:      Conventional
+Commit point reached - logical record count 5
+
+Table PROPIETARIOS:
+  4 Rows successfully loaded.
+
+Check the log file:
+  /home/vagrant/propietarios.log
+for more information about the load.
+~~~
+
+* Vamos a ver el archivo de log.
+
+~~~
+vagrant@oracleagv:~$ cat propietarios.log 
+
+SQL*Loader: Release 19.0.0.0.0 - Production on Sun Mar 5 22:27:24 2023
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+Control File:   /home/vagrant/propietarios.ctl
+Data File:      /home/vagrant/propietarios.csv
+  Bad File:     /home/vagrant/propietarios.bad
+  Discard File:  none specified
+ 
+ (Allow all discards)
+
+Number to load: ALL
+Number to skip: 1
+Errors allowed: 50
+Bind array:     250 rows, maximum of 1048576 bytes
+Continuation:    none specified
+Path used:      Conventional
+
+Table PROPIETARIOS, loaded from every logical record.
+Insert option in effect for this table: APPEND
+TRAILING NULLCOLS option in effect
+
+   Column Name                  Position   Len  Term Encl Datatype
+------------------------------ ---------- ----- ---- ---- ---------------------
+NIF                                 FIRST     *   ,  O(") CHARACTER            
+NOMBRE                               NEXT     *   ,  O(") CHARACTER            
+APELLIDOS                            NEXT     *   ,  O(") CHARACTER            
+CUOTA                                NEXT     6   ,  O(") CHARACTER            
+
+Record 1: Rejected - Error on table PROPIETARIOS, column APELLIDOS.
+ORA-12899: value too large for column "DATOS"."PROPIETARIOS"."APELLIDOS" (actual: 23, maximum: 20)
+
+
+Table PROPIETARIOS:
+  4 Rows successfully loaded.
+  1 Row not loaded due to data errors.
+  0 Rows not loaded because all WHEN clauses were failed.
+  0 Rows not loaded because all fields were null.
+
+
+Space allocated for bind array:                 195500 bytes(250 rows)
+Read   buffer bytes: 1048576
+
+Total logical records skipped:          1
+Total logical records read:             5
+Total logical records rejected:         1
+Total logical records discarded:        0
+
+Run began on Sun Mar 05 22:27:24 2023
+Run ended on Sun Mar 05 22:27:25 2023
+
+Elapsed time was:     00:00:00.31
+CPU time was:         00:00:00.02
+~~~
+
+* Comprobamos que los datos se han introducido correctamente.
+
+~~~
+SQL> select * from propietarios;
+
+NIF	  NOMBRE	  APELLIDOS		    CUOTA
+--------- --------------- -------------------- ----------
+20015195C Alexandra	  Angulo Lamas		      320
+19643077L Miriam	  Zafra Valencia	       45
+33599573T Josue 	  Reche de los Santos	       50
+X4164637G Christian	  Lopez Reyes		       50
 ~~~
