@@ -139,7 +139,45 @@ SQL> SELECT * FROM EMP;
 
 3. Pon tu base de datos en modo ArchiveLog y realiza con RMAN una copia de seguridad física en caliente.
 
-1. Documenta el empleo de las herramientas de copia de seguridad y restauración de Postgres.
+* Ponemos la base de datos en modo `ArchiveLog`
+
+~~~
+SQL> ALTER DATABASE ARCHIVELOG;
+
+Database altered.
+
+SQL> ALTER DATABASE OPEN;
+
+Database altered.
+~~~
+
+* Podemos comprobar que se encuentra en este modo.
+
+~~~
+SQL> SELECT LOG_MODE FROM V$DATABASE;
+
+LOG_MODE
+------------
+ARCHIVELOG
+~~~
+
+* Ahora creamos la copia de seguridad física con `RMAN`.
+
+~~~
+vagrant@oracleagv:~$ rman target SYSTEM/SYSTEM
+
+Recovery Manager: Release 19.0.0.0.0 - Production on Mon Mar 6 22:57:41 2023
+Version 19.3.0.0.0
+
+Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
+
+connected to target database: ORCLCDB (DBID=2889724655)
+
+RMAN> BACKUP INCREMENTAL LEVEL 0 SECTION SIZE 512M DATABASE PLUS
+      ARCHIVELOG;
+~~~
+
+6. Documenta el empleo de las herramientas de copia de seguridad y restauración de Postgres.
 
 #### Realizar copias de seguridad.
 
