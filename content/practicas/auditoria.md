@@ -57,51 +57,33 @@ unified_audit_systemlog 	     string
 * Creamos la auditoria.
 
 ~~~
-SQL> AUDIT CREATE SESSION WHENEVER NOT SUCCESSFUL;
+SQL> AUDIT CREATE SESSION WHENEVER SUCCESSFUL;
 
 Audit succeeded.
 ~~~
 
-* Vamos a auditar a uno de nuestros usuarios.
+* Vamos a ver la auditoria después de haber iniciado sesión.
 
 ~~~
-SQL> AUDIT CREATE SESSION BY SCOTT;
-
-Audit succeeded.
-
-
-SQL> SELECT * FROM DBA_PRIV_AUDIT_OPTS;
-
-USER_NAME
+SQL> SELECT USERNAME, OS_USERNAME, TIMESTAMP, ACTION_NAME, RETURNCODE
+FROM dba_audit_session  
+WHERE username='SCOTT';
+  2    3  
+USERNAME
 --------------------------------------------------------------------------------
-PROXY_NAME
+OS_USERNAME
 --------------------------------------------------------------------------------
-PRIVILEGE				 SUCCESS    FAILURE
----------------------------------------- ---------- ----------
-
-
-CREATE SESSION				 NOT SET    BY ACCESS
-
-PROFESOR
-
-CREATE SESSION				 BY ACCESS  BY ACCESS
-
-USER_NAME
---------------------------------------------------------------------------------
-PROXY_NAME
---------------------------------------------------------------------------------
-PRIVILEGE				 SUCCESS    FAILURE
----------------------------------------- ---------- ----------
-
+TIMESTAMP ACTION_NAME		       RETURNCODE
+--------- ---------------------------- ----------
 SCOTT
-
-CREATE SESSION				 BY ACCESS  BY ACCESS
+vagrant
+06-MAR-23 LOGON 
 ~~~
 
 * Para desactivar la auditoria:
 
 ~~~
-SQL> NOAUDIT CREATE SESSION WHENEVER NOT SUCCESSFUL;
+SQL> NOAUDIT CREATE SESSION WHENEVER SUCCESSFUL;
 
 Noaudit succeeded.
 ~~~
