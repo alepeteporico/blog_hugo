@@ -161,7 +161,7 @@ LOG_MODE
 ARCHIVELOG
 ~~~
 
-* Ahora creamos la copia de seguridad física con `RMAN`.
+* Ahora creamos la copia de seguridad física con `RMAN`. Primero vamos a añadir el directorio donde se creará la copia.
 
 ~~~
 vagrant@oracleagv:~$ rman target SYSTEM/SYSTEM
@@ -173,9 +173,160 @@ Copyright (c) 1982, 2019, Oracle and/or its affiliates.  All rights reserved.
 
 connected to target database: ORCLCDB (DBID=2889724655)
 
-RMAN> BACKUP INCREMENTAL LEVEL 0 SECTION SIZE 512M DATABASE PLUS
-      ARCHIVELOG;
+RMAN> configure channel device type disk format '/mnt/backups/copias';
+
+new RMAN configuration parameters:
+CONFIGURE CHANNEL DEVICE TYPE DISK FORMAT   '/mnt/backups/copias';
+new RMAN configuration parameters are successfully stored
 ~~~
+
+* Y creamos la copias de seguridad.
+
+~~~
+RMAN> backup database format '/mnt/backups/%U.dbf';
+
+Starting backup at 07-MAR-23
+using channel ORA_DISK_1
+channel ORA_DISK_1: starting full datafile backup set
+channel ORA_DISK_1: specifying datafile(s) in backup set
+input datafile file number=00001 name=/opt/oracle/oradata/ORCLCDB/system01.dbf
+input datafile file number=00003 name=/opt/oracle/oradata/ORCLCDB/sysaux01.dbf
+input datafile file number=00004 name=/opt/oracle/oradata/ORCLCDB/undotbs01.dbf
+input datafile file number=00014 name=/opt/oracle/oradata/ORCLCDB/tsg1.dbf
+input datafile file number=00007 name=/opt/oracle/oradata/ORCLCDB/users01.dbf
+input datafile file number=00018 name=/opt/oracle/product/19c/dbhome_1/dbs/ts1_001.dbf
+channel ORA_DISK_1: starting piece 1 at 07-MAR-23
+channel ORA_DISK_1: finished piece 1 at 07-MAR-23
+piece handle=/mnt/backups/0c1mel73_1_1.dbf tag=TAG20230307T114331 comment=NONE
+channel ORA_DISK_1: backup set complete, elapsed time: 00:00:07
+channel ORA_DISK_1: starting full datafile backup set
+channel ORA_DISK_1: specifying datafile(s) in backup set
+input datafile file number=00010 name=/opt/oracle/oradata/ORCLCDB/ORCLPDB1/sysaux01.dbf
+input datafile file number=00009 name=/opt/oracle/oradata/ORCLCDB/ORCLPDB1/system01.dbf
+input datafile file number=00011 name=/opt/oracle/oradata/ORCLCDB/ORCLPDB1/undotbs01.dbf
+input datafile file number=00012 name=/opt/oracle/oradata/ORCLCDB/ORCLPDB1/users01.dbf
+channel ORA_DISK_1: starting piece 1 at 07-MAR-23
+channel ORA_DISK_1: finished piece 1 at 07-MAR-23
+piece handle=/mnt/backups/0d1mel7a_1_1.dbf tag=TAG20230307T114331 comment=NONE
+channel ORA_DISK_1: backup set complete, elapsed time: 00:00:03
+channel ORA_DISK_1: starting full datafile backup set
+channel ORA_DISK_1: specifying datafile(s) in backup set
+input datafile file number=00006 name=/opt/oracle/oradata/ORCLCDB/pdbseed/sysaux01.dbf
+input datafile file number=00005 name=/opt/oracle/oradata/ORCLCDB/pdbseed/system01.dbf
+input datafile file number=00008 name=/opt/oracle/oradata/ORCLCDB/pdbseed/undotbs01.dbf
+channel ORA_DISK_1: starting piece 1 at 07-MAR-23
+channel ORA_DISK_1: finished piece 1 at 07-MAR-23
+piece handle=/mnt/backups/0e1mel7d_1_1.dbf tag=TAG20230307T114331 comment=NONE
+channel ORA_DISK_1: backup set complete, elapsed time: 00:00:03
+Finished backup at 07-MAR-23
+
+Starting Control File and SPFILE Autobackup at 07-MAR-23
+piece handle=/opt/oracle/product/19c/dbhome_1/dbs/c-2889724655-20230307-00 comment=NONE
+Finished Control File and SPFILE Autobackup at 07-MAR-23
+~~~
+
+4. Borra un fichero de datos de un tablespace e intenta recuperar la instancia de la base de datos a partir de la copia de seguridad creada en el punto anterior.
+
+* Borramos un tablespace.
+
+~~~
+SQL> DROP TABLESPACE INDICES INCLUDING CONTENTS;
+
+Tablespace dropped.
+~~~
+
+* Antes de recuperar la instancia debemos apagar y encender RMAN.
+
+~~~
+RMAN> shutdown 
+
+database closed
+database dismounted
+Oracle instance shut down
+
+RMAN> startup mount
+
+connected to target database (not started)
+Oracle instance started
+database mounted
+
+Total System Global Area    1660941680 bytes
+
+Fixed Size                     9135472 bytes
+Variable Size               1140850688 bytes
+Database Buffers             503316480 bytes
+Redo Buffers                   7639040 bytes
+~~~
+
+* Ahora restauraremos la copia usando RMAN.
+
+~~~
+RMAN> restore database;
+
+Starting restore at 07-MAR-23
+allocated channel: ORA_DISK_1
+channel ORA_DISK_1: SID=45 device type=DISK
+
+skipping datafile 5; already restored to file /opt/oracle/oradata/ORCLCDB/pdbseed/system01.dbf
+skipping datafile 6; already restored to file /opt/oracle/oradata/ORCLCDB/pdbseed/sysaux01.dbf
+skipping datafile 8; already restored to file /opt/oracle/oradata/ORCLCDB/pdbseed/undotbs01.dbf
+skipping datafile 9; already restored to file /opt/oracle/oradata/ORCLCDB/ORCLPDB1/system01.dbf
+skipping datafile 10; already restored to file /opt/oracle/oradata/ORCLCDB/ORCLPDB1/sysaux01.dbf
+skipping datafile 11; already restored to file /opt/oracle/oradata/ORCLCDB/ORCLPDB1/undotbs01.dbf
+skipping datafile 12; already restored to file /opt/oracle/oradata/ORCLCDB/ORCLPDB1/users01.dbf
+channel ORA_DISK_1: starting datafile backup set restore
+channel ORA_DISK_1: specifying datafile(s) to restore from backup set
+channel ORA_DISK_1: restoring datafile 00001 to /opt/oracle/oradata/ORCLCDB/system01.dbf
+channel ORA_DISK_1: restoring datafile 00003 to /opt/oracle/oradata/ORCLCDB/sysaux01.dbf
+channel ORA_DISK_1: restoring datafile 00004 to /opt/oracle/oradata/ORCLCDB/undotbs01.dbf
+channel ORA_DISK_1: restoring datafile 00007 to /opt/oracle/oradata/ORCLCDB/users01.dbf
+channel ORA_DISK_1: reading from backup piece /mnt/backups/0c1mel73_1_1.dbf
+channel ORA_DISK_1: piece handle=/mnt/backups/0c1mel73_1_1.dbf tag=TAG20230307T114331
+channel ORA_DISK_1: restored backup piece 1
+channel ORA_DISK_1: restore complete, elapsed time: 00:00:15
+Finished restore at 07-MAR-23
+~~~
+
+* Y no solo tenemos que hacer eso, sino también un recover.
+
+~~~
+RMAN> recover database;
+
+Starting recover at 07-MAR-23
+using channel ORA_DISK_1
+
+starting media recovery
+media recovery complete, elapsed time: 00:00:03
+
+Finished recover at 07-MAR-23
+~~~
+
+* Abrimos la base de datos.
+
+~~~
+SQL> ALTER DATABASE OPEN;
+
+Database altered.
+~~~
+
+* Y comprobamos que se ha restaurado el tablespace.
+
+~~~
+SQL> select tablespace_name from dba_tablespaces;
+
+TABLESPACE_NAME
+------------------------------
+SYSTEM
+SYSAUX
+UNDOTBS1
+TEMP
+USERS
+INDICES
+~~~
+
+5. Borra un fichero de control e intenta recuperar la base de datos a partir de la copia de seguridad creada en el punto anterior.
+
+
 
 6. Documenta el empleo de las herramientas de copia de seguridad y restauración de Postgres.
 

@@ -1510,8 +1510,11 @@ total 5098748
 * Pero necesitamos primero varios ficheros, empecemos con los de control. Los ficheros de control constan de diferente información como:
 
 **Donde encontrar los datos**
+
 **Como se espera que esos datos estén formados**
+
 **Como se manejaran cosas como: la memoria, interrupciones, registros rechazados, etc...**
+
 **Como se manipularán los datos**
 
 * Vamos a ver como haremos los dos ficheros de control que necesitamos, uno para cada tabla.
