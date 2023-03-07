@@ -496,3 +496,103 @@ Total de comisiones en el departamento OPERATIONS: 0
 
 PL/SQL procedure successfully completed.
 ~~~
+
+10. Realiza un procedimiento que reciba el nombre de una tabla y muestre los nombres de las restricciones que tiene, a qué columna afectan y en qué consisten exactamente. (DBA_TABLES, DBA_CONSTRAINTS, DBA_CONS_COLUMNS)
+
+~~~
+CREATE OR REPLACE PROCEDURE listar_restricciones (n_tabla VARCHAR2)
+IS
+    CURSOR c_restricciones IS
+        SELECT a.constraint_name, b.column_name, a.constraint_type
+        FROM dba_constraints a, dba_cons_columns b, dba_tables c
+        WHERE a.constraint_name = b.constraint_name
+        AND a.table_name = c.table_name
+        AND a.table_name = n_tabla;
+
+BEGIN
+
+    FOR v_restriccion in c_restricciones LOOP
+        dbms_output.put_line('Restriccion: ' || v_restriccion.constraint_name);
+        dbms_output.put_line('Columna: ' || v_restriccion.column_name);
+        dbms_output.put_line('Descripcion: ' || v_restriccion.constraint_type);
+    END LOOP;
+END;
+/
+~~~
+
+* Prueba de funcionamiento.
+
+~~~
+SQL> exec listar_restricciones ('CARRERAS_PROFESIONALES');
+Tabla: CARRERAS_PROFESIONALES
+Restriccion: HORA_CARRERA
+Columna: FECHA
+Descripcion: C
+Tabla: CARRERAS_PROFESIONALES
+Restriccion: FECHA_CARRERA
+Columna: FECHA
+Descripcion: C
+Tabla: CARRERAS_PROFESIONALES
+Restriccion: PK_CARRERAS
+Columna: CODCARRERA
+Descripcion: P
+
+PL/SQL procedure successfully completed.
+~~~
+
+11. Realiza al menos dos de los ejercicios anteriores en Postgres usando PL/pgSQL.
+
+#### Hacer un procedimiento que muestre el nombre y el salario del empleado cuyo código es 7900
+
+~~~
+CREATE OR REPLACE FUNCTION cod_7900() RETURNS VOID
+AS $CODIGO7900$
+    DECLARE
+        vnombre emp.ename%TYPE;
+        vsal emp.sal%TYPE;
+    BEGIN
+        SELECT ename, sal INTO vnombre, vsal
+        FROM EMP
+            WHERE EMPNO='7900';
+        RAISE NOTICE '%', 'El empleado: '||vnombre||', gana: '||vsal;
+END;
+$CODIGO7900$ LANGUAGE plpgsql;
+~~~
+
+* Prueba de funcionamiento
+
+~~~
+empresa=# SELECT cod_7900();
+NOTICE:  El empleado: JAMES, gana: 950.00
+ cod_7900 
+----------
+ 
+(1 row)
+~~~
+
+#### Hacer un procedimiento que reciba como parámetro un código de empleado y devuelva su nombre
+
+~~~
+CREATE OR REPLACE FUNCTION cod_nombre (cod_emp emp.empno%TYPE) RETURNS VOID
+AS $CODIGONOMBRE$
+DECLARE
+    nombre_emp emp.ename%TYPE;
+BEGIN
+    SELECT ename INTO nombre_emp
+    FROM EMP
+        WHERE empno=cod_emp;
+    RAISE NOTICE '%', 'El nombre de este empleado es: '||nombre_emp;
+END;
+$CODIGONOMBRE$ LANGUAGE plpgsql;
+~~~
+
+* Prueba de funcionamiento.
+
+~~~
+empresa=# SELECT cod_nombre('7900');
+NOTICE:  El nombre de este empleado es: JAMES
+ cod_nombre 
+------------
+ 
+(1 row)
+~~~
