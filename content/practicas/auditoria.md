@@ -466,6 +466,90 @@ set pgaudit.log = 'read, ddl';
 
 * Podemos dirigirnos al [repositorio oficial](https://github.com/pgaudit/pgaudit/blob/master/README.md) con la documentación para saber todas las opciones que tiene esta herramienta.
 
+* Pero vamos a usar un nuevo metodo, para ello instalaremos la siguiente herramienta que contiene varios triggers que crean vistas para auditar postgres.
+
+~~~
+postgres@postgresagv:~$ wget https://raw.githubusercontent.com/2ndQuadrant/audit-trigger/master/audit.sql
+~~~
+
+* Y lo instalamos dentro de postgres.
+
+~~~
+postgres=# \i audit.sql
+~~~
+
+### Adutiar accesos fallidos.
+
+* Para realizar esta tarea nos dirigimos al fichero de configuración de postgres `/etc/postgresql/13/main/postgresql.conf` y añadimos la siguiente línea:
+
+~~~
+log_statement = 'all'
+~~~
+
+* Una vez hecho esto y reiniciado el servidor miramos el fichero de log para ver los accesos fallidos
+
+~~~
+vagrant@postgresagv:~$ sudo tail -f /var/log/postgresql/postgresql-13-main.log
+2023-03-08 08:12:31.375 UTC [2514] LOG:  database system is ready to accept connections
+2023-03-08 08:12:32.431 UTC [2525] postgres@template1 LOG:  statement: 
+2023-03-08 08:12:32.942 UTC [2528] postgres@template1 LOG:  statement: 
+2023-03-08 08:12:33.453 UTC [2531] postgres@template1 LOG:  statement: 
+2023-03-08 08:12:53.122 UTC [2554] aplicacion@empresa FATAL:  password authentication failed for user "aplicacion"
+2023-03-08 08:12:53.122 UTC [2554] aplicacion@empresa DETAIL:  Password does not match for user "aplicacion".
+	Connection matched pg_hba.conf line 94: "local   all             all                                    md5"
+2023-03-08 08:12:58.438 UTC [2567] aplicacion@empresa FATAL:  password authentication failed for user "aplicacion"
+2023-03-08 08:12:58.438 UTC [2567] aplicacion@empresa DETAIL:  Password does not match for user "aplicacion".
+	Connection matched pg_hba.conf line 94: "local   all             all                                    md5"
+~~~
+
+### Auditar operaciones DML
+
+* Ahora si haremos uso de los triggers instalados anteriormente, Creamos el trigger para la tabla dept.
+
+~~~
+empresa=# select audit.audit_table('dept');
+NOTICE:  trigger "audit_trigger_row" for relation "dept" does not exist, skipping
+NOTICE:  trigger "audit_trigger_stm" for relation "dept" does not exist, skipping
+NOTICE:  CREATE TRIGGER audit_trigger_row AFTER INSERT OR UPDATE OR DELETE ON dept FOR EACH ROW EXECUTE PROCEDURE audit.if_modified_func('true');
+NOTICE:  CREATE TRIGGER audit_trigger_stm AFTER TRUNCATE ON dept FOR EACH STATEMENT EXECUTE PROCEDURE audit.if_modified_func('true');
+ audit_table 
+-------------
+ 
+(1 row)
+~~~
+
+* Realizamos algunas operaciones DML.
+
+~~~
+empresa=# select * from dept;
+ deptno |   dname    |   loc    
+--------+------------+----------
+     10 | ACCOUNTING | NEW YORK
+     20 | RESEARCH   | DALLAS
+     30 | SALES      | CHICAGO
+     40 | OPERATIONS | BOSTON
+(4 rows)
+
+empresa=# insert into dept values(50,'LIMPIADOR','MORON');
+INSERT 0 1
+empresa=# delete from dept where deptno=50;
+DELETE 1
+~~~
+
+* Hacemos una consulta para ver las operaciones que se han realizado que en este caso será en la vista `logged_actions`.
+
+~~~
+empresa=# select session_user_name, action, table_name, action_tstamp_clk, client_query
+empresa-# from audit.logged_actions;
+
+ session_user_name | action | table_name |       action_tstamp_clk       |                  client_query                   
+-------------------+--------+------------+-------------------------------+-------------------------------------------------
+ postgres          | D      | dept       | 2023-03-08 08:22:53.249753+00 | delete from dept where deptno=50;
+ postgres          | I      | dept       | 2023-03-08 08:23:12.649005+00 | insert into dept values(50,'LIMPIADOR','MORON')+
+                   |        |            |                               | ;
+(2 rows)
+~~~
+
 8. Averigua si en MySQL se pueden realizar los apartados 1, 3 y 4. Si es así, documenta el proceso adecuadamente.
 
 * Instalamos el plugin de auditoria.
