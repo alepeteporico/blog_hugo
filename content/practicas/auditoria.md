@@ -601,46 +601,148 @@ vagrant@buster:~$ sudo apt-get install -y mongodb-enterprise
 * Una vez instalado debemos activar las auditorias y el repositorio donde se guardarán. Para ello añadimos lo siguiente el fichero de configuración `/etc/mongod.conf`
 
 ~~~
-storage:
-  dbPath: data/db
 auditLog:
   destination: file   
   format: JSON
-  path: data/db/auditLog.json
+  path: /var/lib/mongodb/auditLog.json
 ~~~
 
-* Creamos la carpeta y el fichero de auditorias.
+* Después de reiniciar ya se estarían auditando los cambios en el fichero de log. Vamos a hacer algunos cambios.
+
+#### Creación de usuario.
 
 ~~~
-vagrant@buster:~$ mkdir data/db
-
-vagrant@buster:~$ cat > data/db/auditLog.json
+db.createUser({user: 'admin', pwd: 'admin', roles: [{role: 'userAdminAnyDatabase', db: 'admin'}, {role: 'readWriteAnyDatabase', db: 'admin'}]})
 ~~~
 
-* Para auditorar los cambios que se hacen debemo usar la siguiente herramienta que informará de todas las modificaciones, inserciones y borrados de los documentos
+#### Creación de colección.
 
 ~~~
-mongod --dbpath data/db --auth --setParameter auditAuthorizationSuccess=true --auditDestination file --auditFilter '{ atype: "authCheck", "param.command": { $in: [ "find", "insert", "delete", "update", "findandmodify" ] } }' --auditFormat JSON --auditPath data/db/auditLog.json
+Enterprise test> use prueba
+switched to db prueba
+Enterprise prueba> db.createCollection("empleados")
+{ ok: 1 }
 ~~~
 
-* Si tambień queremos auditar la creación y borrado de las colecciones podemos usar la siguiente variante.
+* Para ver los logs usamos:
 
 ~~~
-mongod --dbpath data/db --auditDestination file --auditFilter '{ atype: { $in: [ "createCollection", "dropCollection" ] } }' --auditFormat JSON --auditPath data/db/auditLog.json
+vagrant@mongoagv:~$ sudo cat /var/lib/mongodb/auditLog.json | jq
 ~~~
 
-* Ya tenemos el fichero y las auditorias, como las tenemos en json podemos visualizarlas de una forma mas legible a como están habitualmente, para ello podemos intalar la herramienta `jq`
+* Vemos la creación de un usuario.
 
 ~~~
-
+{
+  "atype": "createUser",
+  "ts": {
+    "$date": "2023-03-08T09:09:32.012+00:00"
+  },
+  "uuid": {
+    "$binary": "4lEZ0pSvRWet2HKP/V+QbA==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 46796
+  },
+  "users": [],
+  "roles": [],
+  "param": {
+    "user": "admin",
+    "db": "admin",
+    "roles": [
+      {
+        "role": "readWriteAnyDatabase",
+        "db": "admin"
+      },
+      {
+        "role": "userAdminAnyDatabase",
+        "db": "admin"
+      }
+    ]
+  },
+  "result": 0
+}
 ~~~
 
-1.   Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.
-
-* Si que tenemos esa posibilidad.
+* Creación de la colección:
 
 ~~~
-mongod --dbpath data/db --auth --auditDestination file --auditFilter '{ atype: "authenticate", "param.db": "test" }' --auditFormat BSON --auditPath data/db/auditLog.bson
+{
+  "atype": "authenticate",
+  "ts": {
+    "$date": "2023-03-08T09:12:34.042+00:00"
+  },
+  "uuid": {
+    "$binary": "ugIel7WaQgKDCE6MQsIiXw==",
+    "$type": "04"
+  },
+  "local": {
+    "ip": "127.0.0.1",
+    "port": 27017
+  },
+  "remote": {
+    "ip": "127.0.0.1",
+    "port": 46796
+  },
+  "users": [
+    {
+        "user": "admin",
+        "db": "admin"
+    }
+  ],
+  "roles": [
+    {
+        "role": "readWriteAnyDatabase",
+        "db": "admin"
+    },
+    {
+        "role": "userAdminAnyDatabase",
+        "db": "admin"
+    }
+  ],
+  "param": {
+    "user": "admin",
+    "db": "admin",
+    "mechanism": "SCRAM-SHA-256"
+  },
+  "result": 0
+}
 ~~~
 
-* Para saber más sobre las auditorias en mongo podemos ir a [la pagina oficial](https://www.mongodb.com/docs/manual/tutorial/configure-audit-filters/).
+10.   Averigua si en MongoDB se pueden auditar los accesos a una colección concreta. Demuestra su funcionamiento.
+
+* Si que tenemos esa posibilidad mediante la siguiente orden.
+
+~~~
+db.setLogLevel(level, component)
+~~~
+
+* Vamos a ver tanto los levels como los components:
+
+#### levels:
+
+`0`: Nada
+
+`1`: Errores
+
+`2`: Errores y advertencias
+
+`3`: Errores, advertencias y mensajes informativos.
+
+`4`: Errores, advertencias, mensajes informativos y mensajes de depuración
+
+#### components:
+
+**“accessControl”, “command”, “index”, “query”, “replication”, “sharding”, “storage”, “write”, “audit”, “cluster”, “control”, “ftdc”, “geo”, “network”, “query”, “repl”, “security”, “sharding”, “storage”, “write”.**
+
+* Nosotros queremos ver los accesos, por lo que usaremos el componente "accesControl" y por ejemplo el nivel 3.
+
+~~~
+db.setLogLevel(3, "accessControl")
+~~~
